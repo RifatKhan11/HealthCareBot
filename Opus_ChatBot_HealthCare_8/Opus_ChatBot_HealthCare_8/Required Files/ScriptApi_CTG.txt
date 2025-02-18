@@ -1,0 +1,68 @@
+<script>
+    (function () {
+
+
+
+    var chatIcon = document.createElement('img');
+    chatIcon.id = 'chatIcon';
+    localStorage.setItem('botKey', '2C2FEB08-EA3F-491F-9BEC-CF5E11DBEFBB');
+    document.cookie = `${'botKey'}=${'2C2FEB08-EA3F-491F-9BEC-CF5E11DBEFBB'}`;
+    chatIcon.src = 'https://tota.opuserp.com/chatbox/chatBot.png';
+    chatIcon.style = 'position:fixed;bottom:80px; right: 20px; width: 95px; height: 120px; cursor: pointer;padding:-0px;z-index: 4; ';
+    document.body.appendChild(chatIcon);
+
+    var IconAnimation = document.createElement('div');
+    IconAnimation.id = 'IconAnimation';
+    localStorage.setItem('botKey', '2C2FEB08-EA3F-491F-9BEC-CF5E11DBEFBB');
+    document.cookie = `${'botKey'}=${'2C2FEB08-EA3F-491F-9BEC-CF5E11DBEFBB'}`;
+    IconAnimation.innerHTML = '<p></p>';
+    IconAnimation.style = 'position:fixed;bottom:102px;border-radius: 50%;animation: ripple 2s infinite; right: 20px; width: 90px; height: 97px; cursor: pointer;padding:-0px;';
+    document.body.appendChild(IconAnimation);
+
+    var IconTitle = document.createElement('div');
+    IconTitle.id = 'IconTitle';
+    localStorage.setItem('botKey', '2C2FEB08-EA3F-491F-9BEC-CF5E11DBEFBB');
+    document.cookie = `${'botKey'}=${'2C2FEB08-EA3F-491F-9BEC-CF5E11DBEFBB'}`;
+    IconTitle.innerHTML = '<p>Hello, how can I help you?</p>';
+    IconTitle.style = 'position:fixed;bottom:200px;text-align:center;padding-top: 2px; border-radius: 20px;right: 20px; width: 230px; height: 30px; background-color: #41385d; color: #0eeee9;';
+    document.body.appendChild(IconTitle);
+
+    var Icon = document.createElement('img');
+    Icon.id = 'btnclose';
+    localStorage.setItem('botKey', '2C2FEB08-EA3F-491F-9BEC-CF5E11DBEFBB');
+    document.cookie = `${'botKey'}=${'2C2FEB08-EA3F-491F-9BEC-CF5E11DBEFBB'}`;
+    Icon.src = 'https://tota.opuserp.com/chatbox/closebtn.png';
+    Icon.style = 'position:fixed;opacity:0; transition: bottom 88s cubic-bezier(0.895, 0.03, 0.685, 0.22);transition-delay: 120s; bottom:4px; right: 20px; width: 38px; height: 36px; cursor: pointer; z-index: 10000 ';
+    document.body.appendChild(Icon);
+
+
+    var iframe = document.createElement('iframe');
+    iframe.src = 'https://tota.opuserp.com/CustoomChatBox/MyChatbotCTG?botKey=' + '2C2FEB08-EA3F-491F-9BEC-CF5E11DBEFBB';
+    iframe.style = 'position:fixed;bottom:-96vh;right:10px;width:390px;height: calc(100vh - 50px);z-index:9999;border: 0;transition: bottom 0.8s cubic-bezier(0.895, 0.03, 0.685, 0.22); border-radius:15px;';
+    iframe.className = 'iframe';
+    document.body.appendChild(iframe);
+
+    var isIframeVisible = false;
+
+    chatIcon.addEventListener('click', function () {
+        if (isIframeVisible) {
+            iframe.style.bottom = '-96vh'; // Slide down to hide the iframe
+
+        } else {
+            iframe.style.bottom = '5px'; // Slide up to show the iframe
+            Icon.style.display = 'block';
+            Icon.style.bottom = '4px';
+            Icon.style.opacity = 1;
+
+        }
+        isIframeVisible = !isIframeVisible; // Toggle the visibility flag
+    });
+
+    $("#btnclose").click(function () {
+        iframe.style.bottom = '-96vh';
+        $("#btnclose").hide();
+    });
+
+})();
+</script>
+
