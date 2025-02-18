@@ -1,0 +1,14 @@
+﻿{
+  "myQues": "আমার প্রশ্ন?",
+  "nextQues": "না",
+  "view": "হ্যাঁ",
+  "menu": "মেনু",
+  "back": "পেছনে",
+  "sorry": "দুঃখিত! :(  দয়াকরে মেনু থেকে সিলেক্ট করুন :)",
+  "selectFromBelow": "নিচের অপশন থেকে দেখুন",
+  "ask": "প্রশ্ন করুন",
+  "didYouMean": "Did you mean?",
+  "askMobile": "Enter your mobile number",
+  "more": "বিস্তারিত",
+  "quesFeedBack": "I received your question let you know when I got the answer. Thanks"
+}

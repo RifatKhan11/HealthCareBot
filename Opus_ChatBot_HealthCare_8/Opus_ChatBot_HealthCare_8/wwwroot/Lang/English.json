@@ -1,0 +1,14 @@
+{
+  "myQues": "My Question?",
+  "nextQues": "no",
+  "view": "yes",
+  "menu": "Menu",
+  "back": "Back",
+  "sorry": "Sorry! :(  Please select from menu :)",
+  "selectFromBelow": "Select From Below",
+  "ask": "Ask",
+  "didYouMean": "Did you mean?",
+  "askMobile": "Enter your mobile number",
+  "more": "more",
+  "quesFeedBack": "I received your question let you know when I got the answer. Thanks"
+}
