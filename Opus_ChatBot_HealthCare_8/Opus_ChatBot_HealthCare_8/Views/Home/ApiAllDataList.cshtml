@@ -1,0 +1,546 @@
+﻿ 
+@model DashboardViewModel
+
+@{
+    ViewData["Title"] = "Api Data";
+}
+
+@section Style{
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+
+    <style>
+        #loader {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999; /* Ensure it appears on top of other content */
+}
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+    </style>
+
+}
+
+  
+
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-chart-area"></i>
+        Today:
+    </div>
+    <div class="card-body">
+
+        <div class="row">
+            <div class="col-xl-3 col-sm-6 mb-4">
+                <div class="card text-white bg-info o-hidden h-100">
+                    <div class="card-body">
+                        <div class="card-body-icon">
+                            <i class="fas fa-fw fa-list"></i>
+                        </div>
+                        <div class="mr-5"> <span id="totalDept"></span></div>
+                    </div>
+
+                    <a class="card-footer text-white clearfix small z-1" onclick="Department()">
+                        <span class="float-left">Total Departments</span>
+                        <span class="float-right">
+                            
+                        </span>
+                    </a>
+                </div>
+                @* <button type="button" onclick="pullDepartment()">Pull Department</button> *@
+                <button type="button" style="float: left; background-color: #0d99af; color: white; border: none; padding: 3px; width: 115px; border-radius: 2px; margin-top: 3px"  onclick="pullDepartment()">Pull</button>
+                <button type="button" style="float: right; background-color: gray; color: white; border: none; padding: 3px; width: 115px; border-radius: 2px; margin-top: 3px" onclick="Department()">List</button>
+            </div>
+
+            <div class="col-xl-3 col-sm-6 mb-4">
+                <div class="card text-white bg-danger o-hidden h-100">
+                    <div class="card-body">
+                        <div class="card-body-icon">
+                            <i class="fas fa-fw fa-shopping-cart"></i>
+                        </div>
+                        <div class="mr-5"> <span id="totalDoctors"></span></div>
+                    </div>
+                    <a class="card-footer text-white clearfix small z-1" onclick="Doctor()">
+                        <span class="float-left">Total Doctors</span>
+                        
+                    </a>
+                </div>
+                @* <button type="button" onclick="pullDoctor()">Pull Doctor</button> *@
+                <button type="button" style="float: left; background-color: #dc3545; color: white; border: none; padding: 3px; width: 115px; border-radius: 2px; margin-top: 3px"  onclick="pullDoctor()">Pull</button>
+                <button type="button" style="float: right; background-color: gray; color: white; border: none; padding: 3px; width: 115px; border-radius: 2px; margin-top: 3px"  onclick="Doctor()">List</button>
+            </div>
+             
+            
+            <div class="col-xl-3 col-sm-6 mb-4">
+                <div class="card text-white bg-primary o-hidden h-100">
+                    <div class="card-body">
+                        <div class="card-body-icon">
+                            <i class="fas fa-fw fa-comments"></i>
+                        </div>
+                        <div class="mr-5"> <span id="totalSpc"></span></div>
+                    </div>
+                    
+                    <a class="card-footer text-white clearfix small z-1" onclick="Specialisation()">
+                        <span class="float-left">Total Specialisation</span>
+                        <span class="float-right"> 
+                        </span>
+                    </a>
+                </div>
+                <button type="button" style="float: left; background-color: #1f6cf9; color: white; border: none; padding: 3px; width: 115px; border-radius: 2px; margin-top: 3px"  onclick="pullSpecialization()">Pull</button>
+                <button type="button" style="float: right; background-color: gray; color: white; border: none; padding: 3px; width: 115px; border-radius: 2px; margin-top: 3px"  onclick="Specialisation()">List</button>
+            </div>
+             <div class="col-xl-3 col-sm-6 mb-4">
+                
+                   <div class="card text-white bg-success" style="margin-top: 40px">
+                     
+                  @*   <a class="card-footer text-white bg-success clearfix small z-1" style="height: 50px; text-align: center; font-size: 17px" >
+                        <span>Process</span>
+                         
+                    </a> *@
+                    <a class="card-footer text-white bg-success  small z-1" style="text-align: center; font-size: 17px" onclick="Process()">
+                        <span>Process</span>
+                         
+                    </a>
+                </div>
+                 
+            </div>
+        </div>
+
+    </div>
+    <div class="card-footer small text-muted">Updated Today- @DateTime.Now</div>
+</div>
+
+  
+
+<div class="card mb-3" id="depId" style="display: none">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+       Departments
+          
+    </div>
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0" id="tblDepartmentInfo">
+                <thead>
+                    <tr>
+                        <th>#SL</th>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Facility</th>
+                        <th>Status</th>
+
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="dtDepartmentInfo">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+ 
+   
+<div class="card mb-3" id="docId" style="display: none">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-4">
+                <i class="fas fa-table"></i>
+                Doctor
+            </div>
+            <div class="col-8">
+                 
+                    <div class="form-group row">
+                        <label class="col-md-3" style="font-size: 17px; font-weight: 500">Specialisation</label>
+                        <div class="col-md-5"> 
+                            <input type="text" id="specialisationName" class="form-control" />
+                        </div>
+                        <div class="col-md-4">
+                        <button type="button" style="float: left; background-color: gray; color: white; border: none; padding: 5px 15px;margin: 2px; border-radius: 2px; margin-top: 3px" onclick="Search()">Search</button>
+                        <button type="button" id="InActivebtn" style="float: left; background-color: lightsalmon; color: white; border: none; padding: 5px 15px;margin: 2px; border-radius: 2px; margin-top: 3px;" onclick="InActive()">InActive All</button>
+
+                        </div>
+
+ 
+                    </div>
+                 
+            </div>
+        </div>
+         
+          
+    </div>
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0" id="tblDoctor">
+                <thead>
+                    <tr>
+                        <th>#SL</th>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Specialisation</th>
+                        <th>Facility</th>
+                        <th>Status</th>
+
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="dtDoctor">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+ 
+ 
+<div class="card mb-3" id="speId" style="display: none">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+       Specialisation
+          
+    </div>
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0" id="tblSpecialisation">
+                <thead>
+                    <tr>
+                        <th>#SL</th>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                         <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="dtSpecialisation">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="myModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Process Data</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Department: <span id="departmentResult"></span></p>
+                <p>Doctor: <span id="doctorResult"></span></p>
+                <p>Specialisation: <span id="specialisationResult"></span></p>
+            </div>
+            <div class="modal-footer">
+                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+ <div id="loader" class="text-center" style="display: none; background-color: #ffffff94; width: 100%; height:100%;">
+                    <div class="loader-box" style="margin: 130px"><img src="https://i.gifer.com/ZhKG.gif""></div>
+    </div>
+
+@section Scripts{
+
+    <script src="~/js/demo/chart-area-demo.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            
+             
+            var botKey = '20dddd7c-734e-4c80-bbed-fae386e0291e';
+            Common.Ajax('GET', '/Home/GetAllApiInsertData', [], 'json', ajaxData);
+
+
+            $('#InActivebtn').hide();
+        });
+
+ function ajaxData(res) {
+                $('#totalDoctors').html(res[0].totalDoctors);
+                 $('#totalSpc').html(res[0].totalSpc);
+                $('#totalDept').html(res[0].totalDept);
+
+            } 
+
+
+            function Department(){
+                $('#depId').show();
+                $('#docId').hide();
+                $('#speId').hide();
+                 Common.Ajax('GET', '/Appointment/GetAllApiDepartmentData', [], 'json', ajaxDepartmentData, false);
+            }
+        
+
+
+ function ajaxDepartmentData(res) {
+     var option = '';
+     var status = '';
+     var InActivebtn = '';
+    $.each(res, function (i, item) {
+        if (item.isDelete == 1) {
+                    status = 'InActive';
+                    InActivebtn = '';
+        }
+        else {
+                    status = 'Active';
+                    InActivebtn = `<a class="btn btn-sm btn-danger" style="color: white;font-size: 14px;" onclick="DeleteDepartment(${item.id})">InActive</a>`;
+        }
+         
+        option += `<tr  id="DepartmentRow-${item.id}">
+                      <td>${i + 1}</td>
+                      <td>${item.code}</td>
+                      <td>${item.name}</td>
+                      <td>${status}</td>
+                      <td>${item.facility}</td>
+                              <td> ${InActivebtn}</td>
+                    </tr>`;
+    });
+
+    $('#dtDepartmentInfo').empty();
+    $('#dtDepartmentInfo').append(option);
+}
+
+        function Search() {
+            $('#depId').hide();
+            $('#docId').show();
+            $('#speId').hide();
+            $('#InActivebtn').show();
+            var specialisation = $('#specialisationName').val();
+            Common.Ajax('GET', '/Appointment/GetAllApiDoctorDataBySpecialisation?specialisation=' + specialisation, [], 'json', ajaxDoctorData, false);
+        }
+        function InActive() {
+            $('#depId').hide();
+            $('#docId').show();
+            $('#speId').hide();
+            $('#InActivebtn').hide();
+            var specialisation = $('#specialisationName').val();
+            Common.Ajax('GET', '/Appointment/InActiveApiDoctorData?specialisation=' + specialisation, [], 'json', ajaxDoctorData, false);
+        }
+
+
+        function Doctor(){
+                $('#depId').hide();
+                $('#docId').show();
+                $('#speId').hide();
+                 Common.Ajax('GET', '/Appointment/GetAllApiDoctorData', [], 'json', ajaxDoctorData, false);
+            }
+        
+
+
+ function ajaxDoctorData(res) {
+     var option = '';
+     var status = '';
+            var InActivebtn = '';
+    $.each(res, function (i, item) {
+                if (item.isDelete == 1) {
+                    status = 'InActive';
+                    InActivebtn = '';
+                }
+                else {
+                    status = 'Active';
+                    InActivebtn = `<a class="btn btn-sm btn-danger" style="color: white;font-size: 14px;" onclick="DeleteDoctor(${item.id})">InActive</a>`;
+                }
+        option += `<tr id="doctorRow-${item.id}">  
+                      <td>${i + 1}</td>
+                      <td>${item.code}</td>
+                      <td>${item.name}</td>
+                      <td>${item.specialization}</td>
+                      <td>${item.facility}</td>
+                       <td>${status}</td>
+                       <td> ${InActivebtn}</td>
+                    </tr>`;
+    });
+
+    $('#dtDoctor').empty();
+    $('#dtDoctor').append(option);
+}
+
+ function Specialisation(){
+                $('#depId').hide();
+                $('#docId').hide();
+                $('#speId').show();
+                 Common.Ajax('GET', '/Appointment/GetAllApiSpecialisationData', [], 'json', ajaxSpecialisationData, false);
+            }
+        
+
+
+ function ajaxSpecialisationData(res) {
+     var option = '';
+            var status = '';
+            var InActivebtn = '';
+    $.each(res, function (i, item) {
+                if (item.isDelete == 1) {
+                    status = 'InActive';
+                    InActivebtn = '';
+                }
+                else {
+                    status = 'Active';
+                    InActivebtn = `<a class="btn btn-sm btn-danger" style="color: white;font-size: 14px;" onclick="DeleteSpecialisation(${item.id})">InActive</a>`;
+                }
+        option += `<tr  id="SpecialisationRow-${item.id}">
+                      <td>${i + 1}</td>
+                      <td>${item.code}</td>
+                      <td>${item.name}</td>
+                       <td>${status}</td>
+                                <td> ${InActivebtn}</td>
+                        
+                    </tr>`;
+    });
+
+    $('#dtSpecialisation').empty();
+    $('#dtSpecialisation').append(option);
+}
+
+
+ function DeleteDepartment(id) {
+             
+            $.ajax({
+                     url: '/Appointment/DeleteApiDepartment?id=' + id,
+                     method: 'GET',
+                     success: function (data) {
+                         //  console.log('Doctors pulled successfully', data);
+                         $('#DepartmentRow-' + id).remove(); 
+                        Common.Ajax('GET', '/Home/GetAllApiInsertData', [], 'json', ajaxData);
+
+                     },
+                     error: function (error) {
+                         location.reload();  
+                     }
+                 });
+
+        }
+
+        function DeleteDoctor(id) {
+           
+
+             $.ajax({
+                     url: '/Appointment/DeleteApiDoctor?id=' + id, 
+                     method: 'GET',
+                     success: function (data) {
+                            //location.reload();   
+                            $('#doctorRow-' + id).remove();
+                            Common.Ajax('GET', '/Home/GetAllApiInsertData', [], 'json', ajaxData);
+                     },
+                     error: function (error) {
+                      }
+                 });
+
+
+        }
+
+     
+
+        function DeleteSpecialisation(id) {
+           
+
+             $.ajax({
+                     url: '/Appointment/DeleteApiSpecialisation?id=' + id, 
+                     method: 'GET',
+                     success: function (data) {
+                           $('#SpecialisationRow-' + id).remove();  
+                          Common.Ajax('GET', '/Home/GetAllApiInsertData', [], 'json', ajaxData); 
+                     },
+                     error: function (error) {
+                         location.reload();  
+                     }
+                 });
+
+
+        }
+
+        function pullDoctor() {
+                 $.ajax({
+                     url: '/Home/PullApiDoctor',  
+                     method: 'GET',
+                     success: function (data) {
+                           //location.reload(); 
+                          // $('#totalDoctors').text(data);
+                            Common.Ajax('GET', '/Home/GetAllApiInsertData', [], 'json', ajaxData);
+                  
+                           Doctor();
+                     },
+                     error: function (error) {
+                          
+                     }
+                 });
+                
+        }
+
+         function pullDepartment() {
+                 $.ajax({
+                     url: '/Home/PullApiDepartment',  
+                     method: 'GET',
+                     success: function (data) {
+                          
+                        //$('#totalDept').text(data);  
+                       Common.Ajax('GET', '/Home/GetAllApiInsertData', [], 'json', ajaxData);
+
+                        Department();
+
+                     },
+                     error: function (error) {
+                          
+                     }
+                 });
+                 
+        }
+
+         function pullSpecialization() {
+                 $.ajax({
+                     url: '/Home/PullApiSpecialization',  
+                     method: 'GET',
+                     success: function (data) {
+                         //$('#totalSpc').text(data);
+                         Common.Ajax('GET', '/Home/GetAllApiInsertData', [], 'json', ajaxData);
+                          Specialisation();
+                     },
+                     error: function (error) {
+                          
+                     }
+                 });
+              
+        }
+
+
+       function Process() {
+           $('#loader').show();
+
+            $.ajax({
+                //url: '/api/UpdateAllApiData',
+                url: '/api/AllApiUpdateData',
+                method: 'GET',
+                success: function (data) {
+                     console.log("sdfh", data);
+                     $('#departmentResult').text(data.departmentResult);
+                     $('#doctorResult').text(data.doctorResult);
+                     $('#specialisationResult').text(data.specialisationResult);
+                      
+                    $('#loader').hide();
+                    $('#myModal').modal('show');
+                },
+                error: function (error) {
+                    console.error("Error:", error);
+                }
+            });
+     }
+
+            
+    </script>
+
+   <script type="text/javascript">
+        
+
+    </script>
+ }

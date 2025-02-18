@@ -1,0 +1,97 @@
+﻿@model RegisterViewModel
+@{
+    ViewData["Title"] = "New Bot";
+}
+
+
+<div class="row">
+    <div class="col-md-12">
+        <form asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+            <h4>Create New Bot.</h4>
+            <hr />
+            <div asp-validation-summary="All" class="text-danger col-12"></div>
+
+            <div class="row">
+
+                <div class="col-6">
+                    <div class="form-group">
+                        <label asp-for="Name">Username</label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Email"></label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Password"></label>
+                        <input asp-for="Password" class="form-control" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="GrettingsNameEn"></label>
+                        <input asp-for="GrettingsNameEn" class="form-control" />
+                        <span asp-validation-for="GrettingsNameEn" class="text-danger"></span>
+                    </div>
+
+                </div>
+
+                <div class="col-6">
+                    <div class="form-group d-none">
+                        <label asp-for="PageId"></label>
+                        <input asp-for="PageId" class="form-control" value="@Guid.NewGuid()" />
+                        <span asp-validation-for="PageId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="BotName"></label>
+                        <input asp-for="BotName" class="form-control" value="" />
+                        <span asp-validation-for="BotName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Phone"></label>
+                        <input asp-for="Phone" class="form-control" />
+                        <span asp-validation-for="Phone" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ConfirmPassword"></label>
+                        <input asp-for="ConfirmPassword" class="form-control" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                    </div>
+                    <div class="form-group d-none">
+                        <label asp-for="PageAccessToken"></label>
+                        <input asp-for="PageAccessToken" class="form-control" value="@Guid.NewGuid()" />
+                        <span asp-validation-for="PageAccessToken" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group d-none">
+                        <label asp-for="UserFbId"></label>
+                        <input asp-for="UserFbId" class="form-control" value="@Guid.NewGuid()" />
+                        <span asp-validation-for="UserFbId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group d-none">
+                        <label asp-for="PageGreetingMessage"></label>
+                        <input asp-for="PageGreetingMessage" class="form-control" value="test" />
+                        <span asp-validation-for="PageGreetingMessage" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="GrettingsNameBn"></label>
+                        <input asp-for="GrettingsNameBn" class="form-control" />
+                        <span asp-validation-for="GrettingsNameBn" class="text-danger"></span>
+                    </div>
+                </div>
+
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Create Bot</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

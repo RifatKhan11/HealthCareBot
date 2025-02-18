@@ -1,0 +1,128 @@
+﻿@model OperatorViewModel
+@{
+    ViewData["Title"] = "Create Operator";
+}
+
+<ol class="breadcrumb">
+    <li class="breadcrumb-item">
+        <a href="/">Dashboard</a>
+    </li>
+    <li class="breadcrumb-item active">Create Operator</li>
+</ol>
+
+<!-- Area Chart Example-->
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Create Operator
+    </div>
+    <div class="card-body" id="EditSection">
+
+        <form asp-controller="MasterData" asp-action="IndexOperator" onsubmit="return CheckStatus()" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <input type="hidden" class="form-control" id="Id" name="Id" value="">
+           
+
+            <div class="form-group">
+                <label for="ParrentMenuName">Operator Name</label>
+                <input type="text" class="form-control" id="questioncategoryName" value="" name="questioncategoryName" required>
+            </div>
+
+            <input type="submit" class="btn btn-primary" value="Save Changes">
+        </form>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Operator List
+    </div>
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>#SL</th>
+                        <th>Operator Name</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var count = 1;
+                    }
+                    @foreach (var data in Model.operators)
+                    {
+                    <tr>
+                        <td>@count</td>
+                        <td>@data.operatorName</td>
+                       
+                        <td>
+                            <a href="#EditSection" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Edit Question" onclick="Edit('@data.Id','@Html.Raw(HttpUtility.JavaScriptStringEncode(data.operatorName))')"><i class="fas fa-edit"></i></a>
+
+                            <form asp-controller="MasterData" asp-action="DeleteOperator" method="post">
+                                <input type="hidden" name="id" value="@data.Id" />
+                                <button type="submit" class="btn btn-danger btn-sm mt-2" data-toggle="confirmation-singleton" data-singleton="true" data-btn-ok-icon-class="material-icons" data-btn-ok-icon-content="check" data-btn-cancel-icon-class="material-icons" data-btn-cancel-icon-content="close" data-title="Are sure to delete it?">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+
+                        </td>
+                    </tr>
+                        count++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('#dataTable').DataTable({
+                "columnDefs": [
+                    { "width": "10%", "targets": 0 },
+                    { "width": "80%", "targets": 1 },
+                    { "width": "10%", "targets": 2 },
+                    
+                ],
+                "pageLength": 100
+            });
+
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            });
+
+        });
+
+        
+
+        function Edit(id,question) {
+            $("#Id").val(id);
+       
+            $("#questioncategoryName").val(question);
+          
+        }
+
+        function CheckStatus() {
+            if ($("#questioncategoryName").val() == "" ) {
+                swal("Opps!!!", "Please enter correctly", "error");
+                return false;
+            }
+            return true;
+        }
+
+        $('[data-toggle=confirmation-singleton]').confirmation({
+            rootSelector: '[data-toggle=confirmation-singleton]',
+            container: 'body'
+        });
+
+    </script>
+}

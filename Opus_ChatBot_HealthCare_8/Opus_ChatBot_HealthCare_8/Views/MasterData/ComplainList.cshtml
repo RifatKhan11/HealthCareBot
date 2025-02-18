@@ -1,0 +1,70 @@
+﻿@model OperatorViewModel
+@{
+    ViewData["Title"] = "Complaint List";
+}
+
+<ol class="breadcrumb">
+    <li class="breadcrumb-item">
+        <a href="/">Dashboard</a>
+    </li>
+    <li class="breadcrumb-item active">Complaint List</li>
+</ol>
+
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Complaint List
+    </div>
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>#SL</th>
+                        <th>Complaint text</th>
+                        <th>Passport Number</th>
+                        
+                        <th>Date & Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var count = 1;
+                    }
+                    @foreach (var data in Model.complainSuggestions.OrderByDescending(x => x.Id))
+                    {
+                    <tr>
+                        <td>@count</td>
+                        <td>@data.text</td>
+                        <td>@data.passportNumber</td>
+                        <td>@data?.dateTime</td>
+                       
+                    </tr>
+                        count++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('#dataTable').DataTable({
+
+                "pageLength": 100
+            });
+
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            });
+
+        });
+        
+
+    </script>
+}

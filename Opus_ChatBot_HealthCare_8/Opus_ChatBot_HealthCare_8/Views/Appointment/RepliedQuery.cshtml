@@ -1,0 +1,294 @@
+﻿@model UserFeedbackViewModel
+@{
+    ViewData["Title"] = "Queries List";
+}
+
+@section Style{
+    <link href="https://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="Stylesheet">
+    @*<link href="https://www.jqueryscript.net/demo/Material-Time-Picker-Plugin-jQuery-MDTimePicker/mdtimepicker.css" rel="Stylesheet">*@
+    <link href="~/css/jquery.datetimepicker.css" rel="stylesheet" />
+    <link href="~/SweetAlert/sweetalert2.css" rel="stylesheet" />
+}
+<style>
+    .swal2-icon {
+        width: 2em !important;
+        height: 2em !important;
+        margin: 0.25em auto 0.5em !important;
+        border: 0.25em solid transparent;
+    }
+</style>
+
+<div class="row mb-5">
+    <div class="col-md-4">
+        <label for="fromDate" class="col-sm-12 col-form-label text-left">From Date <span class="redStar">*</span></label>
+        <div class="col-sm-12 input-group">
+            @*<input id="frmDate" class="form-control input-group-sm" value="@DateTime.Now.ToString("yyyy-MM-dd")" readonly />*@
+            <input id="frmDate" class="form-control input-group-sm" readonly />
+
+        </div>
+    </div>
+    <div class="col-md-4">
+        <label for="fromDate" class="col-sm-12 col-form-label text-left">To Date <span class="redStar">*</span></label>
+        <div class="col-sm-12 input-group">
+            <input id="toDate" class="form-control input-group-sm" readonly />
+
+        </div>
+    </div>
+    <div class="col-md-4" style="padding: 30px 0px">
+        <button id="loadData" onclick="loadData()" title="Load" style="float:left;font-size: 16px;" class="btn btn-primary ml-1 m-1">Load</button>
+
+        <a href="#" id="ExcelButton" title="xlsx" style="float:left;font-size: 16px;" class="btn btn-info ml-1 m-1">xlsx</a>&nbsp;&nbsp;&nbsp;
+        <a href="#" id="ExcelButtonxls" title="xls" style="float:left;font-size: 16px;" class="btn btn-info ml-1 m-1">xls</a>&nbsp;&nbsp;&nbsp;
+        <a href="#" id="ExcelButtonCsv" title="csv" style="float:left;font-size: 16px;" class="btn btn-info ml-1 m-1">csv</a>&nbsp;&nbsp;&nbsp;
+
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Replied Queries
+    </div>
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0" id="tblVisitorInfo">
+                <thead>
+                    <tr>
+                        <th>#SL</th>
+                        <th>UHID</th>
+                        <th>Phone</th>
+                        <th>Time</th>
+                        <th>Date</th>
+                        <th>Message</th>
+                        <th>Reply</th>
+                    </tr>
+                </thead>
+                <tbody id="dtVisitorInfo">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+ 
+
+@section Scripts{
+    <script src="https://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+    @*<script src="https://www.jqueryscript.net/demo/Material-Time-Picker-Plugin-jQuery-MDTimePicker/mdtimepicker.js"></script>*@
+    <script src="~/js/jquery.datetimepicker.js"></script>
+    <script src="~/SweetAlert/sweetalert2.common.js"></script>
+    <script src="~/SweetAlert/sweetalert2.js"></script>
+    <script>
+        $(document).ready(function () {
+            var date = '@DateTime.Now.ToString("MM-dd-yyyy")';
+            $('#frmDate').datetimepicker();
+            $('#toDate').datetimepicker();
+
+             
+
+            $('#dataTable').DataTable({
+
+                "pageLength": 100
+            });
+
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            });
+
+            Common.Ajax('GET', '/Appointment/GetAllRepliedQueryData', [], 'json', ajaxQueriesData, false);
+
+        });
+
+        function ajaxQueriesData(res) {
+            //console.log("data", res);
+            var option = '';
+            $.each(res, function (i, item) {
+                var status = 'light';
+                if (item.appointStatus == 'Application') {
+                    status = 'warning';
+                }
+                else if (item.appointStatus == 'Called') {
+                    status = 'info';
+                }
+                else if (item.appointStatus == 'Scheduled') {
+                    status = 'success';
+                }
+                else if (item.appointStatus == 'Rejected') {
+                    status = 'danger';
+                }
+                else {
+
+                }
+
+                var replied = '';
+                var replyBtn = ' ';
+                if (item.replied == 1) {
+                    replied = 'lightcyan';
+                    replyBtn = '';
+                }
+
+                option += `<tr style="background-color: ${replied}">
+                                         <td>${i + 1}</td>
+                                         <td>${item.uhid}</td>
+                                        <td>${item.phone != null ? item.phone : ""}</td>
+                                         <td>${item.querytime}</td>
+                                         <td>${item.querydate}</td>
+                                         <td>${item.query}</td>
+                                         <td>${item.replyText}</td>
+                                        </tr>`
+            })
+
+            $('#dtVisitorInfo').empty();
+            $('#dtVisitorInfo').append(option);
+        }
+
+
+
+
+        function loadData() {
+            var frmDate = $('#frmDate').val();
+            var toDate = $('#toDate').val();
+            Common.Ajax('GET', '/Appointment/GetAllRepliedQueryData2?frmDate=' + frmDate + '&toDate=' + toDate, [], 'json', ajaxQueriesData2, false);
+
+
+        }
+
+
+        $("#ExcelButton").click(function (e) {
+            var frmDate = $('#frmDate').val();
+            var toDate = $('#toDate').val();
+            var a = document.createElement('a');
+            a.target = "_blank";
+            a.href = '/Appointment/RepliedQueryDataExcel?frmDate=' + frmDate + '&toDate=' + toDate, '_blank';
+            a.click();
+
+        });
+        $("#ExcelButtonxls").click(function (e) {
+            var frmDate = $('#frmDate').val();
+            var toDate = $('#toDate').val();
+            var a = document.createElement('a');
+            a.target = "_blank";
+            a.href = '/Appointment/RepliedQueryDataExcelxls?frmDate=' + frmDate + '&toDate=' + toDate, '_blank';
+            a.click();
+
+        });
+        $("#ExcelButtonCsv").click(function (e) {
+            var frmDate = $('#frmDate').val();
+            var toDate = $('#toDate').val();
+            var a = document.createElement('a');
+            a.target = "_blank";
+            a.href = '/Appointment/RepliedQueryDataExcelCsv?frmDate=' + frmDate + '&toDate=' + toDate, '_blank';
+            a.click();
+
+        });
+
+        function ajaxQueriesData2(res) { 
+            var option = '';
+            $.each(res, function (i, item) {
+                var status = 'light';
+                if (item.appointStatus == 'Application') {
+                    status = 'warning';
+                }
+                else if (item.appointStatus == 'Called') {
+                    status = 'info';
+                }
+                else if (item.appointStatus == 'Scheduled') {
+                    status = 'success';
+                }
+                else if (item.appointStatus == 'Rejected') {
+                    status = 'danger';
+                }
+                else {
+
+                }
+
+                var replied = '';
+                var replyBtn = ' ';
+                if (item.replied == 1) {
+                    replied = 'lightcyan';
+                    replyBtn = '';
+                }
+
+                option += `<tr style="background-color: ${replied}">
+                                         <td>${i + 1}</td>
+                                         <td>${item.uhid}</td>
+                                         <td>${item.phone != null ? item.phone : ""}</td>
+                                         <td>${item.querytime}</td>
+                                         <td>${item.querydate}</td>
+                                         <td>${item.query}</td>
+                                         <td>${item.replyText}</td>
+                                        </tr>`
+            })
+
+            $('#dtVisitorInfo').empty();
+            $('#dtVisitorInfo').append(option);
+        }
+
+
+        function Delete(id) {
+            swal({
+                title: 'Are you sure?', text: 'Do you want to delete this record!', type: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'Yes, delete it!'
+            }).then(function () {
+                $.ajax({
+                    url: '/Appointment/DeleteAppointment?id=' + id,
+                    method: 'GET',
+                    success: function (data) {
+                        location.reload();
+                    },
+                    error: function (error) {
+                        console.error('Error:', error);
+                    }
+                });
+            });
+        }
+        function Dismis() {
+            $('#createDoctor').hide();
+            $('#create').show();
+            location.reload();
+        }
+
+        function Add() {
+            $('#createDoctor').show();
+            $('#create').hode();
+        }
+
+
+        function Edit(id, name, departmentName, departmentId, designationName, gender, status) {
+            $('#frmid').val(id);
+            $('#name').val(name);
+            $('#departmentName').val(departmentName);
+            $('#departmentId').val(departmentId);
+            $('#designationName').val(designationName);
+            $('#gender').val(gender);
+            $('#status').val(status);
+            $('#createDoctor').show();
+            $('#Update').show();
+            $('#Save').hide();
+        }
+
+
+        function Update() {
+            //var data = $('#EditAppointmentForm').serialize();
+
+            //swal({
+            //    title: 'Are you sure?', text: 'Do you want to update this record!', type: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'Yes, update it!'
+            //}).then(function () {
+            //    $.ajax({
+            //        url: '/Appointment/UpdateDoctor',
+            //        method: 'POST',
+            //        data: data,
+            //        success: function (data) {
+            //            location.reload();
+            //        },
+            //        error: function (error) {
+            //            console.error('Error:', error);
+            //        }
+            //    });
+            //});
+        }
+
+
+    </script>
+}

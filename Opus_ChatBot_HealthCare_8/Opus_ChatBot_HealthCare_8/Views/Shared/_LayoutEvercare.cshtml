@@ -1,0 +1,378 @@
+﻿@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@using OpusBot.Services.IServices
+@inject IBotService botService
+
+@{
+    var username = User.Identity.Name;
+
+    var chatbotInfo = await botService.GetBotInfoByUserName("evercare");
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link rel="shortcut icon" type="image/x-icon" href="~/TotaIcon.ico" />
+    <title>@ViewData["Title"] - Tota</title>
+
+    <!-- Bootstrap core CSS-->
+    <link href="~/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template-->
+    <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+
+    <!-- Page level plugin CSS-->
+    <link href="~/vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="~/css/sb-admin.css" rel="stylesheet">
+    <style>
+        .no-js #loader {
+            display: none;
+        }
+
+        .js #loader {
+            display: block;
+            position: absolute;
+            left: 100px;
+            top: 0;
+        }
+
+        .se-pre-con {
+            position: fixed;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            background: url(/images/loader-64x/Preloader_2.gif) center no-repeat #fff;
+        }
+
+        #page-top{
+            background-image: url("/chatbox/evercareHome.png");
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+
+        @@keyframes bounceColor {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-20px);
+                background-color: #ff6347; /* Set your desired color */
+            }
+            60% {
+                transform: translateY(-10px);
+                background-color: #00ced1; /* Set another desired color */
+            }
+        }
+
+        #chatIcon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 160px;
+            cursor: pointer;
+            padding: 3px;
+        }
+
+        /*#chatIcon {
+            position: fixed;
+            bottom: 122px;
+            right: 30px;
+            background: #41385c;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0px 3px 16px 0px rgba(0, 0, 0, 0.6), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+            animation: ripple 2s infinite;
+        }*/
+
+        .howyhelpicontext {
+            font-size: 12px;
+            width: 188px;
+            cursor: pointer;
+            z-index: 9999 !important;
+            text-align: center;
+            background: #41385d;
+            color: #0eeee9;
+            padding: 5px;
+            display: inline-grid;
+            bottom: 204px;
+            position: fixed;
+            right: 30px;
+            border-radius: 100px;
+            box-shadow: 0 2px 2px 1px rgba(0,0,0,.1);
+        }
+
+        .howyhelpicon {
+            width: 88px;
+            height: 108px;
+            /* bottom: 40px; */
+            cursor: pointer;
+            z-index: 9999 !important;
+            text-align: center;
+            box-shadow: none;
+            box-shadow: 0 2px 2px 1px rgba(0,0,0,.1);
+        }
+
+
+  @@keyframes ripple {
+  0% {
+  -moz-box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 0 0 rgba(204, 26, 26, 0.86);
+  }
+  100% {
+  -moz-box-shadow: 0 0 0 30px rgba(0, 0, 0, 0);
+  box-shadow: 0 0 0 30px rgba(0, 0, 0, 0);
+  }
+  }
+
+        .closeChatBoxbtn {
+            width: 35px;
+            background: #0E2355;
+            height: 35px;
+            position: absolute;
+            bottom: 0px;
+            right: 0px;
+            z-index: 100;
+            border-radius: 50%;
+        }
+
+        .RefreshBtn{
+            width: 35px;
+            background: #7A3F98;
+            height: 35px;
+            position: absolute;
+            bottom: 0px;
+            left: 0px;
+            z-index: 100;
+            border-radius: 50%;
+
+        }
+
+    </style>
+    @RenderSection("Style", required: false)
+    <link href="~/css/d3custom.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <!-- SweetAlert2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.5.6/dist/sweetalert2.min.css" rel="stylesheet">
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.5.6/dist/sweetalert2.all.min.js"></script>
+
+
+</head>
+
+<body id="page-top">
+    <div class="row mt-3" style="width: 100%;">
+        <div class="col-sm-10 col-md-11 col-lg-11"></div>
+        <div class="col-sm-2 col-md-1 col-lg-1" style="text-align: right;">
+            <button type="submit" class="rts-btn btn-primary" style="margin-left: 0px;" onclick="redirectToLoginPage()">Log In</button>
+
+
+            @*<div id="chatIcon" class=" btn-raised" style="z-index: 4;">
+                <div id="chat-overlay"></div>
+
+
+                <div class="howyhelp" id="cor">
+                    <div class="howyhelpicontext"> Hello, how can I help you?</div>
+                    <div class="howyhelpicon" style="background:  url(https://thb-website.s3.ap-south-1.amazonaws.com/plugins/chatbot/evercare/v1.0/chat-drop.png) 0 0 no-repeat;">
+                        <img src="https://healthylabs.s3-ap-southeast-1.amazonaws.com/chatbot/evercare.png" alt="" width="40px" class="mr-2" style="border: #fff solid 1px;
+                                        border-radius: 100px;
+                                        width: 66px;
+                                        height: 66px;
+                                        background: #fff;
+                                        padding: 3px;
+                                        margin-top: 10px;">
+                    </div>
+
+                </div>
+
+
+            </div>
+            *@<div class="footerbtn">
+                @*  <div onclick="RefreshBot()" class="RefreshBtn">
+                    <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 14.155 14.155" style="enable-background:new 0 0 14.155 14.155;transform: rotate(90deg);margin: 7px;" xml:space="preserve">
+                    <g><path style="fill:#fff;" d="M12.083,1.887c-0.795-0.794-1.73-1.359-2.727-1.697v2.135c0.48,0.239,0.935,0.55,1.334,0.95
+                                    c1.993,1.994,1.993,5.236,0,7.229c-1.993,1.99-5.233,1.99-7.229,0c-1.991-1.995-1.991-5.235,0-7.229
+                                    C3.466,3.269,3.482,3.259,3.489,3.25h0.002l1.181,1.179L4.665,0.685L0.923,0.68l1.176,1.176C2.092,1.868,2.081,1.88,2.072,1.887
+                                    c-2.763,2.762-2.763,7.243,0,10.005c2.767,2.765,7.245,2.765,10.011,0C14.844,9.13,14.847,4.649,12.083,1.887z"></path>
+                            </g>
+                    </svg>
+                </div>
+                <div onclick="closeChatBox()" class="closeChatBoxbtn" id="closeChatBox">
+                    <svg focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="presentation" style="margin: 4px;fill: #fff;">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+                        <path fill="none" d="M0 0h24v24H0z"></path>
+                    </svg>
+                </div>*@
+            </div>
+        </div>
+    </div>
+    @RenderBody()
+
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="~/vendor/jquery/jquery.min.js"></script>
+    <script src="~/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="~/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script type="text/javascript" src="~/js/common.js"></script>
+    <!-- Page level plugin JavaScript-->
+    <script src="~/vendor/chart.js/Chart.min.js"></script>
+    <script src="~/vendor/datatables/jquery.dataTables.js"></script>
+    <script src="~/vendor/datatables/dataTables.bootstrap4.js"></script>
+
+    <!-- Popper Js CDN -->
+    <script src="https://unpkg.com/popper.js@1.14.5/dist/umd/popper.min.js"></script>
+    <!-- Bootstrap Confirmation-->
+    <script src="~/vendor/bootstrap-confirmation/bootstrap-confirmation.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="~/js/sb-admin.min.js"></script>
+
+    <!-- Sweet Alert Package -->
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+    <script src="https://use.fontawesome.com/5dfc29e1bc.js"></script>
+
+    <!-- Demo scripts for this page-->
+
+    <script>
+        $(window).on('load', function () {
+            // Animate loader off screen
+            $(".se-pre-con").fadeOut("slow");;
+        });
+        function redirectToLoginPage() {
+            window.location.href = '/Account/Login';
+        }
+        $(document).ready(function () {
+           // $("#chatbot-chat").css({ "height": "100px", "width": "100px" });
+            // $("#chatbot-chat").css({ "height": "700px", "width": "410px" });
+           // alert($("#chatbot-chat").text());
+
+
+
+
+            $("#chatbot-chat").hide();
+            $("#boxCloseBtn").hide();
+            var BaseUrl = "";
+            var ip = location.host;
+            //if (ip == 'localhost:23997') {
+            //    BaseUrl = 'http://localhost:23997/CustoomChatBox/MyChatbot?botKey=' + '20dddd7c-734e-4c80-bbed-fae386e0291e';
+            //}
+            //else {
+            //    BaseUrl = 'http://115.127.99.113:239/CustoomChatBox/MyChatbot?botKey=' + '20dddd7c-734e-4c80-bbed-fae386e0291e';
+            //}
+            // var i = 0;
+            // $("#test").click(function () {
+
+            //     if (i % 2 == 0) {
+            //         $('#chatbot-chat-frame').prop('src', BaseUrl);
+            //         $("#chatbot-chat").show();
+            //         $("#boxCloseBtn").show();
+            //     } else {
+            //         $('#chatbot-chat-frame').removeAttr('src');
+            //         $("#chatbot-chat").hide();
+            //         $("#boxCloseBtn").hide();
+            //     }
+            //     i++;
+            // });
+
+
+            //$("#boxCloseBtn").click(function () {
+            //    iframe.style.bottom = '-96vh';
+            //    //window.location.reload();
+            //    $("#boxCloseBtn").hide();
+            //});
+
+        });
+    </script>
+
+
+
+    <script src="~/chatbox/cookie.js"></script>
+
+    <script>
+        (function () {
+            var chatIcon = document.createElement('img');
+            chatIcon.id = 'chatIcon';
+            localStorage.setItem('botKey', '20dddd7c-734e-4c80-bbed-fae386e0291e');
+            document.cookie = `${'botKey'}=${'20dddd7c-734e-4c80-bbed-fae386e0291e'}`;
+            chatIcon.src = 'https://localhost:44433/chatbox/chatBot.png';
+            chatIcon.style = 'position:fixed;bottom:80px; right: 20px; width: 95px; height: 120px; cursor: pointer;padding:-0px;z-index: 4; ';
+            document.body.appendChild(chatIcon);
+
+            var IconAnimation = document.createElement('div');
+            IconAnimation.id = 'IconAnimation';
+            localStorage.setItem('botKey', '20dddd7c-734e-4c80-bbed-fae386e0291e');
+            document.cookie = `${'botKey'}=${'20dddd7c-734e-4c80-bbed-fae386e0291e'}`;
+            IconAnimation.innerHTML = '<p></p>';
+            IconAnimation.style = 'position:fixed;bottom:102px;border-radius: 50%;animation: ripple 2s infinite; right: 20px; width: 90px; height: 97px; cursor: pointer;padding:-0px;';
+            document.body.appendChild(IconAnimation);
+
+            var IconTitle = document.createElement('div');
+            IconTitle.id = 'IconTitle';
+            localStorage.setItem('botKey', '20dddd7c-734e-4c80-bbed-fae386e0291e');
+            document.cookie = `${'botKey'}=${'20dddd7c-734e-4c80-bbed-fae386e0291e'}`;
+            IconTitle.innerHTML = '<p>Hello, how can I help you?</p>';
+            IconTitle.style = 'position:fixed;bottom:200px;text-align:center;padding-top: 2px; border-radius: 20px;right: 20px; width: 230px; height: 30px; background-color: #41385d; color: #0eeee9;';
+            document.body.appendChild(IconTitle);
+
+            var Icon = document.createElement('img');
+            Icon.id = 'boxCloseBtn';
+            localStorage.setItem('botKey', '20dddd7c-734e-4c80-bbed-fae386e0291e');
+            document.cookie = `${'botKey'}=${'20dddd7c-734e-4c80-bbed-fae386e0291e'}`;
+            Icon.src = 'https://localhost:44433/chatbox/closebtn.png';
+            Icon.style = 'position:fixed;opacity:0; transition: bottom 88s cubic-bezier(0.895, 0.03, 0.685, 0.22);transition-delay: 120s; bottom:4px; right: 20px; width: 38px; height: 36px; cursor: pointer; z-index: 10000 ';
+            document.body.appendChild(Icon);
+
+
+            var iframe = document.createElement('iframe');
+            iframe.src = 'https://localhost:44433/CustoomChatBox/MyChatbot?botKey=' + '20dddd7c-734e-4c80-bbed-fae386e0291e' + '&embedded=true';
+            iframe.style = 'position:fixed;bottom:-96vh;right:10px;width:390px;height: calc(100vh - 50px);z-index:9999;border: 0;transition: bottom 0.8s cubic-bezier(0.895, 0.03, 0.685, 0.22); border-radius:15px;';
+            iframe.className = 'iframe';
+            document.body.appendChild(iframe);
+
+            var isIframeVisible = false;
+
+            chatIcon.addEventListener('click', function () {
+                if (isIframeVisible) {
+                   iframe.style.bottom = '-96vh'; // Slide down to hide the iframe
+                } else {
+                    iframe.style.bottom = '5px'; // Slide up to show the iframe
+                    Icon.style.display = 'block';
+                    Icon.style.bottom = '4px';
+                    Icon.style.opacity = 1;
+                }
+                isIframeVisible = !isIframeVisible; // Toggle the visibility flag
+            });
+
+            document.getElementById('boxCloseBtn').addEventListener('click', function () { document.querySelector('iframe').style.bottom = '-96vh'; this.style.display = 'none'; });
+        })();
+
+
+</script>
+
+
+
+
+
+
+    @RenderSection("Scripts", required: false)
+
+</body>
+
+</html>

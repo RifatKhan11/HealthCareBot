@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Opus_ChatBot_HealthCare_8")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fc3145f10a08e68d575ab303c3cc24b0c6b2a5c8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+69370dfcb7f5da8b8d563d3d04973586128ec1f7")]
 [assembly: System.Reflection.AssemblyProductAttribute("Opus_ChatBot_HealthCare_8")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Opus_ChatBot_HealthCare_8")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

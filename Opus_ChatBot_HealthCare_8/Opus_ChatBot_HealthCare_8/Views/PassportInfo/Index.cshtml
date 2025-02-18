@@ -1,0 +1,227 @@
+﻿@model PassportInfoViewModel
+@{
+    ViewData["Title"] = "Menu";
+}
+
+@section Style{
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+}
+
+<ol class="breadcrumb">
+    <li class="breadcrumb-item">
+        <a href="/">Dashboard</a>
+    </li>
+    <li class="breadcrumb-item active">Apply for police verification certificate</li>
+</ol>
+
+<!-- Area Chart Example-->
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Passport Information
+    </div>
+    <div class="card-body" id="EditSection">
+
+        <form asp-controller="PassportInfo" asp-action="Index" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <input type="hidden" class="form-control" id="Id" name="Id" value="0">
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" class="form-control" id="name" value="" name="name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fname">Father's Name</label>
+                        <input type="text" class="form-control" id="fname" value="" name="fname" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mname">Mother's Name</label>
+                        <input type="text" class="form-control" id="mname" value="" name="mname" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dob">Date of Birth</label>
+                        <input type="text" class="form-control" id="dob" value="" name="dob" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="applyDate">Date of Apply</label>
+                        <input type="text" class="form-control" id="applyDate" value="" name="applyDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="issueDate">Date of Issue</label>
+                        <input type="text" class="form-control" id="issueDate" value="" name="issueDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="expireDate">Expire Date</label>
+                        <input type="text" class="form-control" id="expireDate" value="" name="expireDate" required>
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+
+
+                    <div class="form-group">
+                        <label for="issuePlace">Issue Place</label>
+                        <input type="text" class="form-control" id="issuePlace" value="" name="issuePlace" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="natonality">Natonality</label>
+                        <input type="text" class="form-control" id="natonality" value="" name="natonality" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="passportNo">Passport No</label>
+                        <input type="text" class="form-control" id="passportNo" value="" name="passportNo" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="refNo">Reference No</label>
+                        <input type="text" class="form-control" id="refNo" value="" name="refNo" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" value="" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mobile">Mobile</label>
+                        <input type="text" class="form-control" id="mobile" value="" name="mobile" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="gender">Gender</label>
+                        <select class="form-control" id="gender" value="" name="gender" required>
+                            <option value="">Select One</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Others">Others</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <input type="submit" class="btn btn-primary" value="Save Changes">
+        </form>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Knowledge Base
+    </div>
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>#SL</th>
+                        <th>Name</th>
+                        <th>Passport Number</th>
+                        <th>Mobile</th>
+                        <th>Email</th>
+                        <th>Nationality</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var count = 1;
+                    }
+                    @foreach (var data in Model.passportInfos)
+                    {
+                        <tr>
+                            <td>@count</td>
+                            <td>@data.name</td>
+                            <td>@data.passportNo</td>
+                            <td>@data.mobile</td>
+                            <td>@data.email</td>
+                            <td>@data.natonality</td>
+                            <td>
+                                <a href="#EditSection" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Edit Question" onclick="Edit('@data.Id','@data.name','@Html.Raw(HttpUtility.JavaScriptStringEncode(data.fname))','@Html.Raw(HttpUtility.JavaScriptStringEncode(data.mname))','@data.dob?.ToString("MM/dd/yyyy")','@data.applyDate?.ToString("MM/dd/yyyy")','@data.issueDate?.ToString("MM/dd/yyyy")','@data.expireDate?.ToString("MM/dd/yyyy")','@data.issuePlace','@data.natonality','@data.passportNo','@data.refNo','@data.email','@data.mobile','@data.gender')"><i class="fas fa-edit"></i></a>
+
+                                <form asp-controller="Knowledge" asp-action="Delete" method="post">
+                                    <input type="hidden" name="id" value="@data.Id" />
+                                    <button type="submit" class="btn btn-danger btn-sm" data-toggle="confirmation-singleton" data-singleton="true" data-btn-ok-icon-class="material-icons" data-btn-ok-icon-content="check" data-btn-cancel-icon-class="material-icons" data-btn-cancel-icon-content="close" data-title="Are sure to delete it?">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+
+                            </td>
+                        </tr>
+                        count++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+@section Scripts{
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+    $(document).ready(function () {
+        $('#dob').flatpickr({ dateFormat: "m/d/Y", maxDate: "@DateTime.Now.ToString("MM/dd/yyyy")" });
+        $('#applyDate').flatpickr({ dateFormat: "m/d/Y", maxDate: "@DateTime.Now.ToString("MM/dd/yyyy")" });
+        $('#issueDate').flatpickr({ dateFormat: "m/d/Y", maxDate: "@DateTime.Now.ToString("MM/dd/yyyy")" });
+        $('#expireDate').flatpickr({ dateFormat: "m/d/Y", minDate: "@DateTime.Now.ToString("MM/dd/yyyy")" });
+
+        $('#dataTable').DataTable({
+            "pageLength": 100
+    });
+
+    $(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+    });
+
+    });
+
+
+
+        function Edit(Id, name, fname, mname, dob, applyDate, issueDate, expireDate, issuePlace, natonality, passportNo, refNo, email, mobile, gender) {
+            $("#Id").val(Id);
+            $("#name").val(name);
+            $("#fname").val(fname);
+            $("#mname").val(mname);
+            $("#dob").val(dob);
+            $("#applyDate").val(applyDate);
+            $("#issueDate").val(issueDate);
+            $("#expireDate").val(expireDate);
+            $("#issuePlace").val(issuePlace);
+            $("#natonality").val(natonality);
+            $("#passportNo").val(passportNo);
+            $("#refNo").val(refNo);
+            $("#email").val(email);
+            $("#mobile").val(mobile);
+            $("#gender").val(gender);
+    }
+
+    function CheckStatus() {
+    if ($("#question").val() == "" || $("#question").val() == null || $("#answer").val() == "" || $("#answer").val() == null) {
+    swal("Opps!!!", "Please enter correctly", "error");
+    return false;
+    }
+    return true;
+    }
+
+    $('[data-toggle=confirmation-singleton]').confirmation({
+    rootSelector: '[data-toggle=confirmation-singleton]',
+    container: 'body'
+    });
+
+    </script>
+}

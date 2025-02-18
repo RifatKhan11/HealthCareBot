@@ -1,0 +1,49 @@
+﻿@model AppointMentManagementVm
+@{
+    ViewData["Title"] = "All Appointment";
+}
+
+<style>
+    input, select, button, textarea {
+        box-shadow: none !important;
+    }
+</style>
+
+<ol class="breadcrumb">
+    <li class="breadcrumb-item">
+        <a href="/">Dashboard</a>
+    </li>
+    <li class="breadcrumb-item active">All Appointment</li>
+</ol>
+
+<!-- Area Chart Example-->
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        All Appointment
+    </div>
+    <div class="card-body">
+        <table>
+            <thead>
+                <tr>
+                    <th>Doctor Name</th>
+                    <th>Appointment Date</th>
+                    <th>Time Slot</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.AppoinmentInfos)
+                {
+                    <tr>
+                        <td>@item.doctorInfo?.name</td>
+                        <td>@item.date?.ToString("yyyy-MM-dd")</td>
+                        <td>@item.time</td>
+                        <td>@(item.status == 1 ? "Ongoing" : "Confirmed")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

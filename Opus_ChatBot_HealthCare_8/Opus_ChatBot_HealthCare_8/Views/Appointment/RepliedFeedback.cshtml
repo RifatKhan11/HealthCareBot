@@ -1,0 +1,289 @@
+﻿@model UserFeedbackViewModel
+@{
+    ViewData["Title"] = "Feedback List";
+}
+
+@section Style{
+    <link href="https://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="Stylesheet">
+    @*<link href="https://www.jqueryscript.net/demo/Material-Time-Picker-Plugin-jQuery-MDTimePicker/mdtimepicker.css" rel="Stylesheet">*@
+    <link href="~/css/jquery.datetimepicker.css" rel="stylesheet" />
+    <link href="~/SweetAlert/sweetalert2.css" rel="stylesheet" />
+}
+<style>
+    .swal2-icon {
+        width: 2em !important;
+        height: 2em !important;
+        margin: 0.25em auto 0.5em !important;
+        border: 0.25em solid transparent;
+    }
+</style>
+<div class="row mb-5">
+    <div class="col-md-4">
+        <label for="fromDate" class="col-sm-12 col-form-label text-left">From Date <span class="redStar">*</span></label>
+        <div class="col-sm-12 input-group">
+            @*<input id="frmDate" class="form-control input-group-sm" value="@DateTime.Now.ToString("yyyy-MM-dd")" readonly />*@
+            <input id="frmDate" class="form-control input-group-sm" readonly />
+
+        </div>
+    </div>
+    <div class="col-md-4">
+        <label for="fromDate" class="col-sm-12 col-form-label text-left">To Date <span class="redStar">*</span></label>
+        <div class="col-sm-12 input-group">
+            <input id="toDate" class="form-control input-group-sm" readonly />
+
+        </div>
+    </div>
+    <div class="col-md-4" style="padding: 30px 0px">
+        <button id="loadData" onclick="loadData()" style="float:left; font-size: 16px;" class="btn btn-primary ml-1 m-1" title="Preview">Load</button>
+
+        <a href="#" id="ExcelButton" title="xlsx" style="float:left; font-size: 16px;" class="btn btn-info ml-1 m-1">xlsx</a>&nbsp;&nbsp;&nbsp;
+        <a href="#" id="ExcelButtonxls" title="xls" style="float:left; font-size: 16px;" class="btn btn-info ml-1 m-1">xls</a>&nbsp;&nbsp;&nbsp;
+        <a href="#" id="ExcelButtonCsv" title="csv" style="float:left; font-size: 16px;" class="btn btn-info ml-1 m-1">csv</a>&nbsp;&nbsp;&nbsp;
+
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Pending Feedbacks
+    </div>
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0" id="tblVisitorInfo">
+                <thead>
+                    <tr>
+                        <th>#SL</th>
+                        <th>Name</th>
+                        <th>Email</th> 
+                        <th>Mobile</th>
+                        <th>Message</th> 
+                        <th>Reply</th>
+                    </tr>
+                </thead>
+                <tbody id="dtVisitorInfo">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+
+ <!-- Modal -->
+<div class="modal fade" id="queryReply" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Reply</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group row">
+            <lable class="col-md-12">Reply To:</lable>
+            <div class="col-md-12">
+                <input type="text" id="toemail" name="toemail" readonly class="form-control" />
+                <input type="hidden" id="id" name="id" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <lable class="col-md-12">Message:</lable>
+            <div class="col-md-12">
+                <textarea class="form-control" readonly id="queryMessage" name="queryMessage"></textarea>
+            </div>
+        </div>
+        <div class="form-group row">
+            <lable class="col-md-12">Reply:</lable>
+            <div class="col-md-12">
+                <textarea class="form-control" id="queryReplyText" name="queryReplyText"></textarea>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="SendReply()">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+
+
+@section Scripts{
+    <script src="https://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+    @*<script src="https://www.jqueryscript.net/demo/Material-Time-Picker-Plugin-jQuery-MDTimePicker/mdtimepicker.js"></script>*@
+    <script src="~/js/jquery.datetimepicker.js"></script>
+    <script src="~/SweetAlert/sweetalert2.common.js"></script>
+    <script src="~/SweetAlert/sweetalert2.js"></script>
+    <script>
+        $(document).ready(function () {
+            var date = '@DateTime.Now.ToString("MM-dd-yyyy")';
+
+            $('#frmDate').datetimepicker();
+            $('#toDate').datetimepicker();
+            //$('#frmDate').datepicker({ dateFormat: "dd-M-yy", showAnim: "scale", changeMonth: true, changeYear: true, yearRange: "1900:2100" });
+            //$('#toDate').datepicker({ dateFormat: "dd-M-yy", showAnim: "scale", changeMonth: true, changeYear: true, yearRange: "1900:2100" });
+
+            //$('#frmTime').mdtimepicker({
+            //    timeFormat: 'hh:mm:ss.000',
+            //    format: 'hh:mm',
+            //    pick12HourFormat: false,
+            //    theme: 'dark',
+            //    readOnly: true,
+            //    hourPadding: true,
+            //    clearBtn: false
+            //});
+
+
+
+            $('#dataTable').DataTable({
+
+                "pageLength": 100
+            });
+
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            });
+
+             Common.Ajax('GET', '/Appointment/GetAllRepliedFeedbackData', [], 'json', ajaxQueriesData, false);
+
+
+ 
+        });
+
+        function ajaxQueriesData(res){
+             console.log(res);
+            var option = '';
+            $.each(res, function (i, item) {
+                var status = 'light';
+                if (item.appointStatus == 'Application') {
+                    status = 'warning';
+                }
+                else if (item.appointStatus == 'Called') {
+                    status = 'info';
+                }
+                else if (item.appointStatus == 'Scheduled') {
+                    status = 'success';
+                }
+                else if (item.appointStatus == 'Rejected') {
+                    status = 'danger';
+                }
+                else {
+
+                }
+
+                var replied = '';
+                var replyBtn = ' ';
+                if(item.replied == 1){
+                    replied = 'lightcyan';
+                    replyBtn = '';
+                }
+
+                option += `<tr style="background-color: ${replied}">
+                                 <td>${i + 1}</td>
+                                 <td>${item.name}</td>
+                                <td>${item.email}</td>
+                                <td>${item.phone}</td>
+                                <td>${item.message}</td> 
+                                 <td>${item.replyText}</td>
+                                </tr>`
+            })
+
+            $('#dtVisitorInfo').empty();
+            $('#dtVisitorInfo').append(option);
+        }
+        function loadData() {
+            var frmDate = $('#frmDate').val();
+            var toDate = $('#toDate').val();
+            Common.Ajax('GET', '/Appointment/GetAllLoadFeedbackData?frmDate=' + frmDate + '&toDate=' + toDate, [], 'json', ajaxFeedbackData, false);
+
+
+        }
+
+
+        $("#ExcelButton").click(function (e) {
+            var frmDate = $('#frmDate').val();
+            var toDate = $('#toDate').val();
+            var a = document.createElement('a');
+            a.target = "_blank";
+            a.href = '/Appointment/RepliedFeedbackQueryDataExcel?frmDate=' + frmDate + '&toDate=' + toDate, '_blank';
+            a.click();
+
+        });
+        $("#ExcelButtonxls").click(function (e) {
+            var frmDate = $('#frmDate').val();
+            var toDate = $('#toDate').val();
+            var a = document.createElement('a');
+            a.target = "_blank";
+            a.href = '/Appointment/RepliedFeedbackQueryDataExcelxls?frmDate=' + frmDate + '&toDate=' + toDate, '_blank';
+            a.click();
+
+        });
+        $("#ExcelButtonCsv").click(function (e) {
+            var frmDate = $('#frmDate').val();
+            var toDate = $('#toDate').val();
+            var a = document.createElement('a');
+            a.target = "_blank";
+            a.href = '/Appointment/RepliedFeedbackQueryDataExcelcsv?frmDate=' + frmDate + '&toDate=' + toDate, '_blank';
+            a.click();
+
+        });
+        function ajaxFeedbackData(res) {
+            console.log(res);
+            var option = '';
+            $.each(res, function (i, item) {
+                var status = 'light';
+                if (item.appointStatus == 'Application') {
+                    status = 'warning';
+                }
+                else if (item.appointStatus == 'Called') {
+                    status = 'info';
+                }
+                else if (item.appointStatus == 'Scheduled') {
+                    status = 'success';
+                }
+                else if (item.appointStatus == 'Rejected') {
+                    status = 'danger';
+                }
+                else {
+
+                }
+
+                var replied = '';
+                var replyBtn = ' ';
+                if (item.replied == 1) {
+                    replied = 'lightcyan';
+                    replyBtn = '';
+                }
+
+                option += `<tr style="background-color: ${replied}">
+                                         <td>${i + 1}</td>
+                                         <td>${item.name}</td>
+                                        <td>${item.email}</td>
+                                        <td>${item.phone}</td>
+                                        <td>${item.message}</td>
+                                         <td>${item.replyText}</td>
+                                        </tr>`
+            })
+
+            $('#dtVisitorInfo').empty();
+            $('#dtVisitorInfo').append(option);
+        }
+
+        function Dismis() {
+            $('#createDoctor').hide();
+            $('#create').show();
+           location.reload();
+        }
+
+        function Add() {
+            $('#createDoctor').show();
+            $('#create').hode();
+        }
+
+
+    </script>
+}

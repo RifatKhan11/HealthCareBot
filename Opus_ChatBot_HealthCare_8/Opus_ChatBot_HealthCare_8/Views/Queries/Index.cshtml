@@ -1,0 +1,105 @@
+﻿@model QueriesViewModel
+
+@{
+    ViewData["Title"] = "Queries";
+}
+
+<!-- Breadcrumbs-->
+<ol class="breadcrumb">
+    <li class="breadcrumb-item">
+        <a href="/">Dashboard</a>
+    </li>
+    <li class="breadcrumb-item active">Queries</li>
+</ol>
+
+
+<!-- Area Chart Example-->
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        All Queries for human support.
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>#SL</th>
+                        @*<th>User</th>*@
+                        <th>Questio</th>
+                        <th>Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>#SL</th>
+                        @*<th>User</th>*@
+                        <th>Questio</th>
+                        <th>Total</th>
+                        <th>Action</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    @{
+                        var count = 1;
+                    }
+                    @foreach (var data in Model.queriesDataViewModels.OrderByDescending(x=>x.Id))
+                    {
+                    <tr>
+                        <td>@count</td>
+                        @*<td>@data.FbUserName</td>*@
+                        <td>@data.queriesText</td>
+                        <td>@data.qCount</td>
+                        @if (data.answerText == null || data.answerText == "")
+                        {
+                            <td style="">
+
+                                <form method="post">
+                                    <input type="hidden" name="QueriesId" value="@data.Id" />
+                                    <div class="input-group mb-3">
+                                        <textarea type="text" name="AnswerText" class="form-control" placeholder="Enter Replay" aria-label="Recipient's username" aria-describedby="basic-addon2" rows="3" style="resize:none" required></textarea>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" type="submit"><i class="fas fa-share-square"></i></button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </td>
+                        }
+                        else
+                        {
+                            <td>@data.answerText</td>
+                        }
+
+                    </tr>
+
+                        count++;
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+
+@section Scripts{
+
+    <script>
+        $(document).ready(function () {
+            $('#dataTable').DataTable({
+                "columnDefs": [
+                    { "width": "5%", "targets": 0 },
+                    //{ "width": "15%", "targets": 1 },
+                    { "width": "45%", "targets": 2 },
+                    { "width": "540%", "targets": 3 }
+                ],
+                 "pageLength": 100
+            });
+        });
+    </script>
+}
+
+

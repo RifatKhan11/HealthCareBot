@@ -1,0 +1,405 @@
+﻿@model InputGroupMasterViewModel
+@{
+    ViewData["Title"] = "Menu";
+}
+
+
+<style >
+
+</style>
+
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Create Group Master
+    </div>
+
+
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <form asp-action="CreateGroupMasters" id="CreateGroupMastersId" method="post" enctype="multipart/form-data">
+                <input type="hidden" class="form-control" id="Id" name="Id" value="0">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="ParrentMenuName">Name</label>
+                            <input type="text" class="form-control" id="NameId" value="" name="Name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="ParrentMenuName">Status</label>
+                            <select class="form-control" name="Status" id="StatusId" required>
+                                <option value="1">Active</option>
+                                <option value="0">Inactive</option>
+                            </select>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="ParrentMenuName">Menu</label>
+                            <select class="form-control" name="MenuId" id="MenusId" required>
+                                <option value="">Menu List</option>
+                                @foreach (var data in Model.Menus)
+                                {
+                                    <option value="@data.Id">@data.MenuNameEN</option>
+                                }
+                            </select>
+                        </div>
+                       
+                        <button type="button" class="btn btn-outline-primary" style="float:right" onclick="return CheckStatus()" value="Save">Save</button>
+
+                </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+    <div>
+        <div class="card mb-3">
+            <div class="card-header">
+                <i class="fas fa-table"></i>
+                Group Master List
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered" id="GroupMaster" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>#SL</th>
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th>Menu</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" id="ViewDetailsModal" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">                
+                <label class="modal-title pull-left" id="myActiveModalLabel" style="color:rgb(9, 7, 161);font-size:1.5em;">Create Group Details</label>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <br />
+            </div>
+            <div class="modal-body">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <form asp-action="CreateGroupDetails" id="CreateGroupDetailsId" method="post" enctype="multipart/form-data">
+                            <input type="hidden" class="form-control" id="Id" name="Id" value="0">
+                            <input type="hidden" class="form-control" id="masterId" name="masterId" value="0">
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="form-group">
+                                        <label for="ParrentMenuName">Input Name</label>
+                                        <input type="text" class="form-control" id="InputNameId" value="" name="InputName" required>
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <label for="ParrentMenuName">Para Meter</label>
+                                        <input type="text" class="form-control" id="ParaMeterId" value="" name="ParaMeter" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="ParrentMenuName">Input Type</label>
+                                        <select class="form-control" name="InputType" id="InputTypeId" required>
+                                            <option value="INPUT">Input</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="ParrentMenuName">Place Holder</label>
+                                        <input type="text" class="form-control" id="PlaceHolderId" value="" name="PlaceHolder" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="ParrentMenuName">Status</label>
+                                        <select class="form-control" name="Status" id="StatusId" required>
+                                            <option value="1">Active</option>
+                                            <option value="0">Inactive</option>
+                                        </select>
+                                    </div>
+
+                                    <button type="button" class="btn btn-outline-primary" style="float:right" onclick="SaveDetails()" value="">Save</button>
+
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+                <div>
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <i class="fas fa-table"></i>
+                            Group Details List
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered" id="GroupDetails" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>#SL</th>
+                                        <th>Input Name</th>
+                                        <th>Para Meter</th>
+                                        <th>Input Type</th>
+                                        <th>Place Holder</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+@section Scripts{
+
+    <script>
+        $(document).ready(function () {
+
+            GetAllGroupMasters();
+
+
+            //$('#entrydate').flatpickr({ dateFormat: "d-M-Y" });
+            $('#CreateGroupMasters').DataTable({
+                "columnDefs": [
+                    { "width": "15%", "targets": 0 },
+                    { "width": "25%", "targets": 1 },
+                    { "width": "20%", "targets": 2 },
+                    { "width": "25%", "targets": 3 },
+                    { "width": "15%", "targets": 4 },
+
+                ],
+                "pageLength": 100
+            });
+
+
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            });
+
+
+        });
+
+
+
+        function OpenDetailModal(masterId) {
+            $('#masterId').val(masterId);
+            LoadDetailByMasterId(masterId);
+            $('#detailsmodal').modal('show');
+        }
+
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('.blah')
+                        .attr('src', e.target.result);
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        function CheckStatus() {
+            $('#CreateGroupMastersId').submit();
+        }
+
+        function Save() {
+            var data = $('#CreateGroupMastersId').serialize();
+
+            $.ajax({
+                method: 'post',
+                url: '/Knowledge/CreateGroupMasters',
+                data: data,
+                async: false,
+                success: function (response) {
+                    if (parseInt(response) > 0) {
+                        swal('Success', 'Saved Success', 'success').then(function () {
+                            var masterId = $('#masterId').val();
+                            LoadDetailByMasterId(masterId);
+                        });
+                    }
+                },
+                error: function (error) {
+                    swal('Warning', 'Saved Faild', 'warning');
+                }
+            });
+        }
+
+        function Remove(id){
+            Common.Ajax('GET', '/global/api/DeleteGroupMaster?masterId=' + id, [], 'json', ajaxRemove, false);
+        }
+
+        function ajaxRemove(res){
+            if(res == 1){
+                swal('Success', 'Delete Success', 'success').then(function () {
+                    location.reload();
+                });
+            }
+            else{
+                swal('Warning', 'Delete Faild', 'warning');
+            }
+        }
+
+        function GetAllGroupMasters() {
+            Common.Ajax('GET', '/global/api/GetAllGroupMasters', [], 'json', ajaxGetAllGroupMasters, false);
+        }
+
+        function ajaxGetAllGroupMasters(res) {
+            console.log('grp');
+            console.log(res);
+            var option = '';
+            var sl = 1;
+            var status='';
+            $.each(res, function (i, item) {
+                if (item.status==1) 
+                {
+                    status='Active';
+                }
+                else
+                {
+                    status = 'Inactive';
+                }
+                
+                option += `<tr>
+
+                                <td>${sl}</td >
+                                <td>${item.name}</td>
+                                <td>${status}</td>
+                                <td>${item.menu?.menuNameEN}</td>
+
+                                <td>
+                                   <a href="#" onclick="Edit(${item.id},'${item.name}',${item.status},${item.menuId})" class="btn btn-outline-warning btn-sm" data-toggle="tooltip" data-placement="bottom" title="Edit Question" "><i class="fas fa-edit"></i></a>
+
+                                   <a href="#" onclick="Remove(${item.id})" class="btn btn-outline-danger btn-sm" data-toggle="confirmation-singleton" data-singleton="true" data-btn-ok-icon-class="material-icons" data-btn-ok-icon-content="check" data-btn-cancel-icon-class="material-icons" data-btn-cancel-icon-content="close" data-title="Agree to Delete it?"><i class="fas fa-trash"></i></a>
+
+                                    <button type="button" class="btn btn-primary" onclick="ViewDetail(${item.id})"><i class="fas fa-eye"></i></button>
+
+                                </td>
+                            </tr>`
+                            sl=sl+1;
+            });
+
+            $('#GroupMaster tbody').empty();
+            $('#GroupMaster tbody').append(option);
+        }
+
+        function Edit(id, name, status, menuId) 
+        {
+            $("#Id").val(id);
+            $("#NameId").val(name);
+            $("#StatusId").val(status);
+            $("#MenusId").val(menuId);
+
+        }
+
+        function ViewDetail(masterId){
+            $('#masterId').val(masterId);
+
+            GetInputDetailByMasterId(masterId);
+
+            $('#ViewDetailsModal').modal('show');
+        }
+        function SaveDetails() {
+            var data = $('#CreateGroupDetailsId').serialize();
+
+            $.ajax({
+                method: 'post',
+                url: '/Knowledge/CreateGroupDetails',
+                data: data,
+                async: false,
+                success: function (response) {
+                    if (parseInt(response) > 0) {
+                        swal('Success', 'Saved Success', 'success').then(function () {
+                            var masterId = $('#masterId').val();
+                            GetInputDetailByMasterId(masterId);
+                        });
+                    }
+                },
+                error: function (error) {
+                    swal('Warning', 'Saved Faild', 'warning');
+                }
+            });
+        }
+        function GetInputDetailByMasterId(masterId) {
+            Common.Ajax('GET', '/global/api/GetInputDetailByMasterId?masterId=' + masterId, [], 'json', ajaxGetInputDetailByMasterId, false);
+        }
+
+        function ajaxGetInputDetailByMasterId(res){
+            console.log(res);
+            var option = '';
+            var sl = 1;
+            var status = '';
+            $.each(res, function (i, Detail) {
+                if (Detail.status == 1) {
+                    status = 'Active';
+                }
+                else {
+                    status = 'Inactive';
+                }
+
+                option += `<tr>
+
+                                        <td>${sl}</td >
+                                                <td>${Detail.inputName} </td>
+                                                <td> ${Detail.parameterName} </td>
+                                                <td> ${Detail.inputType} </td>
+                                                <td> ${Detail.placeHolder} </td>
+                                        <td>${status}</td>
+
+                                        <td>
+                                        <a href="#" onclick="EditDetail(${Detail.id},'${Detail.inputName}','${Detail.parameterName}','${Detail.inputType}','${Detail.placeHolder}','${Detail.status}')" class="btn btn-outline-warning btn-sm" data-toggle="tooltip" data-placement="bottom" title="Edit Question" "><i class="fas fa-edit"></i></a>
+
+                <a href="#" onclick="RemoveDetails(${Detail.id})" class="btn btn-outline-danger btn-sm" data-toggle="confirmation-singleton" data-singleton="true" data-btn-ok-icon-class="material-icons" data-btn-ok-icon-content="check" data-btn-cancel-icon-class="material-icons" data-btn-cancel-icon-content="close" data-title="Agree to Delete it?"><i class="fas fa-trash"></i></a>
+
+                                        </td>
+
+                                    </tr>`
+                sl = sl + 1;
+            });
+
+            $('#GroupDetails tbody').empty();
+            $('#GroupDetails tbody').append(option);
+        
+        }
+        function EditDetail(id, inputName, parameterName, inputType, placeHolder, status) 
+        {
+            $("#CreateGroupDetailsId #Id").val(id);
+            $("#CreateGroupDetailsId #InputNameId").val(inputName);
+            $("#CreateGroupDetailsId #ParaMeterId").val(parameterName);
+            $("#CreateGroupDetailsId #InputTypeId").val(inputType);
+            $("#CreateGroupDetailsId #PlaceHolderId").val(placeHolder);
+            $("#CreateGroupDetailsId #StatusId").val(status);
+
+        }
+        function RemoveDetails(id) {
+            Common.Ajax('GET', '/global/api/DeleteGroupDetails?DetailsId=' + id, [], 'json', ajaxRemoveDetails, false);
+        }
+
+        function ajaxRemoveDetails(res) {
+            if (res == 1) {
+                swal('Success', 'Delete Success', 'success').then(function () {
+                    location.reload();
+                });
+            }
+            else {
+                swal('Warning', 'Delete Faild', 'warning');
+            }
+        }
+    </script>
+  }
+

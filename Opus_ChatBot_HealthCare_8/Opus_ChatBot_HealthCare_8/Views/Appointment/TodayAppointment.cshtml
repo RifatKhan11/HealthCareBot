@@ -1,0 +1,256 @@
+﻿@model AppointmentListViewModel
+@{
+    ViewData["Title"] = "Complaint List";
+}
+
+@section Style{
+    <link href="https://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="Stylesheet">
+    <link href="https://www.jqueryscript.net/demo/Material-Time-Picker-Plugin-jQuery-MDTimePicker/mdtimepicker.css" rel="Stylesheet">
+    <link href="~/SweetAlert/sweetalert2.css" rel="stylesheet" />
+}
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Appointment List
+    </div>
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0" id="tblVisitorInfo">
+                <thead>
+                    <tr>
+                        <th>#SL</th>
+                        <th>Doctor Name</th>
+                        <th>Department</th>
+                        <th>Patient</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="dtVisitorInfo">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+
+
+<!-- The Modal -->
+<div class="modal" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Update Appointment</h4>
+                <button type="button" class="close" onclick="Dismis()">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <form id="EditAppointmentForm">
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <label class="col-md-2">Phone</label>
+                        <div class="col-md-10">
+                            <input type="hidden" id="frmid" name="id" class="form-control" />
+                            <input type="hidden" value="@ViewBag.botkey" id="botkey" name="botkey" class="form-control" />
+                            <input type="hidden" value="@ViewBag.branchInfoId" id="branchId" name="branchId" class="form-control" />
+                            <input type="text" id="frmPhone" readonly name="phone" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-2">Date</label>
+                        <div class="col-md-10">
+                            <input type="text" readonly id="frmDate" name="frmDate" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-2">Time</label>
+                        <div class="col-md-10">
+                            <input type="text" id="frmTime" name="time" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-2">Status</label>
+                        <div class="col-md-10">
+                            <select class="form-control" id="frmStatus" name="status">
+                                <option value="Application">Choose Status</option>
+                                <option value="Called">Called</option>
+                                <option value="Scheduled">Scheduled</option>
+                                <option value="Rejected">Rejected</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    @*<button type="button" onclick="close()" class="btn btn-danger btn-small" data-dismiss="modal">Close</button>*@
+
+                    <a class="btn btn-small btn-danger" onclick="Dismis()">Close</a>
+                    <a class="btn btn-small btn-warning" onclick="Update()">Update</a>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts{
+    <script src="https://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+    <script src="https://www.jqueryscript.net/demo/Material-Time-Picker-Plugin-jQuery-MDTimePicker/mdtimepicker.js"></script>
+    <script src="~/SweetAlert/sweetalert2.common.js"></script>
+    <script src="~/SweetAlert/sweetalert2.js"></script>
+    <script>
+        $(document).ready(function () {
+            var date = '@DateTime.Now.ToString("MM-dd-yyyy")';
+
+
+            $('#frmDate').datepicker({ dateFormat: "dd-M-yy", showAnim: "scale", changeMonth: true, changeYear: true, yearRange: "1900:2100" });
+            $('#frmTime').mdtimepicker({
+                timeFormat: 'hh:mm:ss.000',
+                format: 'hh:mm',
+                pick12HourFormat: false,
+                theme: 'dark',
+                readOnly: true,
+                hourPadding: true,
+                clearBtn: false
+            });
+
+
+
+            $('#dataTable').DataTable({
+
+                "pageLength": 100
+            });
+
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            });
+
+            var botKey = '20dddd7c-734e-4c80-bbed-fae386e0291e';
+            var branchId = $('#branchId').val();
+            Common.Ajax('GET', '/Appointment/GetTodayAppointmentData?date=' + date + '&branchId=' + branchId, [], 'json', ajaxTodayAppointmentData, false);
+
+
+
+
+            //var interval = setInterval(function () {
+            //    Common.Ajax('GET', '/Appointment/GetTodayAppointmentData?date=' + date, [], 'json', ajaxTodayAppointmentData, false);
+            //}, 60000);
+        });
+
+
+        function ajaxTodayAppointmentData(res) {
+            console.log(res);
+            var option = '';
+             $('#tblVisitorInfo').dataTable().fnClearTable();
+            $('#tblVisitorInfo').dataTable().fnDestroy();
+
+            $.each(res, function (i, item) {
+                var status = 'light';
+                if (item.appointStatus == 'Application') {
+                    status = 'warning';
+                }
+                else if (item.appointStatus == 'Called') {
+                    status = 'info';
+                }
+                else if (item.appointStatus == 'Scheduled') {
+                    status = 'success';
+                }
+                else if (item.appointStatus == 'Rejected') {
+                    status = 'danger';
+                }
+                else {
+
+                }
+                option += `<tr>
+                                   <td>${i + 1}</td>
+                                   <td>${item.doctorname}</td>
+                                   <td>${item.departmentName}</td>
+                                   <td>
+                                       ${item.name} <br>
+                                       ${item.mobile} <br>
+                                       ${item.gender} <br>
+                                       ${item.date} [${item.time}]
+                                    </td>
+                                    <td>${item.date}</td>
+                                    <td><span class="badge badge-${status}">${item.appointStatus}</span></td>
+                                    <td>
+                                        <a class="btn btn-sm btn-success" onclick="Edit(${item.id}, '${item.doctorname}', '${item.mobile}', '${item.departmentName}', '${item.date}', '${item.time}', '${item.appointStatus}')">Edit</a>
+                                        <a class="btn btn-sm btn-danger" onclick="Delete(${item.id})">Delete</a>
+                                    </td>
+                                </tr>`
+            })
+
+            $('#dtVisitorInfo').empty();
+            $('#dtVisitorInfo').append(option);
+
+            $('#tblVisitorInfo').DataTable({
+                "ordering": false,
+                scrollX: true,
+                scrollY: "490px",
+                "scrollCollapse": true
+            });
+        }
+
+
+
+        function Delete(id) {
+            swal({
+                title: 'Are you sure?', text: 'Do you want to delete this record!', type: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'Yes, delete it!'
+            }).then(function () {
+                $.ajax({
+                    url: '/Appointment/DeleteAppointment?id=' + id,
+                    method: 'GET',
+                    success: function (data) {
+                        location.reload();
+                    },
+                    error: function (error) {
+                        console.error('Error:', error);
+                    }
+                });
+            });
+        }
+        function Dismis() {
+            $('#myModal').hide();
+        }
+
+
+        function Edit(id, doctorname, mobile, departmentName, date, time, appointStatus) {
+            $('#frmid').val(id);
+            $('#frmPhone').val(mobile);
+            $('#frmDate').val(date);
+            $('#frmTime').val(time);
+            $('#frmStatus').val(appointStatus);
+
+            $('#myModal').show();
+        }
+
+
+        function Update() {
+            var data = $('#EditAppointmentForm').serialize();
+
+            swal({
+                title: 'Are you sure?', text: 'Do you want to update this record!', type: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'Yes, update it!'
+            }).then(function () {
+                $.ajax({
+                    url: '/Appointment/UpdateAppointment',
+                    method: 'POST',
+                    data: data,
+                    success: function (data) {
+                        location.reload();
+                    },
+                    error: function (error) {
+                        console.error('Error:', error);
+                    }
+                });
+            });
+        }
+    </script>
+}

@@ -1,0 +1,89 @@
+﻿@model DoctorListViewModel
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@section Style{
+    <style>
+        .redStar {
+            color: red;
+        }
+
+        .card-header {
+            border-left: 19px solid #0F72B4;
+            font-family: Arial;
+            font-size: 10px !important;
+            background-color: white !important;
+        }
+    </style>
+}
+
+<div class="card" style="width: 100%;" id="div1">
+    <div class="card-header row outBox" style="background-color: #EAF6FA;padding: 0; color: black;">
+        <div class="col-md-4" style="display: flex; justify-content: flex-start; align-items: center; ">
+            <h5 class="card-title" style="color: black; margin: 8px;">Doctor List</h5>
+        </div>
+        <div class="col-md-8">
+            <div style="float: right; margin: 16px;">
+                <a class='btn btn-info' style="" data-toggle='tooltip' title='Go Back' href='/DoctorInfo/DoctorListUpload'>Doctor Upload</a>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-bordered" id="GroupTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>#SL</th>
+                        <th>Doctor Code</th>
+                        <th>Doctor Name</th>
+                        <th>Department Code</th>
+                        <th>Department Name</th>
+                        <th>Specialisation Code</th>
+                        <th>Specialisation Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var count = 1;
+                    }
+                    @foreach (var data in Model.doctorInfos.OrderByDescending(x=>x.Id))
+                    {
+                        <tr>
+                            <td>@count</td>
+                            <td>@data.doctorCode</td>
+                            <td>@data.name</td>
+                            <td>@data.Department?.departmentCode</td>
+                            <td>@data.Department?.departmentName</td>
+                            <td>@data.doctorSpecialization?.code</td>
+                            <td>@data.doctorSpecialization?.name</td>
+
+                           @*  <td>
+                                <a class="btn btn-success" onclick="Edit(@data.Id,'@data.groupName')" href="javascript:void(0)"><i class="fa fa-edit"></i></a>&nbsp;&nbsp;
+                                <a class="btn btn-danger" title="Delete Group" onclick="Delete(@data.Id)" href="#"><i class="fa fa-trash-alt"></i></a>
+                            </td> *@
+                        </tr>
+                        count++;
+                    }
+
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('#GroupTable').dataTable();
+        });
+     
+
+    </script>
+}
+

@@ -1,0 +1,110 @@
+﻿@using static OpusBot.Controllers.HomeController
+ @model ApiActivityLogVm
+@{
+    ViewData["Title"] = "Api Activity Log List";
+}
+
+@section Style {
+    <link href="https://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="Stylesheet">
+    <link href="https://www.jqueryscript.net/demo/Material-Time-Picker-Plugin-jQuery-MDTimePicker/mdtimepicker.css" rel="Stylesheet">
+    <link href="~/SweetAlert/sweetalert2.css" rel="stylesheet" />
+}
+<style>
+    .swal2-icon {
+        width: 2em !important;
+        height: 2em !important;
+        margin: 0.25em auto 0.5em !important;
+        border: 0.25em solid transparent;
+    }
+    .table td {
+        word-wrap: break-word;
+        word-break: break-word;
+        white-space: normal;
+    }
+</style> 
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Api Activity Logs Data
+    </div>
+    <div class="card-body">
+
+        <div class="">
+            <table class="table table-bordered" width="100%">
+                <thead>
+                    <tr>
+
+                        <th  width="10%">Type</th>
+                        <th  width="10%">Create By</th>
+                        <th  width="10%">Date</th>
+                        <th  width="70%">jsonResponse</th>
+                    </tr>
+                </thead>
+                <tbody id="dtVisitorInfo">
+                    @foreach (var item in @Model.apiActivityLogs)
+                    {
+                        <tr>
+                            <td>@item.type</td>
+                            <td>@item.createBy</td>
+                             <td>@item.DateTime.ToString("yyyy-MM-dd")</td>
+                            <td>@item.jsonResponse</td>
+
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+
+
+
+
+@section Scripts {
+    <script src="https://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+    <script src="https://www.jqueryscript.net/demo/Material-Time-Picker-Plugin-jQuery-MDTimePicker/mdtimepicker.js"></script>
+    <script src="~/SweetAlert/sweetalert2.common.js"></script>
+    <script src="~/SweetAlert/sweetalert2.js"></script>
+    <script>
+        $(document).ready(function () {
+            var date = '@DateTime.Now.ToString("MM-dd-yyyy")';
+
+
+            $('#frmDate').datepicker({ dateFormat: "dd-M-yy", showAnim: "scale", changeMonth: true, changeYear: true, yearRange: "1900:2100" });
+            $('#frmTime').mdtimepicker({
+                timeFormat: 'hh:mm:ss.000',
+                format: 'hh:mm',
+                pick12HourFormat: false,
+                theme: 'dark',
+                readOnly: true,
+                hourPadding: true,
+                clearBtn: false
+            });
+
+
+
+            $('#dataTable').DataTable({
+
+                "pageLength": 100
+            });
+
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            });
+
+
+        });
+
+
+
+
+
+
+ 
+    </script>
+}
+

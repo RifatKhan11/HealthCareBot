@@ -1,0 +1,883 @@
+﻿@model MenuViewModel
+
+@{
+    ViewData["Title"] = "Menu";
+}
+<style>
+    input, select, textarea {
+        box-shadow: none !important;
+    }
+</style>
+<!-- Breadcrumbs-->
+<ol class="breadcrumb">
+    <li class="breadcrumb-item">
+        <a href="/">Dashboard</a>
+    </li>
+    <li class="breadcrumb-item active">Menus</li>
+</ol>
+
+<!-- Area Chart Example-->
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        All Menus
+        <div class="btn-group" role="group" style="float:right" aria-label="Basic example">
+            <button id="lanENG" type="button" style="font-size:10px;" class="btn btn-info">ENG</button>
+            <button id="lanBAN" type="button" style="font-size:10px;" class="btn btn-success">বাংলা</button>
+        </div>
+    </div>
+
+    <div class="card-body" style="min-height: 500px;">
+        <div id="d3Content">
+            <img id="customLoaderMenu" src="~/images/loader-64x/Preloader_3.gif" alt="loader" style="margin-top: 200px; margin-left: 48%;" />
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+  
+</div>
+
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Menu Actions
+    </div>
+    <div class="card-body">
+
+        <div class="container" id="modificationSec">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#TabNewMenu">New Menu</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#TabRenameMenu">Rename Menu</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#TabActionMenu">Action Menu</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#TabServiceFlow">Service Flow</a>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <div id="TabNewMenu" class="tab-pane active">
+                    <form asp-controller="Menu" asp-action="Index" onsubmit="return CheckStatus()" method="post">
+
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <input type="hidden" id="ParrentMenuId" name="ParrentMenuId" value="" />
+                        <input type="hidden" value="" name="botKey" class="botKey" />
+
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="ParrentMenuName">প্যারেন্ট মেনু</label>
+                                    <input type="text" class="form-control" id="ParrentMenuName" readonly value="" name="ParrentMenuName">
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="ParrentMenuNameEN">Parrent Menu</label>
+                                    <input type="text" class="form-control" id="ParrentMenuNameEN" readonly value=""  name="ParrentMenuNameEN">
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="newMenu">নতুন মেনু</label>
+                                    <input type="text" class="form-control" id="newMenu" aria-describedby="newMenuHelp" placeholder="নতুন মেনু নাম লিখুন"  name="MenuName">
+                                    <small id="newMenuHelp" class="form-text text-muted">Enter New Menu in Bangla</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="newMenuEN">New Menu</label>
+                                    <input type="text" class="form-control" id="newMenuEN" aria-describedby="newMenuENHelp" placeholder="Enter menu name"  name="MenuNameEN">
+                                    <small id="newMenuHelp" class="form-text text-muted">Enter New Menu in English</small>
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="menuType">Menu Type</label>
+                                    <select class="form-control" id="menuType" aria-describedby="menuTypeHelp" name="menuType">
+                                        <option value="Button">Button</option>
+                                        @*<option value="Input">Input</option>*@
+                                    </select>
+                                    <small id="menuTypeHelp" class="form-text text-muted">Choose Menu Type</small>
+                                </div>
+                            </div>
+
+                            <div class="col-6" id="responseAPI-box" style="display: none;">
+                                <div class="form-group">
+                                    <label for="menuType">Response API</label>
+                                    <textarea class="form-control" id="responseAPI" rows="3" aria-describedby="responseAPIHelp" name="responseAPI">
+                                    </textarea>
+                                    <small id="responseAPIHelp" class="form-text text-muted">Please Define Reponse API</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="IsLast" name="IsLast">
+                                <label class="form-check-label" for="IsLast">
+                                    Make It As a  Last Node
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+
+                            <input type="submit" name="SubmitType" id="addMenu" class="btn btn-primary" value="Save Menu">
+                        </div>
+
+                    </form>
+                </div>
+                <div id="TabRenameMenu" class="tab-pane">
+
+                    <form asp-controller="Menu" asp-action="Index" onsubmit=" return CheckStatus2()" method="post">
+
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <input type="hidden" id="currentMenuId" name="ParrentMenuId" value="" />
+
+                        <div class="row">
+
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="currentMenuName">মেনু নাম</label>
+                                    <input type="text" class="form-control" id="currentMenuName" aria-describedby="currentMenuNameHelp" placeholder="মেনু নাম লিখুন"  name="MenuName">
+                                    <small id="currentMenuName" class="form-text text-muted">Enter New Menu Name In Bangla</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="currentMenuNameEN">Menu Name</label>
+                                    <input type="text" class="form-control" id="currentMenuNameEN" aria-describedby="currentMenuNameENHelp" placeholder="Enter menu name"  name="MenuNameEN">
+                                    <small id="currentMenuNameENHelp" class="form-text text-muted">Enter New Menu Name In English</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" name="SubmitType" class="btn btn-primary" id="renameMenu" value="Rename">
+                        </div>
+
+                    </form>
+
+
+                </div>
+
+                <div id="TabActionMenu" class="tab-pane">
+                    <div class="col-12" style="margin-top:5px;">
+                        <p class="alert alert-warning text-center"> You can perform this action when the node have no dependency.</p>
+                    </div>
+
+                    <form asp-controller="Menu" asp-action="Index" onsubmit=" return CheckStatus3()" method="post">
+
+                        <div asp-validation-summary="All" class="text-danger"></div>
+
+                        <input type="hidden" id="currentMenuIdAction" name="ParrentMenuId" value="" />
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="ParrentMenuName">মেনু নাম</label>
+                                    <input type="text" class="form-control" name="MenuName" id="CurrentManeuNameAction" readonly value="" >
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="ParrentMenuNameEN">Menu Name</label>
+                                    <input type="text" class="form-control" name="MenuNameEN" id="CurrentManeuNameENAction" readonly value="" >
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="actionConfirmation" placeholder="Type 'yes' for action." value="">
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="actionApi" placeholder="Type 'API' for action." value="">
+                        </div>
+
+                        <div class="form-group">
+                            <div class="row border-top" style="padding-top:5px;">
+                                <div class="col-4 text-center">
+                                    <input type="submit" name="SubmitType" id="makeGeneral" class="btn btn-info" value="Make It as General">
+                                </div>
+                                <div class="col-4 text-center">
+                                    <input type="submit" name="SubmitType" id="makeLast" class="btn btn-warning" value="Make It as Last">
+                                </div>
+                                <div class="col-4 text-center">
+                                    <input type="submit" name="SubmitType" id="deleteMenu" class="btn btn-danger" value="Delete This Menu">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+
+                <div id="TabServiceFlow" class="tab-pane active">
+                    <form onsubmit="return SaveServiceFlow()" method="post" id="serviceFlowFrm">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="parentNodeEn">Parent Node</label>
+                                    <input type="hidden" name="Id" id="Id" value="0" />
+                                    <select class="form-control" id="parentNodeEn" name="parentNodeEn" onchange="ChangeNode()">
+                                        <option value="0">Select Node</option>
+                                        @foreach (var item in Model.AllMenus.Where(x => x.IsLast == true))
+                                        {
+                                            <option value="@item.Id">@item.MenuName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="questionEn"></label>
+                                    <input type="text" class="form-control" id="questionEn" aria-describedby="questionEnHelp" placeholder="Enter Question" name="questionEn">
+                                    <small id="questionEnHelp" class="form-text text-muted">Enter Question</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="parameterName"></label>
+                                    <input type="text" class="form-control" id="parameterName" aria-describedby="parameterNameHelp" placeholder="Enter Parameter Name" name="parameterName">
+                                    <small id="parameterNameHelp" class="form-text text-muted">Enter Parameter Name</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="stepNo"></label>
+                                    <input type="text" class="form-control" id="stepNo" aria-describedby="stepNoHelp" placeholder="Enter Step No" name="stepNo">
+                                    <small id="stepNoHelp" class="form-text text-muted">Enter Step No</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="button" name="SaveServiceFlow" id="SaveServiceFlow" class="btn btn-primary" value="Save Service Flow">
+                        </div>
+                    </form>
+
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="table table-bordered" id="menureadertbl">
+                                <thead>
+                                    <tr>
+                                        <th>Question</th>
+                                        <th>Step</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+            </div>
+
+        </div>
+
+    </div>
+    <br />
+    <br />
+</div>
+
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Questions under selected menu. 
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>#SL</th>
+                        <th>Menu</th>
+                        <th>Question(Bangla)</th>
+                        <th>Answer(Bangla)</th>
+                        <th>Question(English)</th>
+                        <th>Answer(English)</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var count = 1;
+                    }
+                    @foreach (MenuQuestionAnswer data in Model.menuQuestionAnswers)
+                    {
+                    <tr>
+                        <td>@count</td>
+                        <td>@data.MenuName</td>
+                        @if (data.TypeId == 1)
+                        {
+                            <td>@data.QuestionText</td>
+                            <td>@data.AnswerText</td>
+                            <td>@data.QuestionTextEN</td>
+                            <td>@data.AnswerTextEN</td>
+                        }
+                        else
+                        {
+                            <td>@data.QuestionText</td>
+                            <td>Template(@data.TypeName)</td>
+                            <td>@data.QuestionTextEN</td>
+                            <td>Template(@data.TypeName)</td>
+                        }
+
+
+                    </tr>
+                        count++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+
+    <script>
+        var table;
+
+        //var botKey = localStorage.getItem('botKey');
+        var botKey = getCookie('botKey');
+        $(document).ready(function () {
+            $('.botKey').val(botKey);
+
+
+
+
+
+            $('#IsLast').on('change', function () {
+                if ($(this).is(':checked')) {
+                    console.log('Checkbox is checked.');
+                    $('#responseAPI-box').show();
+                } else {
+                    console.log('Checkbox is unchecked.');
+                    $('#responseAPI-box').hide();
+                    // Do something when the checkbox is unchecked
+                }
+            });
+
+
+
+
+
+            $("#lanENG").click(function () {
+                $("#d3Content").empty();
+                $("#d3Content").append(
+                    '<img id="customLoaderMenu" src="images/loader-64x/Preloader_3.gif" alt="loader" style="margin-top: 200px; margin-left: 48%;" />'
+                );
+
+                $.get("Menu/GetMenusJson?FbPageId=@Model.FbPageId" + "&botKey=" + botKey, function (data, status) {
+                GenerateTreeENG(data.menus, data.depth);
+            });
+            });
+        $("#lanBAN").click(function () {
+            $("#d3Content").empty();
+            $("#d3Content").append(
+                '<img id="customLoaderMenu" src="images/loader-64x/Preloader_3.gif" alt="loader" style="margin-top: 200px; margin-left: 48%;" />'
+            );
+ $.get("Menu/GetMenusJson?FbPageId=@Model.FbPageId" + "&botKey=" + botKey, function (data, status) {
+                GenerateTree(data.menus, data.depth);
+            });
+
+        });
+        $.get("Menu/GetMenusJson?FbPageId=@Model.FbPageId" + "&botKey=" + botKey, function (data, status) {
+                GenerateTree(data.menus, data.depth);
+            });
+            ClearMenu();
+
+            table = $('#dataTable').DataTable({
+                "columnDefs": [
+                    { "width": "5%", "targets": 0 },
+                    { "width": "20%", "targets": 1 },
+                    { "width": "20%", "targets": 2 },
+                    { "width": "20%", "targets": 3 },
+                    { "width": "20%", "targets": 4 },
+                    { "width": "15%", "targets": 5 },
+                ],
+                "pageLength": 100
+            });
+
+        });
+
+        function ClearMenu() {
+
+            $("#ParrentMenuId").val(null);
+            $("#currentMenuId").val(null);
+            $("#currentMenuIdAction").val(null);
+            $("#ParrentMenuName").val(null);
+            $("#CurrentManeuNameAction").val(null);
+            $("#ParrentMenuNameEN").val(null);
+            $("#CurrentManeuNameENAction").val(null);
+            $("#currentMenuName").val(null);
+            $("#currentMenuNameEN").val(null);
+
+            $("#renameMenu").hide();
+            $("#makeLast").hide();
+            $("#makeGeneral").hide();
+            $("#deleteMenu").hide();
+
+        }
+
+        function SelectMenu(id, menuName, menuNameEN, type) {
+            $("#ParrentMenuId").val(id);
+            $("#currentMenuId").val(id);
+            $("#currentMenuIdAction").val(id);
+            $("#ParrentMenuName").val(menuName);
+            $("#CurrentManeuNameAction").val(menuName);
+            $("#ParrentMenuNameEN").val(menuNameEN);
+            $("#CurrentManeuNameENAction").val(menuNameEN);
+            $("#currentMenuName").val(menuName);
+            $("#currentMenuNameEN").val(menuNameEN);
+
+
+            $("#renameMenu").show();
+            $("#deleteMenu").show();
+            if (type == "parrent") {
+                $("#makeLast").show();
+                $("#addMenu").show();
+                $("#makeGeneral").hide();
+            } else {
+                $("#addMenu").hide();
+                $("#makeLast").hide();
+                $("#makeGeneral").show();
+            }
+
+            table.columns(5).search(menuName).draw(); // Data Seraching Done, By menu selecting.
+
+        }
+
+        function CheckStatus() {
+            if ($("#ParrentMenuName").val() == "" || $("#ParrentMenuName").val() == null) {
+                swal("Opps!!!", "Select A Menu First", "error");
+                return false;
+            }
+
+            if ($("#newMenu").val() == "" || $("#newMenu").val() == null) {
+                swal("Opps!!!", "Enter New Menu Name In Bangla", "error");
+                return false;
+            }
+
+            if ($("#newMenuEN").val() == "" || $("#newMenuEN").val() == null) {
+                swal("Opps!!!", "Enter New Menu Name In English", "error");
+                return false;
+            }
+
+            return true;
+        }
+
+        function CheckStatus2() {
+            if ($("#ParrentMenuName").val() == "" || $("#ParrentMenuName").val() == null) {
+                swal("Opps!!!", "Select A Menu First", "error");
+                return false;
+            }
+            if ($("#currentMenuName").val() == $("#ParrentMenuName").val() && $("#currentMenuNameEN").val() == $("#ParrentMenuNameEN").val() ) {
+                swal("Opps!!!", "Same Name", "error");
+                return false;
+            }
+            if ($("#currentMenuName").val() == "" || $("#currentMenuName").val() == null) {
+                swal("Opps!!!", "Enter  Menu Name In Bangla", "error");
+                return false;
+            }
+            if ($("#currentMenuNameEN").val() == "" || $("#currentMenuNameEN").val() == null) {
+                swal("Opps!!!", "Enter  Menu Name In English", "error");
+                return false;
+            }
+        }
+
+        function CheckStatus3() {
+            if ($("#ParrentMenuName").val() == "" || $("#ParrentMenuName").val() == null) {
+                swal("Opps!!!", "Select A Menu First", "error");
+                return false;
+            }
+
+            if ($("#actionConfirmation").val() != "yes") {
+                swal("Opps!!!", "Type yes for confirmation", "info");
+                return false;
+            }
+
+            return true;
+        }
+        
+        var treeData, treeDataDepth;
+
+        // ************** Generate the tree diagram	 *****************
+        var margin = { top: 20, right: 60, bottom: 20, left: 60 },
+            width = 960 - margin.right - margin.left,
+            height = 500 - margin.top - margin.bottom;
+
+        var i = 0,
+            duration = 750,
+            root;
+
+        var tree = d3.layout.tree()
+            .size([height, width]);
+
+        var diagonal = d3.svg.diagonal()
+            .projection(function (d) { return [d.y, d.x]; });
+        var svg;
+
+        function GenerateTree(tempData, tempdepth) {
+            console.log(tempData);
+            $("#customLoaderMenu").hide();
+            treeData = JSON.parse(tempData);
+            treeDataDepth = tempdepth;
+            svg = d3.select("#d3Content").append("svg")
+                .attr("width", width + margin.right + margin.left)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            root = treeData[0];
+            root.x0 = height / 2;
+            root.y0 = 0;
+
+            update(root);
+
+            d3.select(self.frameElement).style("height", "500px");
+        }
+        function GenerateTreeENG(tempData, tempdepth) {
+        
+            $("#customLoaderMenu").hide();
+            treeData = JSON.parse(tempData);
+            treeDataDepth = tempdepth;
+            svg = d3.select("#d3Content").append("svg")
+                .attr("width", width + margin.right + margin.left)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            root = treeData[0];
+            root.x0 = height / 2;
+            root.y0 = 0;
+
+            updateENG(root);
+
+            d3.select(self.frameElement).style("height", "500px");
+        }
+
+        function updateENG(source) {
+      
+       
+            // Compute the new tree layout.
+            var nodes = tree.nodes(root).reverse(),
+                links = tree.links(nodes);
+
+            // Normalize for fixed-depth.
+            nodes.forEach(function (d) { d.y = d.depth * ((width - 90) / treeDataDepth); });
+
+            // Update the nodes…
+            var node = svg.selectAll("g.node")
+                .data(nodes, function (d) { return d.id || (d.id = ++i); });
+
+            // Enter any new nodes at the parent's previous position.
+            var nodeEnter = node.enter().append("g")
+                .attr("class", "node")
+                .attr("transform", function (d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
+                .on("click", clickENG);
+
+            nodeEnter.append("circle")
+                .attr("r", 1e-6)
+                .style("fill", function (d) {
+                    if (d.type == "parrent") return "lightsteelblue";
+                    return "#111";
+                });
+
+            nodeEnter.append("text")
+                .attr("x", function (d) { return d.children || d._children ? -13 : 13; })
+                .attr("dy", ".35em")
+                .attr("text-anchor", function (d) { return d.children || d._children ? "end" : "start"; })
+                .text(function (d) { return d.nameEN; })
+                .style("fill-opacity", 1e-6);
+
+            // Transition nodes to their new position.
+            var nodeUpdate = node.transition()
+                .duration(duration)
+                .attr("transform", function (d) { return "translate(" + d.y + "," + d.x + ")"; });
+
+            nodeUpdate.select("circle")
+                .attr("r", 10)
+                .style("fill", function (d) {
+                    if (d.type == "parrent") return "lightsteelblue";
+                    return "#111";
+                });
+
+            nodeUpdate.select("text")
+                .style("fill-opacity", 1);
+
+            // Transition exiting nodes to the parent's new position.
+            var nodeExit = node.exit().transition()
+                .duration(duration)
+                .attr("transform", function (d) { return "translate(" + source.y + "," + source.x + ")"; })
+                .remove();
+
+            nodeExit.select("circle")
+                .attr("r", 1e-6);
+
+            nodeExit.select("text")
+                .style("fill-opacity", 1e-6);
+
+            // Update the links…
+            var link = svg.selectAll("path.link")
+                .data(links, function (d) { return d.target.id; });
+
+            // Enter any new links at the parent's previous position.
+            link.enter().insert("path", "g")
+                .attr("class", "link")
+                .attr("d", function (d) {
+                    var o = { x: source.x0, y: source.y0 };
+                    return diagonal({ source: o, target: o });
+                });
+
+            // Transition links to their new position.
+            link.transition()
+                .duration(duration)
+                .attr("d", diagonal);
+
+            // Transition exiting nodes to the parent's new position.
+            link.exit().transition()
+                .duration(duration)
+                .attr("d", function (d) {
+                    var o = { x: source.x, y: source.y };
+                    return diagonal({ source: o, target: o });
+                })
+                .remove();
+
+            // Stash the old positions for transition.
+            nodes.forEach(function (d) {
+                d.x0 = d.x;
+                d.y0 = d.y;
+            });
+        }
+        function update(source) {
+
+            // Compute the new tree layout.
+            var nodes = tree.nodes(root).reverse(),
+                links = tree.links(nodes);
+
+            // Normalize for fixed-depth.
+            nodes.forEach(function (d) { d.y = d.depth * ((width-90) / treeDataDepth); });
+
+            // Update the nodes…
+            var node = svg.selectAll("g.node")
+                .data(nodes, function (d) { return d.id || (d.id = ++i); });
+
+            // Enter any new nodes at the parent's previous position.
+            var nodeEnter = node.enter().append("g")
+                .attr("class", "node")
+                .attr("transform", function (d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
+                .on("click", click);
+
+            nodeEnter.append("circle")
+                .attr("r", 1e-6)
+                .style("fill", function (d) {
+                    if (d.type == "parrent") return "lightsteelblue";
+                    return "#111";
+                });
+
+            nodeEnter.append("text")
+                .attr("x", function (d) { return d.children || d._children ? -13 : 13; })
+                .attr("dy", ".35em")
+                .attr("text-anchor", function (d) { return d.children || d._children ? "end" : "start"; })
+                .text(function (d) { return d.name; })
+                .style("fill-opacity", 1e-6);
+
+            // Transition nodes to their new position.
+            var nodeUpdate = node.transition()
+                .duration(duration)
+                .attr("transform", function (d) { return "translate(" + d.y + "," + d.x + ")"; });
+
+            nodeUpdate.select("circle")
+                .attr("r", 10)
+                .style("fill", function (d) {
+                    if (d.type == "parrent") return "lightsteelblue";
+                    return "#111";
+                });
+
+            nodeUpdate.select("text")
+                .style("fill-opacity", 1);
+
+            // Transition exiting nodes to the parent's new position.
+            var nodeExit = node.exit().transition()
+                .duration(duration)
+                .attr("transform", function (d) { return "translate(" + source.y + "," + source.x + ")"; })
+                .remove();
+
+            nodeExit.select("circle")
+                .attr("r", 1e-6);
+
+            nodeExit.select("text")
+                .style("fill-opacity", 1e-6);
+
+            // Update the links…
+            var link = svg.selectAll("path.link")
+                .data(links, function (d) { return d.target.id; });
+
+            // Enter any new links at the parent's previous position.
+            link.enter().insert("path", "g")
+                .attr("class", "link")
+                .attr("d", function (d) {
+                    var o = { x: source.x0, y: source.y0 };
+                    return diagonal({ source: o, target: o });
+                });
+
+            // Transition links to their new position.
+            link.transition()
+                .duration(duration)
+                .attr("d", diagonal);
+
+            // Transition exiting nodes to the parent's new position.
+            link.exit().transition()
+                .duration(duration)
+                .attr("d", function (d) {
+                    var o = { x: source.x, y: source.y };
+                    return diagonal({ source: o, target: o });
+                })
+                .remove();
+
+            // Stash the old positions for transition.
+            nodes.forEach(function (d) {
+                d.x0 = d.x;
+                d.y0 = d.y;
+            });
+        }
+
+        // Toggle children on click.
+        function click(d) {
+
+            //console.log(d.name);
+
+            if (d.children) {
+                d._children = d.children;
+                d.children = null;
+            } else {
+                d.children = d._children;
+                d._children = null;
+            }
+            update(d);
+            SelectMenu(d.data, d.name, d.nameEN, d.type);
+            $('html, body').animate({
+                scrollTop: $("#modificationSec").offset().top
+            }, 2000);
+
+        }
+        function clickENG(d) {
+
+            //console.log(d.name);
+
+            if (d.children) {
+                d._children = d.children;
+                d.children = null;
+            } else {
+                d.children = d._children;
+                d._children = null;
+            }
+            updateENG(d);
+            SelectMenu(d.data, d.name, d.nameEN, d.type);
+            $('html, body').animate({
+                scrollTop: $("#modificationSec").offset().top
+            }, 2000);
+
+        }
+
+        function SaveServiceFlow(){
+            var data = $('#serviceFlowFrm').serialize();
+
+            $.ajax({
+                url: '/Menu/SaveMenuReader',
+                type: 'POST',
+                dataType: 'json',
+                data: data,
+                success: function (data) {
+                    console.log('Data received:', data);
+                    if(data == 'ok'){
+                        swal('Success', 'Success', 'success').then(function(){
+                            ChangeNode();
+                        })
+                    }
+                    else{
+                        swal('Warning', 'Failed', 'warning')
+                    }
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                }
+            });
+
+            
+        }
+
+        function ChangeNode(){
+            var menuId = $('#parentNodeEn :selected').val();
+            $('#questionEn').val();
+            $('#parameterName').val();
+            $('#stepNo').val();
+            GetMenuReaderByMenuId(menuId);
+        }
+
+        function GetMenuReaderByMenuId(menuId){
+            $.ajax({
+                url: '/Menu/GetMenuReaderByMenuId?menuId=' + menuId,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    var option = '';
+
+                    $.each(data, function (i, item) {
+                        option += `<tr>
+                                                <td>${item.message}</td>
+                                                <td>${item.stepNo}</td>
+                                                <td><a class="btn btn-danger btn-sm" onClick="DeleteMenuReader(${item.Id})">Delete</a></td>
+                                            </tr>`;
+                    })
+
+                    $('#menureadertbl tbody').empty();
+                    $('#menureadertbl tbody').append(option);
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                }
+            });
+        }
+
+
+        function DeleteMenuReader(id){
+            $.ajax({
+                url: '/Menu/DeleteMenuReader?id=' + id,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    if(data == 1){
+                        swal('Success', 'Deleted Successfully', 'success').then(function(){
+                            ChangeNode();
+                        })
+                    }
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                }
+            });
+        }
+    </script>
+}

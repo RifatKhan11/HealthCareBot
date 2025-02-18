@@ -1,0 +1,1805 @@
+﻿@model MyChatbotViewModel
+@{
+    // Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = null;
+
+}
+<!DOCTYPE html>
+<html class="gr__cdn_chatbot_com">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>chatbot.com</title>
+    <meta http-equiv="cache-control" content="max-age=0">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="expires" content="0">
+    <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT">
+    <meta http-equiv="pragma" content="no-cache">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <link href="~/SweetAlert/sweetalert2.css" rel="stylesheet" />
+    <link href="~/chatbox/Chat.css" rel="stylesheet">
+    <link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+    <link href="~/lib/bootstrap/dist/css/bootstrap-theme.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="~/css/slick.css">
+    <link rel="stylesheet" href="~/css/slick-theme.css">
+    <link href="https://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- SweetAlert CSS-->
+    <link href="~/SweetAlert/sweetalert2.css" rel="stylesheet" />
+
+    <style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+
+        .dropbtn {
+            background-color: white;
+            color: rgb(0, 108, 255);
+            padding: 1px;
+            font-size: 20px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .dropdown {
+            position: relative;
+            float: left;
+            height: 100%;
+            padding: 16px 10px;
+            width: 40px;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            /*background-color: #f1f1f1;*/
+            padding-top: 10px;
+            padding-bottom: 10px;
+            overflow: auto;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            top: -15px;
+            border-radius: 10px;
+            background: #002355;
+            color: white;
+            padding: 0;
+        }
+
+            .dropdown-content a {
+                background: #002355;
+                color: white;
+                padding: 6px 16px;
+                text-decoration: none;
+                display: inline-flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+        .dropdown a:hover {
+            background-color: black;
+        }
+
+        .show {
+            display: block;
+        }
+
+        .anitem {
+            height: 100px;
+        }
+
+        .message {
+            font-size: 13px;
+            text-align: left;
+            font-size: 15px !important;
+            line-height: 24px !important;
+            margin-top: 0px;
+            margin-bottom: 0px;
+            margin-left: 4px;
+            padding: 10px;
+        }
+
+        .text.response-content .message {
+            border-top-right-radius: 0 !important;
+            border-top-left-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
+            color: black !important;
+        }
+
+        .user.response-content .message {
+            border-top-left-radius: 0 !important;
+            border-top-right-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+            background: rgba(0,35,85,1) !important
+        }
+
+        .dot {
+            height: 25px;
+            width: 25px;
+            background-color: #bbb;
+            border-radius: 50%;
+            display: inline-block;
+            padding-left: 7px;
+            cursor: pointer;
+        }
+
+        .actionButton {
+            border: 1px solid #006CFF;
+            color: #006CFF;
+            padding: 5px 10px 5px 10px;
+            margin-top: 5px;
+            /*margin-left: 3px;*/
+            border-radius: 40px;
+            cursor: pointer;
+            display: inline-block;
+            float: left;
+            width: 90px;
+        }
+
+        .actionDate {
+            border: 1px solid #006CFF;
+            color: #006CFF;
+            padding: 5px 10px 5px 10px;
+            margin-top: 5px;
+            /*margin-left: 3px;*/
+            border-radius: 40px;
+            cursor: pointer;
+            width: 110px;
+        }
+
+        .actionTime {
+            border: 1px solid #006CFF;
+            color: #006CFF;
+            padding: 5px 10px 5px 10px;
+            margin-top: 5px;
+            /*margin-left: 3px;*/
+            border-radius: 40px;
+            cursor: pointer;
+            width: 80px;
+        }
+
+        .foo {
+            display: table;
+            width: 100%;
+        }
+
+        .bar {
+            display: table-cell;
+            padding: 0;
+        }
+
+            .bar:first-child, input[type="text"] {
+                width: 29.5%;
+            }
+
+        input {
+            box-sizing: border-box;
+        }
+
+        .chat-window {
+            right: 0 !important;
+            left: 0 !important;
+            top: 0 !important;
+            bottom: 0 !important;
+        }
+
+        .btn-menu:hover {
+            background-color: #3A6DFF;
+            color: white !important;
+        }
+
+
+        .btn-group-message {
+            background: rgb(245, 245, 245);
+            border-radius: 0px 12px 12px;
+            cursor: pointer;
+            color: rgb(6, 42, 47);
+            font-size: 14px;
+            margin: 0px;
+            padding: 5px;
+            border: 1px solid rgb(6, 42, 47);
+            font-weight: normal;
+            font-style: unset;
+            box-shadow: rgba(0, 0, 0, 0.075) 0px 0.125rem 0.25rem;
+            margin: 2px;
+            /*background-color: white;
+                    color: #062A2F;
+                    font-weight: bold;
+                    padding: 4px 8px;
+                    border-top-right-radius: 10px;
+                    border-bottom-left-radius: 10px;
+                    border: 2px solid #062A2F;
+                    margin: 1px; */
+        }
+
+            .btn-group-message:hover {
+                color: white;
+                background-color: #062A2F;
+            }
+
+
+
+
+        .whitebluecard {
+            background: #fff;
+            border-top: #453b67 solid 2px;
+        }
+
+        .bluedualcard3 {
+            position: relative;
+            transition: height .15s ease-in-out;
+            display: inline-block;
+            width: 220px;
+            flex: 0 0 220px;
+            max-width: 220px;
+            float: left;
+            font-weight: 400;
+            line-height: 1.4;
+            background-size: cover;
+            border-radius: 4px 4px 4px 4px;
+            display: block;
+            text-align: center;
+            min-height: 180px;
+            box-shadow: 0px 4px 8px 8px rgba(0,0,0,.06);
+            color: #000000;
+        }
+
+
+
+        .wrapper-box {
+            height: 100%;
+            width: 100%;
+            background-color: white;
+            position: relative;
+            display: block;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 1px;
+            cursor: pointer;
+            background: white;
+        }
+
+            .list-item:hover {
+                background-color: darkgray;
+            }
+
+        .logo {
+            width: 20%;
+            margin-right: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: none;
+        }
+
+        .content {
+            flex: 1;
+        }
+
+        .title {
+            color: #000;
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        .subtitle {
+            font-size: 11px;
+            line-height: 1.3;
+            letter-spacing: .3px;
+            margin: 0;
+            color: rgba(102,102,102,.8);
+            font-weight: 400;
+        }
+
+        .hidden-wrapper {
+            display: none;
+            transition: display 5s ease;
+        }
+
+
+
+
+
+
+
+
+        /*Slick Carousel*/
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+        }
+
+        .autoplay {
+            width: 610px;
+            padding: 0;
+            height: 160px;
+            padding-left: 100px;
+        }
+
+        .slick-arrow {
+            top: 107px;
+        }
+
+        .slick-slide {
+            width: 200px !important;
+            height: 200px !important;
+            background-color: rosybrown;
+            margin: 2px;
+        }
+
+            .slick-slide img {
+                width: 100%;
+            }
+
+
+
+
+        .dropbtn {
+            color: blueviolet;
+        }
+
+        .dr-box {
+            display: flex;
+            overflow-x: scroll;
+            max-height: 280px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        /* Track */
+        ::-webkit-scrollbar-track {
+            box-shadow: inset 0 0 5px grey;
+        }
+
+        /* Handle */
+        ::-webkit-scrollbar-thumb {
+            background: lightgrey;
+        }
+
+            /* Handle on hover */
+            ::-webkit-scrollbar-thumb:hover {
+                background: lightgrey;
+            }
+
+        .graycard.drdtal {
+            margin: 10px;
+            margin-bottom: 5px;
+            flex: 0 0 100%;
+            max-width: 300px;
+            margin-bottom: 5px;
+            flex: 0 0 100%;
+            margin: 0;
+            margin: 10px;
+        }
+
+        .doc-avalday {
+            background: #453B67;
+            border-radius: 50%;
+            color: white;
+            padding: 5px;
+            width: 25px;
+            text-align: center;
+            height: 25px;
+            display: flex;
+        }
+
+            .doc-avalday:hover {
+                background-color: darkcyan;
+                color: black;
+            }
+
+        .doc-avalday-not {
+            background-color: lightgray !important;
+            color: black !important;
+            border: 1px solid black;
+        }
+
+        .btn-btm {
+            background: rgb(0, 35, 85) !important;
+            margin-top: 10px;
+            display: inline-block;
+            font-size: 16px;
+            display: block;
+            color: white !important;
+            text-decoration: none !important;
+            cursor: pointer;
+        }
+
+            .btn-btm:hover {
+                background-color: lightgray !important;
+                color: black !important;
+                text-decoration: none !important;
+            }
+
+        .spangender {
+            line-height: 1.5;
+            float: left;
+            width: 20px;
+            display: block;
+            position: absolute;
+            background: darkblue;
+            left: 5px;
+            text-align: center;
+            border: 1px solid black;
+            color: white;
+        }
+
+        .doc-pic {
+            height: 65px;
+            width: 65px;
+            background-color: #fff;
+            border-radius: 4px;
+            -webkit-box-shadow: 0 0 5px 2px rgba(0,0,0,.2);
+            box-shadow: 0 0 5px 2px rgba(0,0,0,.2);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: 50%;
+            padding: 10px;
+        }
+
+        .drdtal-top {
+            width: 100%;
+            float: left;
+            margin: 20px 0 10px 0;
+            display: flex;
+            align-items: flex-start
+        }
+
+        .drdtal-topright {
+            padding: 0 !important;
+            width: 73%;
+            float: left;
+            padding: 5px;
+            -webkit-box-flex: 1;
+            -ms-flex: 1 1 auto;
+            flex: 1 1 auto;
+            text-align: left;
+        }
+
+        .drname {
+            margin-bottom: 3px;
+            margin-bottom: 3px;
+            font-weight: bolder;
+            font-size: 11px;
+        }
+
+        .doc-subhead {
+            width: 100%;
+            float: left;
+            margin-bottom: 2px;
+            color: #222;
+            font-size: 11px !important;
+            width: 100%;
+            float: left;
+            margin-bottom: 2px;
+            color: #222;
+            background-color: wheat;
+        }
+
+        .doc-aval {
+            display: inline-flex;
+        }
+
+        .doc-avaltxt {
+            color: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .doc-avalday {
+            background: #453b67;
+            border-radius: 50%;
+            color: #fff;
+            padding: 5px;
+            width: 25px;
+            text-align: center;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+
+
+
+        .bubblemodal-content-body {
+            position: relative;
+            -webkit-box-flex: 1;
+            -ms-flex: 1 1 auto;
+            flex: 1 1 auto;
+            padding: 1rem;
+            font-size: 14px;
+        }
+
+        .bubblemodal-content-footer {
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            -webkit-box-pack: center;
+            -ms-flex-pack: end;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .btn-modal {
+            display: inline-block;
+            font-weight: 400;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            border: 1px solid transparent;
+            padding: 0.375rem 0.75rem;
+            font-size: 11px;
+            line-height: 1.5;
+            border-radius: 0.25rem;
+            transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+            margin: 0 5px;
+            background: rgba(0,0,0,.15);
+            color: #fff;
+        }
+
+        .lazy-img-wrapper {
+            border-radius: 50%;
+        }
+
+        .card-title {
+            text-align: center;
+            font-size: 15px;
+            color: white;
+            background-color: #002355;
+            padding: 5px;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .card-box {
+            border: 2px solid lightgray;
+        }
+
+            .card-box:hover {
+                background-color: lightgray;
+                cursor: pointer;
+            }
+
+        .btnbanglas:hover {
+            background-color: #006CFF;
+            color: white !important;
+        }
+
+        #gif img {
+        }
+
+        #myDropdown {
+            background: #002355;
+            color: white;
+        }
+
+        .otpCode, .inp-control {
+            width: 100% !important;
+            box-shadow: none !important;
+        }
+
+        .otpCode {
+            font-weight: bold;
+            font-size: 16px;
+            padding: 5px !important;
+            letter-spacing: 14px;
+        }
+
+        .formMobile {
+            background: #fff none repeat scroll 0 0;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0 0 10px 0;
+            color: rgb(0, 0, 0);
+            display: inline-block;
+            float: right;
+            box-shadow: rgba(99, 199, 222, 0.5) 0px 2px 0px 0px inset;
+            line-height: 1.4;
+            padding: 20px 12px 10px 12px;
+            overflow: hidden;
+            border-width: 1px 1px 1px;
+            border-style: none solid solid;
+            border-color: rgb(238, 238, 238) rgb(238, 238, 238) rgb(238, 238, 238);
+            border-image: initial;
+            border-top: none;
+        }
+        /*
+
+                        .chat-input-group{
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            margin: 0;
+                            padding: 0;
+                            line-height: 0 !important;
+                        }*/
+
+
+
+
+
+        /*Refresh Rotate Animation*/
+
+        @@keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Apply animation to the .fa-refresh element */
+        .fa-refresh {
+            animation: rotate 2s linear infinite;
+        }
+
+        .wrapper-list-item {
+            overflow-y: scroll;
+            height: 400px;
+            padding-left: 5px;
+            padding-right: 5px;
+            padding-bottom: 170px !important;
+            border-top: 2px solid rgb(21, 210, 211);
+            box-shadow: 0 0 5px 0.5px rgba(0,0,0,.15);
+            margin: 0px 10px 7px;
+            /* background: #0E2355;*/
+        }
+
+        .hide {
+            display: none;
+        }
+
+        body {
+            overflow-y: scroll !important;
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+            background: #7A6598 !important;
+        }
+
+        .wel-header {
+            position: relative;
+            opacity: 1;
+            transform: translateY(0);
+            margin: 0;
+            padding: 10px;
+        }
+
+        .wel-header-user { 
+            height: 45px;
+            width: 45px;
+            background-color: #ffffff;
+            border-radius: 4px;
+            -webkit-box-shadow: 0 0 5px 2px rgba(0,0,0,.2);
+            box-shadow: 0 0 5px 2px rgba(0,0,0,.2);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: 50%;
+            padding: 8px;
+            margin: 0;
+        }
+
+        .wel-header-logo {
+            height: 50px;
+            width: 50px;
+            border-radius: 4px;
+            padding: 8px;
+            margin: 0;
+        }
+
+        .hitheretext {
+            width: calc(100% - 83px);
+            padding-left: 10px;
+            text-align: left;
+            float: left;
+        }
+
+        .hitheretext1 {
+            padding-left: 12px;
+            text-align: left;
+            float: left;
+        }
+
+        .wel-subheading {
+            padding-bottom: 10px;
+            font-size: 11px;
+            line-height: 14px;
+            margin-top: -9px;
+        }
+
+        .coronawrapper {
+            position: relative;
+            left: 0;
+            right: 0;
+            margin: 0;
+            color: white;
+            background: white;
+            padding: 10px;
+            color: black;
+        }
+
+        .card-svg-icon {
+            width: 14px;
+            height: 14px;
+            vertical-align: middle;
+            padding-right: 4px;
+        }
+
+        .head .avatar-offset {
+            background: #002355;
+            color: rgb(255, 255, 255);
+            height: 260px;
+            border-radius: 20px !important;
+            margin-top: 50px;
+        }
+
+        .chat-window-wrapper {
+            /*background: rgba(255, 255, 255, 0.95); */
+        }
+
+        .wel-heading {
+            font-size: 20px;
+            margin-top: -1px;
+        }
+
+        .conversation-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .conversation-wrapper {
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
+
+        .conversation::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .conversation {
+            border-radius: 0px 0px 20px 20px;
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
+
+        .wrapper-list-item::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .wrapper-list-item {
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
+        /* #app #chat .chat-window .chat-window-wrapper .window-content-wrapper .window-content .conversation .conversation-wrapper .response .response-wrapper[bot] .response-content.text .message{
+                    width: 100%;
+                    height: calc(100% - -80px);
+                    min-width: 320px;
+                    overflow-x: hidden;
+                    overflow-y: auto;
+                    padding: 20px 0 0;
+                }*/
+        #app #chat .chat-window .chat-window-wrapper .window-content-wrapper .window-content .conversation {
+            float: left;
+            width: 100%;
+            height: calc(100% - -130px);
+            min-width: 320px;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 20px 0 0;
+        }
+
+        .closeChatBoxbtn {
+            width: 35px;
+            background: #0E2355;
+            height: 35px;
+            position: absolute;
+            bottom: 0px;
+            right: 0px;
+            z-index: 100;
+            border-radius: 50%;
+        }
+        /*.footerbtn{
+                    margin-top: 50px;
+                    margin-bottom: -50px !important;
+                }*/
+        form {
+            max-width: 400px;
+            margin: auto;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: grey;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            border: 1px solid lightgrey;
+            border-radius: 3px;
+        }
+
+        .form-control {
+            height: 40px;
+        }
+
+        .fade {
+            animation-name: fade;
+            animation-duration: 1.5s;
+        }
+
+        .prev, .next {
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            width: auto;
+            padding: 16px;
+            margin-top: -22px;
+            color: black;
+            font-weight: bold;
+            font-size: 18px;
+            transition: 0.6s ease;
+            border-radius: 0 3px 3px 0;
+            user-select: none;
+        }
+
+        .prev {
+            left: 0;
+            border-radius: 3px 0 0 3px;
+        }
+
+        .next {
+            right: 0;
+            border-radius: 3px 0 0 3px;
+        }
+
+        #chatIcon {
+            position: fixed;
+            bottom: 122px;
+            right: 30px;
+            background: #41385c;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0px 3px 16px 0px rgba(0, 0, 0, 0.6), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+            animation: ripple 2s infinite;
+        }
+
+        .howyhelpicontext {
+            font-size: 12px;
+            width: 188px;
+            cursor: pointer;
+            z-index: 9999 !important;
+            text-align: center;
+            background: #41385d;
+            color: #0eeee9;
+            padding: 5px;
+            display: inline-grid;
+            bottom: 204px;
+            position: fixed;
+            right: 30px;
+            border-radius: 100px;
+            box-shadow: 0 2px 2px 1px rgba(0,0,0,.1);
+        }
+
+        .howyhelpicon {
+            width: 88px;
+            height: 108px;
+            /* bottom: 40px; */
+            cursor: pointer;
+            z-index: 9999 !important;
+            text-align: center;
+            box-shadow: none;
+            box-shadow: 0 2px 2px 1px rgba(0,0,0,.1);
+        }
+
+
+        @@keyframes ripple {
+            0% {
+                -moz-box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.1);
+                box-shadow: 0 0 0 0 rgba(204, 26, 26, 0.86);
+            }
+
+            100% {
+                -moz-box-shadow: 0 0 0 30px rgba(0, 0, 0, 0);
+                box-shadow: 0 0 0 30px rgba(0, 0, 0, 0);
+            }
+        }
+
+
+
+
+
+
+
+        /* Comment For Reschedule Card */
+        .optionscroll {
+            /* padding-left: 25px; */
+            width: 300px;
+            position: relative;
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            margin-top: -10px;
+            margin-left: -15px;
+            margin-right: -90px;
+            margin-bottom: -22px;
+            align-items: stretch;
+            background-color: white !important;
+            -ms-justify-content: flex-start;
+            justify-content: flex-start;
+            -ms-flex-pack: flex-start;
+            /* padding-bottom: 5px; */
+        }
+
+        .input-container {
+            display: -ms-flexbox; /* IE10 */
+            display: flex;
+            width: 100%;
+            height: 45px;
+            margin-bottom: 5px;
+        }
+
+        .bluedualcard {
+            position: relative;
+            transition: height .15s ease-in-out;
+            display: inline-block;
+            width: 220px;
+            flex: 0 0 220px;
+            max-width: 220px;
+            float: left;
+            margin: 0 7px 10px 0;
+            font-weight: 400;
+            line-height: 1.4;
+            background: rgba(0,35,85,1);
+            background-size: cover;
+            border-radius: 4px 4px 4px 4px;
+            display: block;
+            text-align: center;
+            min-height: 180px;
+            padding: 5px;
+            box-shadow: 4px 4px 8px 0 rgba(0,0,0,.06);
+            color: #fff;
+        }
+
+            .bluedualcard.drdtal .drdtal-top {
+                margin: 8px 0 10px px 0;
+            }
+
+        .drdtal-top {
+            width: 100%;
+            float: left;
+            margin: 20px 0 10px px 0;
+        }
+
+        .drdtal-topleft {
+            width: 75px;
+            float: left;
+            padding: 5px;
+            -webkit-box-flex: 1;
+            -ms-flex: 1 1 auto;
+            flex: 1 1 auto;
+        }
+
+        .bluedualcard img {
+            height: 60px;
+            width: 60px;
+            margin: 0 auto 8px auto;
+            display: block;
+            border-radius: 2px;
+        }
+
+        .drdtal-topright {
+            padding: 0px !important;
+            width: 73%;
+            float: left;
+            padding: 5px;
+            -webkit-box-flex: 1;
+            -ms-flex: 1 1 auto;
+            flex: 1 1 auto;
+            text-align: left;
+        }
+
+        .bluedualcard p {
+            margin-block-start: 0em;
+            margin-block-end: 0em;
+            margin: 0 0 2px 0;
+            font-size: 11px;
+        }
+
+            .bluedualcard p.drname {
+                font-size: 14px;
+            }
+
+        .bluedualcard small {
+            font-size: 11px;
+        }
+
+        .material-icons {
+            font-family: 'Material Icons';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .btnbooking, .drdtal.drppt .btn-btm.btnbooking {
+            display: inline-block;
+            width: 320px;
+            margin-bottom: 0;
+            position: relative;
+            left: -5px;
+            bottom: -5px;
+        }
+
+        .btnbooking1 {
+            display: inline-block;
+            width: 320px;
+            margin-bottom: 0;
+            position: relative;
+            bottom: -25px;
+        }
+
+        .drdtal.drppt .btn-btm {
+            padding: 0px;
+            display: inline-block;
+            width: 100%;
+            margin-bottom: 0;
+            /* position: relative; */
+            /* left: 0; */
+            /* bottom: 0; */
+            border-radius: 0 0 4px 4px;
+            font-size: 14px;
+        }
+
+        .bluedualcard .btn {
+            background: #453b67;
+            display: block;
+            text-align: center;
+            padding: 8px;
+            list-style-type: none;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: normal;
+            color: #fff;
+            width: 90%;
+            margin: 10px auto;
+            border-radius: 2px;
+        }
+
+        .drdtal .btn {
+            float: left;
+            margin: 0;
+            border-radius: 0 0 4px 2px;
+        }
+
+
+        /* Comment For Reschedule Card */
+        .jss125 {
+            height: 55px;
+            border: 1px solid lightgrey;
+            background: white;
+            border-radius: 14px 10px 0px 0px;
+            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.2);
+        }
+
+
+        .dr-box-left {
+            position: absolute;
+            top: 110px;
+            left: 0;
+            border: none;
+            background: grey;
+            font-weight: 800;
+            color: white;
+            padding: 0px 5px;
+        }
+
+        .dr-box-right {
+            position: absolute;
+            top: 110px;
+            right: 0;
+            border: none;
+            background: grey;
+            font-weight: 800;
+            color: white;
+            padding: 0px 5px;
+        }
+
+        
+        .reschedule-box-left {
+            position: absolute;
+            top: 60px;
+            left: 44px;
+            border: none;
+            background: grey;
+            font-weight: 800;
+            color: white;
+            padding: 0px 5px;
+        }
+
+        .reschedule-box-right {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            border: none;
+            background: grey;
+            font-weight: 800;
+            color: white;
+            padding: 0px 5px;
+        }
+
+
+
+
+        .loader-box{
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .loader-box img{
+            width: 70px;
+        }
+        .mySlides {display: none;}
+        img {vertical-align: middle;} 
+        .slideshow-container {
+            
+            position: relative;
+            margin: auto;
+            display: flex;
+            border-radius: 5px 0px 0px 5px;
+            box-sizing: border-box;
+            width: 30%;
+            margin: 0;
+            height: 110px;
+            width: 100px;
+        }
+        .fade1 {
+            animation-name: fade-in;
+            animation-duration: 2.5s;
+        }
+
+    </style>
+</head>
+<body data-gr-c-s-loaded="true" style="overflow: hidden;" id="chatApp">
+
+    <div id="app" style="height: calc(100vh - 40px); border-radius: 0px;overflow: hidden;">
+        <div id="chat">
+            <div class="chat-window" id="chat-window">
+                <div class="chat-window-wrapper">
+                    <div class="window-content-wrapper">
+
+                        <div class="jss125" id="header1" style="display:none;">
+                            <div class="wel-header">
+                                <div class="wel-hold" style="opacity: 1;transform: translateY(0px);color: #fff;position: relative;z-index: 2;display: block;display: inline-flex;">
+                                    <div class="wel-header-logo">
+                                        <img style="width: 35px; height:35px; margin-top:  -10px;" alt="logo" src="https://healthylabs.s3-ap-southeast-1.amazonaws.com/lab/logos/evercare/logo.png">
+                                    </div>
+                                    <div class="hitheretext1">
+                                        <h2 style="color: #002355; font-size: 17px; font-weight: bold;margin-top:  6px;">
+                                            Evercare Hospital - Chattogram
+                                        </h2>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div id="header2" class="head avatar-offset" style=" background: #002355; color: rgb(255, 255, 255); height: 180px; border-radius:6px 0px 0px 0px    !important;">
+                            <div class="headerbg" style="background: url('/chatbox/chatboat-bg.png') 0% 0% / cover; padding: 10px 10px 0px 10px">
+                                <div class="wel-header">
+                                    <div class="wel-hold" style="opacity: 1;transform: translateY(0px);color: #fff;position: relative;z-index: 2;display: block;display: inline-flex;">
+                                        <div class="wel-header-user">
+                                            <img alt="logo" style="width: 30px; height:30px;" src="https://healthylabs.s3-ap-southeast-1.amazonaws.com/chatbot/evercare.png">
+                                        </div>
+                                        <div class="hitheretext">
+                                            <h1 class="wel-heading">
+                                                Hello 👋🏻
+                                            </h1><h2 class="wel-subheading">
+                                                I Am Eva Your health assistant from Evercare Hospital Chattogram, to answer your queries
+                                            </h2>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="coronawrapper">
+                                     @if (Model.wrapperHeaderImgs.Count() > 0)
+                                    {
+                                            <div style="display: flex;  padding:0px 10px; margin-top: -22px; ">
+                                                 
+                                                 <div class="slideshow-container">
+                                        @foreach (var item in Model.wrapperHeaderImgs.Where(x => x.isDelete != 1))
+                                            {
+                                                    <div class="mySlides fade1"> 
+                                                        <img src="~/@item.imgUrl" alt="health image" style="width: 100px; height: 110px; background: #f4f4f4; display: flex;border-radius: 5px 0px 0px 5px;">
+                                                    </div>
+                                                     
+                                                
+                                            }
+                                            </div>
+                                            <div class="corona-screencardtext " style="margin-left: 1px; display: flex; flex-direction: column; justify-content: space-between; width: 100%; background-color: white; padding: 10px;border-radius: 0px 10px 0px 0px;">
+                                                <p style="text-align: left;color: rgb(0, 0, 0);font-size: 15px;margin: 0px;font-weight: 500;padding-bottom: 4px;">Health Check Packages</p>
+                                                <div class="sub-con" style="font-size: 12px; text-align: left; color: rgb(0, 0, 0);">I can help you know more about Health Check Packages.</div>
+                                                <div class="hidewelcome" style="display: flex;">
+                                                    <span class="btn-screen" onclick="ClickListWrapper(10, 'COVID-19')" style="border-color: rgb(21, 210, 211);color: rgb(21, 210, 211);margin: -8px 8px 0px auto;border: 1px solid rgb(21, 210, 211); border-radius: 40px;padding: 4px 15px;-webkit-box-sizing: border-box;box-sizing: border-box;font-size: 12px;cursor: pointer;">
+                                                        <svg focusable="false" class="card-svg-icon" viewBox="0 0 15 16">
+                                                            <g fill="#15d2d3" transform="translate(-24.000000, -12.000000)"><path d="M25.4036262,27.3409362 C24.4176893,27.8509036 23.8195834,27.3951055 24.0683403,26.3201996 L25.0887779,21.910776 C25.2131242,21.3734618 25.7510472,20.8884231 26.3078778,20.8254187 L32.503417,20.1244045 C34.151155,19.9379658 34.1569707,19.6389088 32.503417,19.4549971 L26.3078778,18.7659164 C25.7589338,18.7048617 25.2129433,18.217839 25.0887779,17.6798715 L24.0683403,13.2586546 C23.8198614,12.1820783 24.408944,11.7182276 25.4036262,12.2327184 L38.22304,18.8634497 C39.208977,19.373417 39.2177223,20.1957141 38.22304,20.7102049 L25.4036262,27.3409362 Z"></path></g>
+                                                        </svg>Know more
+                                                    </span>
+                                                </div>
+                                            </div>
+                                           
+                                                @*<div class="corona-screencardtext " style="margin-left: 1px; display: flex; flex-direction: column; justify-content: space-between; width: 100%; background-color: white; padding: 10px;border-radius: 0px 10px 0px 0px;">
+                                                    <p style="text-align: left;color: rgb(0, 0, 0);font-size: 15px;margin: 0px;font-weight: 500;padding-bottom: 4px;">Health Check Packages</p>
+                                                    <div class="sub-con" style="font-size: 12px; text-align: left; color: rgb(0, 0, 0);">I can help you know more about Health Check Packages.</div>
+                                                    <div class="hidewelcome" style="display: flex;">
+                                                        <span class="btn-screen" onclick="ClickListWrapper(10, 'COVID-19')" style="border-color: rgb(21, 210, 211);color: rgb(21, 210, 211);margin: -8px 8px 0px auto;border: 1px solid rgb(21, 210, 211); border-radius: 40px;padding: 4px 15px;-webkit-box-sizing: border-box;box-sizing: border-box;font-size: 12px;cursor: pointer;">
+                                                            <svg focusable="false" class="card-svg-icon" viewBox="0 0 15 16">
+                                                                <g fill="#15d2d3" transform="translate(-24.000000, -12.000000)"><path d="M25.4036262,27.3409362 C24.4176893,27.8509036 23.8195834,27.3951055 24.0683403,26.3201996 L25.0887779,21.910776 C25.2131242,21.3734618 25.7510472,20.8884231 26.3078778,20.8254187 L32.503417,20.1244045 C34.151155,19.9379658 34.1569707,19.6389088 32.503417,19.4549971 L26.3078778,18.7659164 C25.7589338,18.7048617 25.2129433,18.217839 25.0887779,17.6798715 L24.0683403,13.2586546 C23.8198614,12.1820783 24.408944,11.7182276 25.4036262,12.2327184 L38.22304,18.8634497 C39.208977,19.373417 39.2177223,20.1957141 38.22304,20.7102049 L25.4036262,27.3409362 Z"></path></g>
+                                                            </svg>Know more
+                                                        </span>
+                                                    </div>
+                                                </div>*@
+                                            </div>
+
+                                         
+                                     }
+                                </div>
+                            </div>
+                        </div>
+                        <table></table>
+
+
+                        <div class="window-content" style="height: calc(100vh - 225px); background: white">
+                            <div style="">
+                                @if (Model.BotRackInfoDetails.Count() > 0)
+                                {
+                                    <div class="wrapper-box" style="height: 100vh;padding: 0px 5px 0px 5px; background: url('/chatbox/chatboat-bg.png') 0% 0% / cover;">
+
+                                        <div style="margin: 0px 15px; padding-top: 7px; background: white; box-shadow: 0px 4px 8px 8px rgba(0,0,0,.06);height: 90vh;">
+                                            <div class="wrapper-list-item" style="margin: 0px 7px; background: #fff; box-shadow: 0 0 5px 0.5px rgba(0,0,0,.15);">
+                                                @foreach (var item in Model.BotRackInfoDetails.Where(x => x.isDelete != 1).OrderBy(x => x.sortOrder))
+                                                {
+                                                    <div class="list-item" onclick="ClickListWrapper(@item.Id, '@item.firstMessage?.Trim()')">
+                                                        <div class="logo">
+                                                            <img src="~/chatbox/@item.thumb" style="width: 42px; height: 42px;" alt="Logo 1">
+                                                        </div>
+                                                        <div class="content">
+                                                            <div class="title" style="color: #000; font-weight: 500; font-size: 14px;letter-spacing: .4px; line-height: normal;">@item.heading</div>
+                                                            <div class="subtitle" style="font-size: 10px; line-height: 1.3; letter-spacing: .2px; margin: 0; color: rgba(102,102,102,.8);">@item.subHeading</div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+
+                                }
+                            </div>
+
+
+                            <input type="hidden" name="totaBoxId" id="totaBoxId" value="plice123" />
+                            <input type="hidden" name="totaBoxNId" id="totaBoxNId" value="" />
+                            <input type="hidden" name="botKey" id="botKey" class="botKeyDefault" value="@ViewBag.botKey" />
+                            <div class="conversation" style="background-color: white; border-radius: 0px; border: 1px solid lightgrey;">
+                                <div class="conversation-wrapper" id="totaMessagesContainer" style="overflow-y:scroll; height: 330px; background: white;">
+                                </div>
+                                <br />
+                                <div id="totaMessagesContainerLast" style="height:0px;">
+                                    @*<div id="totaMessagesContainerComplain" style="height:150px;display:none">
+                                    <textarea id="complain" placeholder="Write Complain"></textarea>
+                                    <button onclick="">Confirm</button>
+                                    </div>
+                                    <div id="totaMessagesContainerSuggestion" style="height:150px;display:none">
+                                    <textarea id="suggesstion" placeholder="Write Suggestion"></textarea>
+                                    <button onclick="">Confirm</button>
+                                    </div>*@
+                                </div>
+                            </div>
+                            <div class="typing" style="background: rgb(255, 255, 255); opacity: 1;border: 1px solid lightgrey; border-radius: 0px; margin-top: -57px;">
+
+                                <div class="dropdown">
+                                    <button onclick="myFunction()" class="dropbtn" style="opacity: 0;"><i class="fa fa-align-justify dropbtni"></i></button>
+                                    <div id="myDropdown" class="dropdown-content">
+                                        @* <a href="javascript:void(0)" onclick="RefreshBot()"><i class="fa fa-refresh" style="margin-right: 5px;"></i> Refresh</a> *@
+                                    </div>
+                                </div>
+
+                                <input type="text" maxlength="256" placeholder="Type your message here" id="totaMessage" style="color: rgb(0, 0, 0);" autocomplete="off">
+
+                                <div class="actions"><div class="send" id="totaMessageSubmit" onclick="clickFun()"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" xml:space="preserve" class="" style="fill: rgb(0, 0, 0);"><path d="M22,11.7V12h-0.1c-0.1,1-17.7,9.5-18.8,9.1c-1.1-0.4,2.4-6.7,3-7.5C6.8,12.9,17.1,12,17.1,12H17c0,0,0-0.2,0-0.2c0,0,0,0,0,0c0-0.4-10.2-1-10.8-1.7c-0.6-0.7-4-7.1-3-7.5C4.3,2.1,22,10.5,22,11.7z"></path></svg></div></div>
+                            </div>
+                        </div>
+                    </div>
+                    @*<div class="window-close" id="window-close" style="background: rgb(0, 108, 255);"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" title="close the chat" style="fill: rgb(255, 255, 255);"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path> <path d="M0 0h24v24H0z" fill="none"></path></svg></div>*@
+                </div>
+            </div>
+
+            @*<div class="chat-button-theme-bubble" id="chat-button-theme-bubble">
+            <div class="chat-button" style="background: rgb(0, 108, 255); color: rgb(255, 255, 255);">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="chat-icon" style="stroke: rgb(255, 255, 255);"><path d="M9.37,1.34H10.8a8.2,8.2,0,0,1,0,16.39H9.37a10,10,0,0,1-2.68-.45c-.55-.15-2.23,1.81-2.63,1.36s.05-2.79-.41-3.23q-.28-.27-.54-.57A8.2,8.2,0,0,1,9.37,1.34Z" style="fill: none;"></path> <line x1="6.37" y1="7.04" x2="12.58" y2="7.04" style="fill: none; stroke-linecap: round;"></line> <line x1="6.37" y1="9.66" x2="14.31" y2="9.66" style="fill: none; stroke-linecap: round;"></line> <line x1="6.37" y1="12.28" x2="11.42" y2="12.28" style="fill: none; stroke-linecap: round;"></line></svg>
+            </div>
+            </div>*@
+        </div>
+    </div>
+    <div class="footerbtn">
+        <div onclick="RefreshBot()" style=" width: 35px; background: #7A3F98; height: 35px; position: absolute;
+    bottom: 0px;
+    left: 0px;
+    z-index: 100;
+    border-radius: 50%;
+">
+            <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 14.155 14.155" style="enable-background:new 0 0 14.155 14.155;transform: rotate(90deg);margin: 7px;" xml:space="preserve"> 
+            <g><path style="fill:#fff;" d="M12.083,1.887c-0.795-0.794-1.73-1.359-2.727-1.697v2.135c0.48,0.239,0.935,0.55,1.334,0.95
+                                    c1.993,1.994,1.993,5.236,0,7.229c-1.993,1.99-5.233,1.99-7.229,0c-1.991-1.995-1.991-5.235,0-7.229
+                                    C3.466,3.269,3.482,3.259,3.489,3.25h0.002l1.181,1.179L4.665,0.685L0.923,0.68l1.176,1.176C2.092,1.868,2.081,1.88,2.072,1.887
+                                    c-2.763,2.762-2.763,7.243,0,10.005c2.767,2.765,7.245,2.765,10.011,0C14.844,9.13,14.847,4.649,12.083,1.887z"></path>
+                            </g> 
+                    </svg>
+        </div>
+        @* <div onclick="closeChatBox()" class="closeChatBoxbtn" id="closeChatBox">
+        <svg focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="presentation" style="margin: 4px;fill: #fff;">
+        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+        <path fill="none" d="M0 0h24v24H0z"></path>
+        </svg>
+        </div>*@
+    </div>
+
+    <div class="typing" style="background: rgb(255, 255, 255); opacity: 0.6; border: 1px solid lightgrey;">
+    </div>
+
+
+
+
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="margin-top: 100px;" role="document">
+            <div class="modal-content bubblemodal-content">
+                <div class="bubblemodal-content-body text-center">
+                    <p><img src="https://healthylabs.s3-ap-southeast-1.amazonaws.com/chatbot/evercare.png" alt="sunil" style="width:64px;"></p>
+                    <p>Sure to close this chat?</p>
+                    <small>All previous conversation will be lost. If you have a question I could not answer, leave a query.</small>
+                </div>
+                <div class="bubblemodal-content-footer">
+                    <button type="button" style="background: #59b4d3;" class=" btn-modal" onclick="HideExitModal()">Continue chat</button>
+                    <button type="button" style="background: #923c3c;" class=" btn-modal" onclick="ClickedMenu('নতুন করে শুরু')">Start from beginning</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- The Modal -->
+    <div class="modal fade" id="queryModal" tabindex="-1" role="dialog" aria-labelledby="queryModalLabel" aria-hidden="true" style="margin: 8px; padding: 15px;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="border-bottom: 1px dashed lightgrey;">
+                    <h5 class="modal-title" id="queryModalLabel">Submit your query</h5>
+                    <p style="color:red; font-size: 11px;">(all fields are required)</p>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="margin-top: -40px;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <form id="myForm" method="post">
+                        <label for="name" style="width: 100%">UHID:</label>
+                        <input type="text" id="uhid" name="uhid" required style="width: 100%">
+                        <input type="hidden" name="botKeyNew" class="botKeyNew" />
+                        <label for="name" style="width: 100%">Date:</label>
+                        <input type="text" id="querydate" name="querydate" required style="width: 100%" readonly value="@DateTime.Now.ToString("dd-MMM-yyyy")">
+                        <label for="name" style="width: 100%">Time:</label>
+                        <input type="text" id="querytime" name="querytime" required style="width: 100%" readonly value="@DateTime.Now.ToString("HH:mm:ss")">
+                        <label for="phone" style="width: 100%">Mobile Number:</label>
+                        <input type="text" value="01" maxlength='11' minlength='11' onkeyup='validateMobileNumber(this)' id="phone2" name="phone" required style="width: 100%" placeholder="Your Mobile Number">
+                        <small id="phoneValidateMsg" style="color: darkred;">Phone must be 11 digits.</small>
+                        <label for="Querymessage">Message:</label>
+                        <textarea id="Querymessage" name="query" rows="4" required></textarea>
+                        <div class="modal-footer">
+                            <button type="button" id="SaveBtn" onclick="saveQuery()" class="btn btn-primary">Submit</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!--FeedBack-->
+    <div class="modal fade" id="feedbackModal" tabindex="-1" role="dialog" aria-labelledby="feedbackModalLabel" aria-hidden="true" style="margin: 8px; padding: 15px;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="border-bottom: 1px dashed lightgrey;">
+                    <h5 class="modal-title" id="feedbackModalLabel">Submit your FeedBack</h5>
+                    <p style="color:red; font-size: 11px;">(all fields are required)</p>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="margin-top: -40px;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <form id="feedBAckForm" method="post">
+                        <label for="name" style="width: 100%">Name:</label>
+                        <input type="hidden" name="botKeyNew" class="botKeyNew" />
+                        <input type="text" id="name" name="name" required style="width: 100%" placeholder="Your Name">
+                        <label for="name" style="width: 100%">Email:</label>
+                        <input type="text" id="email" name="email" required style="width: 100%" placeholder="Your Email Address">
+                        <label for="name" style="width: 100%">Mobile Number:</label>
+                        <input type="text" value="01" maxlength='11' minlength='11' onkeyup='validatePhoneNumber(this)' id="phone" name="phone" required style="width: 100%" placeholder="Your Mobile Number">
+                        <small id="feedbackphoneValidateMsg" style="color: darkred;">Phone must be 11 digits.</small>
+                        <label for="message">Message:</label>
+                        <textarea id="message" name="message" rows="4" required placeholder="Type your message here...."></textarea>
+                        <div class="modal-footer">
+                            <button type="button" id="feedbackBtn"  onclick="SaveFeedback()" class="btn btn-primary">Submit</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://www.jqueryscript.net/demo/jQuery-Plugin-To-Create-Animated-Placeholders-placeholderTypewriter/placeholderTypewriter.js"></script>
+
+    <script src="~/SweetAlert/sweetalert2.common.js"></script>
+    <script src="~/SweetAlert/sweetalert2.js"></script>
+    <script>
+         
+        // $('#querydate').datepicker({ dateFormat: "dd-M-yy", showAnim: "scale", changeMonth: true, changeYear: true, yearRange: "2015:2050" });
+        // $('#querytime').timepicker({ timeFormat: 'HH:mm', interval: 15, scrollbar: true });
+
+        localStorage.setItem('botKey', '@ViewBag.botKey');
+        document.cookie = `${'botKey'}=${'@ViewBag.botKey'}`;
+        botKeyNew = '@ViewBag.botKey';
+        //document.body.innerHTML += '<script src="~/chatbox/Chat.js"><\/script>'
+
+
+        //alert($("#chatbot-chat").val());
+        //$('#totaMessagesContainer').change(function () {
+        //    $('#conversation').scrollTop($('#conversation')[0].scrollHeight);
+        //});
+
+        $("#chat-button-theme-bubble").click(function () {
+
+            //  alert($("#chatbot-chat").val());
+
+        });
+        function validateMobileNumber(inputElement) {
+            var inputValue = $(inputElement).val().replace(/\D/g, '');
+            console.log(inputValue);
+
+            if (inputValue.length != 11) {
+                console.log('Phone must be 11 digits.', inputValue);
+                $('#phoneValidateMsg').text('Phone must be 11 digits.');
+                $('#SaveBtn').prop('disabled', true);
+            }
+            else if (!inputValue.startsWith('01')) {
+                console.log('Phone must be start with 01', inputValue);
+                $('#phoneValidateMsg').text('Phone must be start with 01');
+                $('#SaveBtn').prop('disabled', true);
+            }
+            else {
+                console.log('Input value is valid');
+                $('#phoneValidateMsg').text('');
+                $('#SaveBtn').prop('disabled', false);
+            }
+
+            // Update the input value
+            $(inputElement).val(inputValue);
+
+        }
+        function validatePhoneNumber(inputElement) {
+
+
+            var inputValue = $(inputElement).val().replace(/\D/g, '');
+            console.log(inputValue);
+
+            if (inputValue.length != 11) {
+                console.log('Phone must be 11 digits.', inputValue);
+                $('#feedbackphoneValidateMsg').text('Phone must be 11 digits.');
+                $('#feedbackBtn').prop('disabled', true);
+            }
+            else if (!inputValue.startsWith('01')) {
+                console.log('Phone must be start with 01', inputValue);
+                $('#feedbackphoneValidateMsg').text('Phone must be start with 01');
+                $('#feedbackBtn').prop('disabled', true);
+            }
+            else {
+                console.log('Input value is valid');
+                $('#feedbackphoneValidateMsg').text('');
+                $('#feedbackBtn').prop('disabled', false);
+            }  
+
+            //if (inputValue.length > 11) {
+            //    inputValue = inputValue.slice(0, 11);
+            //}
+
+            $(inputElement).val(inputValue);
+
+        }
+
+        function saveQuery() {
+            var myData = $("#myForm").serialize();
+            $.ajax({
+                url: "/Appointment/SaveQuery",
+                type: "post",
+                data: myData,
+
+            }).done(function (message) {
+                if (message == "success") {
+                    swal('Success', 'Submit Successfully your query !', 'success').then(function () {
+                        location.reload();
+                    });
+                }
+                else if (message == "user not found") {
+                    swal('warning', 'User not found!', 'warning');
+                }
+                else if (message == "error") {
+                    swal('Warning!', 'Unable to submit your query!', 'warning').then(function () {
+
+                    });
+                }
+                 else if (message == "phoneInvalid") {
+                    swal('Warning!', 'Phone Number Invalied!', 'warning').then(function () {
+
+                    });
+                }
+
+
+            })
+
+        }
+
+
+        function SaveFeedback() {
+            var myData = $("#feedBAckForm").serialize();
+            $.ajax({
+                url: "/Appointment/SaveFeedback",
+                type: "post",
+                data: myData,
+
+            }).done(function (message) {
+                if (message == "success") {
+                    swal('Success', 'Send Successfully your Feedback!', 'success').then(function () {
+                        location.reload();
+                    });
+                }
+                else if (message == "error") {
+                    swal('Warning!', 'Unable to Send your Feedback!', 'warning').then(function () {
+
+                    });
+                }
+                else if (message == "phoneInvalid") {
+                    swal('Warning!', 'Phone Number Invalied!', 'warning').then(function () {
+
+                    });
+                }
+
+
+            })
+
+        }
+
+
+
+
+        var placeholders = [];
+        var wrapperId = 0;
+
+        function ClickListWrapper(id, message) {
+            wrapperId = id;
+            if (message.indexOf('http') >= 0) {
+                window.open(message, '_blank');
+
+                return;
+            }
+
+            if (id == 17) {
+                $('.botKeyNew').val(botKeyNew);
+                $('#queryModal').modal('show');
+
+                $('#SaveBtn').prop('disabled', true);
+
+                return;
+            }
+            if (id == 20) {
+                $('.botKeyNew').val(botKeyNew);
+                $('#feedbackModal').modal('show');
+
+                $('#feedbackBtn').prop('disabled', true);
+
+                return;
+            }
+
+            if (id == 19) {
+
+                window.open('https://www.evercarebd.com/dhaka/health-checks/', '_blank');
+
+                return;
+            }
+            //if (id == 1) {
+            //    $('#totaMessage').placeholderTypewriter({
+            //        text: ["Type here..", "Cardiologist..", "Paediatrics.."],
+            //        delay: 30,
+            //        pause: 1000
+            //    });
+            //}
+            //if (id == 2) {
+            //    $('#totaMessage').placeholderTypewriter({
+            //        text: ["Type here..", "Dr. Ashish..", "Dr. Abdul .."],
+            //        delay: 30,
+            //        pause: 1000
+            //    });
+            //}
+            //if (id == 6 || id == 7) {
+            //    $('.typing').show();
+            //    $('.typing').css('margin-top', '-57px;');
+            //    $('#totaMessage').placeholderTypewriter({
+            //        text: ["Type your query..", "Eg. Appointment", "Eg. Doctor", "Eg. Doctor by name"],
+            //        delay: 30,
+            //        pause: 1000
+            //    });
+            //}
+
+            $('.wrapper-box').toggleClass('hidden-wrapper');
+
+            openMessageBox();
+
+
+            $.ajax({
+                url: "/Menu/GetPreMessageByWrapperDetailsId?id=" + id + "&userId=" + $('#totaBoxNId').val() + "&botKey=" + botKeyNew,
+                type: "GET",
+                dataType: "json",
+                async: false,
+                success: function (data) {
+                    $('.conversation-wrapper .loader-box').remove();
+
+                    if (data.length > 0) {
+                        $('.conversation-wrapper').append(`<div class="loader-box"><img src="https://i.gifer.com/ZhKG.gif""></div>`);
+                        $(".conversation-wrapper").animate({ scrollTop: $(".conversation-wrapper")[0].scrollHeight }, 200);
+                        setTimeout(function () {
+                            $('.conversation-wrapper .loader-box').remove();
+
+                            $.each(data, function (index, value) {
+                                AddServerMessage(value);
+                            });
+                        }, 2000);
+                        
+                    }
+
+
+                    console.log("Data received:", data);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error:", error);
+                }
+            });
+
+
+
+            AddSendMessage(message);
+            GenerateResponseJsonAndSend(message, '', '');
+        }
+
+        function openMessageBox() {
+            $('#coronawrapper').hide();
+            $('#header2').hide();
+            $('#header1').show();
+            $('.head.avatar-offset').css('height', '82px');
+            $('.conversation').css('height', 'calc(100vh -80px)');
+            $('.conversation-wrapper').css('height', '490px');
+        }
+
+
+
+
+
+        $(document).ready(function () {
+            $('.autoplay').slick({
+                slidesToShow: 3,
+                slidesToScroll: 1,
+                autoplay: true,
+                autoplaySpeed: 2000,
+            });
+            showSlides();
+        });
+
+
+
+        function drboxLeft() {
+            $('.dr-box').animate({ scrollLeft: '-=' + 300 }, 'slow');
+        }
+        function drboxRight() {
+            $('.dr-box').animate({ scrollLeft: '-=-' + 300 }, 'slow');
+        }
+        
+
+        function rescheduleboxLeft() {
+            $('#AppointmentCard').animate({ scrollLeft: '-=' + 300 }, 'slow');
+        }
+        function rescheduleboxRight() {
+            $('#AppointmentCard').animate({ scrollLeft: '-=-' + 300 }, 'slow');
+        }
+
+
+        //$('#totaMessage').placeholderTypewriter({
+        //    text: ["Type your message here..", "Ask me something..", "Type Dr. Name..", "Type Department Name.."],
+        //    //text: JSON.stringify(placeholders),
+        //    delay: 30,
+        //    pause: 1000
+        //});
+
+
+        
+        let slideIndex = 0;
+        showSlides();
+        function showSlides() {
+            let i;
+            let slides = document.getElementsByClassName("mySlides");
+            for (i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";
+            }
+            slideIndex++;
+            if (slideIndex > slides.length) { slideIndex = 1 }
+
+            slides[slideIndex - 1].style.display = "block";
+            setTimeout(showSlides, 2000);
+        }
+
+
+    </script>
+    <script src="~/chatbox/signalr/signalr.min.js"></script>
+    <script crossorigin="anonymous" src="~/chatbox/Chat.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="~/js/popper.min.js"></script>
+    <script src="~/chatbox/cookie.js"></script>
+    <script src="~/js/slick.min.js"></script>
+
+
+</body>
+</html>

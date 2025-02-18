@@ -1,0 +1,414 @@
+﻿@model KnowledgeViewModel
+@{
+    ViewData["Title"] = "Menu";
+}
+
+<style>
+    input, select, button, textarea{
+        box-shadow: none !important;
+    }
+
+    .tbllink{
+        color: blue;
+    }
+    #qbox ul li{
+        list-style: none;
+        padding: 4px;
+        background: lightblue;
+        margin: 2px;
+    }
+
+    #qbox ul{
+        padding: 0 !important;
+    }
+</style>
+
+<ol class="breadcrumb">
+    <li class="breadcrumb-item">
+        <a href="/">Dashboard</a>
+    </li>
+    <li class="breadcrumb-item active">Create Knowledge</li>
+</ol>
+
+<!-- Area Chart Example-->
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Create Knowledge
+    </div>
+    <div class="card-body">
+        <form asp-action="CreateKnowledge" id="KnowledgeCreateTbl" method="post">
+            <input type="hidden" class="form-control" id="Id" name="Id" value="0">
+            <input type="hidden" class="form-control" id="facebookId" name="facebookPageId" value="2">
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="ParrentMenuName">Type</label>
+                        <select class="form-control" name="type" id="type" required>
+                            <option value="">Select Type</option>
+                            <option value="1">Text</option>
+                            <option value="2">Button</option>
+                            <option value="3">Button Group</option>
+                            <option value="4">HTML</option>
+                            <option value="5">IFrame Url</option>
+                            <option value="6">Card Group</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="ParrentMenuName">Question</label>
+                        <input type="text" class="form-control" id="question" value="" name="question" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ParrentMenuName">Answer</label>
+                        <textarea rows="5" class="form-control" id="answer" value="" name="answer"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ParrentMenuName">Parent Question</label>
+                        <select class="form-control" name="keyWordQuesAnsId" id="keyWordQuesAnsId" required>
+                            <option value="">No Parent</option>
+                            @foreach (var data in Model.keyWordQuesAns)
+                            {
+                                <option value="@data.Id">@data.question</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="ParrentMenuName">Priority</label>
+                        <input type="number" class="form-control" id="priority" value="" name="priority" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ParrentMenuName">Question Key</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="questionkey" value="@Guid.NewGuid().ToString().ToUpper()" name="questionkey" required>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button" id="generateButton" onclick="return GenerateKey()">Generate</button>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="ParrentMenuName">Status</label>
+                        <select class="form-control" name="status" id="status" required>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ParrentMenuName">Is This a Question?</label>
+                        <select class="form-control" name="isquestion" id="isquestion" required>
+                            <option value="0">No</option>
+                            <option value="1">Yes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="botKey">Bot Key</label>
+                        <input type="text" id="botKey" name="botKey" class="form-control" value="@ViewBag.botKey" readonly />
+                    </div>
+                </div>
+            </div>
+
+
+            <input type="button" onclick="return CheckStatus()" class="btn btn-primary btn-sm" value="Save">
+        </form>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Knowledge List
+    </div>
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>#SL</th>
+                        <th>Question</th>
+                        <th>Reply Text</th>
+                        <th>Keyword Question</th>
+                        <th style="width: 100px !important;">Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="keywordQuestionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="qbox">
+                    <ul style="padding: 0 !important;">
+                        <li><b>Question:</b> </li>
+                        <li><b>Answer:</b> </li>
+                        <li><b>Priority:</b> </li>
+                        <li><b>Question Key:</b> </li>
+                        <li><b>Type:</b> </li>
+                        <li><b>Order No:</b> </li>
+                        <li><b>Status:</b> </li>
+                        <li><b>Is Question:</b> </li>
+                        <li><b>Next Node:</b> </li>
+                        <li><b>Sms OTP:</b> </li>
+                        <li><b>Department:</b> </li>
+                        <li><b>Doctor:</b> </li>
+                        <li><b>Reference:</b> </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            Common.Ajax('GET', '/global/api/GetAllBotKnowledge', [], 'json', ajaxGetAllBotKnowledge, false);
+
+            $("#IsLoop").change(function () {
+
+                if ($(this).val() == 1) {
+
+                    $(this).val(0);
+                }
+                else {
+                    $(this).val(1);
+                }
+
+                if ($(this).val() == 1) {
+
+                    $("#loopof").show();
+                }
+                else {
+                    $("#loopof").hide();
+                }
+                Common.Ajax('GET', '/knowledge/Getquesrion/', [], 'json', orgquestion);
+
+            });
+            $("#questioncategoryId").change(function () {
+                var id = $(this).val();
+                Common.Ajax('GET', '/knowledge/GetquesrionbycatId/' + id, [], 'json', orgquestion);
+            });
+
+            $('#dataTable').DataTable({
+                "columnDefs": [
+                    { "width": "10%", "targets": 0 },
+                    { "width": "10%", "targets": 1 },
+                    { "width": "10%", "targets": 2 },
+                    { "width": "10%", "targets": 3 },
+                    { "width": "10%", "targets": 4 },
+                    { "width": "10%", "targets": 5 },
+                    { "width": "10%", "targets": 6 },
+                    { "width": "10%", "targets": 7 },
+                    { "width": "10%", "targets": 8 },
+                    { "width": "10%", "targets": 9 }
+                ],
+                "pageLength": 100
+            });
+
+
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            });
+
+        });
+        function orgquestion(response) {
+            console.log(response);
+            var options = '<option value="">Select</option>';
+            $.each(response, function (i, item) {
+                options += '<option value="' + item.id + '">' + item.question + '-' + item.answer + '</option>';
+            });
+            console.log(options);
+            $('#keyWordQuesAnssId').empty();
+            $('#keyWordQuesAnssId').append(options);
+
+
+        }
+
+
+        function ajaxGetAllBotKnowledge(res){
+            console.log(res);
+
+            var option = '';
+            $.each(res, function(i, item){
+                i++;
+
+                var keywordQuestion = '';
+                var replyText = '';
+                if (item.keyWordQuesAnsId != null){
+                    keywordQuestion = `<a href="javascript:void(0)" class="tbllink" onclick="OpenKeyWordQuestion(${item.keyWordQuesAnsId})">${item.keyWordQuesAns?.question}</a>`;
+                }
+                if (item.textReply != null) {
+                    replyText = item.textReply;
+                }
+
+                option += `<tr>
+                                <td>${i}</td>
+                                <td>${item.question}</td>
+                                <td>${replyText}</td>
+                                <td>${keywordQuestion}</td>
+                                <td>${item.status == 1 ? "Active" : "Inactive"}</td>
+                                <td>
+                                    <a class="btn btn-warning btn-sm" onclick="Edit(${item.id}, '${item.question}', '${item.textReply}',${item.keyWordQuesAnsId},${item.status})">Edit</a>
+                                    <a class="btn btn-danger btn-sm" onclick="Delete(${item.id})">Delete</a>
+                                </td>
+                            </tr>`;
+            })
+
+            $('#dataTable tbody').empty();
+            $('#dataTable tbody').append(option);
+
+            //$('#dataTable').DataTable();
+
+
+        }
+
+        function OpenKeyWordQuestion(id){
+
+            Common.Ajax('GET', '/global/api/GetKeywordQuestionAnsById?id=' + id, [], 'json', ajaxGetKeywordQuestionAnsById, false);
+
+
+            $('#keywordQuestionModal').modal('show');
+        }
+
+        function ajaxGetKeywordQuestionAnsById(item) {
+            console.log("res", item);
+            var option = `<ul>
+                                <li>Question: ${item.question}</li>
+                                <li>Answer: ${item.answer}</li>
+                                <li>Priority: ${item.priority}</li>
+                                <li>Question Key: ${item.questionKey}</li>
+                                <li>Type: ${item.type}</li>
+                                <li>Order No: ${item.orderNo}</li>
+                                <li>Status: ${item.status}</li>
+                                <li>Is Question: ${item.isQuestion}</li>
+                                <li>Next Node: ${item.nextNode}</li>
+                                <li>Sms OTP: ${item.smsOTP}</li>
+                                <li>Department: ${item.department}</li>
+                                <li>Doctor: ${item.doctor}</li>
+                                <li>Reference: ${item.reference}</li>
+                            </ul>`;
+
+            $('#qbox').empty();
+            $('#qbox').append(option);
+        }
+
+
+        function Edit(id, type, question, answer, keyWordQuesAnsId, priority, questionKey, status, isQuestion) {
+            $("#Id").val(id);
+            $("#type").val(type);
+            $("#question").val(question);
+            $("#answer").val(answer);
+            $("#keyWordQuesAnsId").val(keyWordQuesAnsId);
+            $("#priority").val(priority);
+            $("#questionKey").val(questionKey);
+            $("#status").val(status);
+            $("#isquestion").val(isQuestion);
+
+            Common.Ajax('GET', '/knowledge/Getquesrion/', [], 'json', orgquestion, false);
+            if (isLoop == 1) {
+
+                $("#IsLoop").prop("checked", true);
+                $("#IsLoop").val(1);
+                if ($("#IsLoop").val() == 1) {
+
+                    $("#loopof").show();
+                }
+                else {
+                    $("#loopof").hide();
+                }
+
+            }
+            else {
+                $("#IsLoop").prop("checked", false);
+                $("#IsLoop").val(0);
+                if ($("#IsLoop").val() == 1) {
+
+                    $("#loopof").show();
+                }
+                else {
+                    $("#loopof").hide();
+                }
+
+            }
+            if (keyWordQuesAnsId != null) {
+                $("#keyWordQuesAnssId").val(keyWordQuesAnsId);
+            }
+            else {
+                $("#keyWordQuesAnssId").val(0);
+            }
+        }
+
+        function CheckStatus() {
+            //data = $('#KnowledgeCreateTbl').serialize();
+
+            //console.log(data);
+            //$.ajax({
+            //    url: "/Knowledge/CreateKnowledge",
+            //    type: "POST",
+            //    contentType: "application/json",
+            //    data: data,
+            //    async: false,
+            //    success: function (response) {
+            //        swal('Success', 'Saved Successfully!', 'success').then(function(){
+            //            location.reload();
+            //        });
+            //        console.log(response);
+            //    },
+            //    error: function (error) {
+            //        console.error("Error:", error);
+            //    }
+            //});
+
+
+            $('#KnowledgeCreateTbl').submit();
+
+            //Common.Ajax('GET', '/global/api/TotalCountMenuViewModelsDateRangeL/' + fromDate + '/' + toDate, [], 'json', GetRangeMenuData);
+
+        }
+
+        function GenerateKey(){
+            Common.Ajax('GET', '/Knowledge/GenerateQuestionKey', [], 'json', ajaxGenerateQuestionKe, false);
+        }
+
+        function ajaxGenerateQuestionKe(res) {
+            $('#questionkey').val(res);
+        }
+
+        $('[data-toggle=confirmation-singleton]').confirmation({
+            rootSelector: '[data-toggle=confirmation-singleton]',
+            container: 'body'
+        });
+
+    </script>
+}

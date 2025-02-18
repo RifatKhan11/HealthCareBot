@@ -1,0 +1,112 @@
+﻿@model BotViewModel
+@{
+    ViewData["Title"] = "All Bot";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+<style>
+    #copy{
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        background: lightgray;
+    }
+</style>
+<div class="row">
+    <h4>All Bots</h4>
+    <div class="col-md-12">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Bot Name</th>
+                    <th>User Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Key</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.ChatbotInfo)
+                {
+                    <tr>
+                        <td>@item.BotName</td>
+                        <td>@item.ApplicationUser?.UserName</td>
+                        <td>@item.ApplicationUser?.Email</td>
+                        <td>@item.ApplicationUser?.PhoneNumber</td>
+                        <td>@item.botKey</td>
+                        <td>
+                            <a class="btn btn-light btn-sm" onclick="OpenModal(@item.Id)">View</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Script</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+            <a class="btn btn-default btn-sm" id="copy">Copy</a>
+            <pre><code class="language-javascript" id="script"></code></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+@section Scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+
+    <script>hljs.highlightAll();</script>
+    <script>
+        $(document).ready(function () {
+            $("#copy").click(function () {
+                var textToCopy = $("#script").text();
+                var tempTextArea = $("<textarea>");
+                tempTextArea.val(textToCopy);
+                $("body").append(tempTextArea);
+                tempTextArea.select();
+                document.execCommand("copy");
+                tempTextArea.remove();
+                $("#copy").text("Copied!");
+                $("#copy").css("background", 'yellow');
+                setTimeout(function () {
+                    $("#copy").text("Copy");
+                    $("#copy").css("background", 'lightgray');
+                }, 2000);
+            });
+        });
+
+
+
+
+        function OpenModal(id)
+        {
+            $.ajax({
+                url: '/Account/GetScriptById?id=' + id,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    $('#script').text(data);
+                    $('#exampleModal').modal('show');
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error('Error:', textStatus, errorThrown);
+                }
+            });
+        }
+    </script>
+}

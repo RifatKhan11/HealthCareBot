@@ -1,0 +1,111 @@
+﻿@{
+    Layout = null;
+}
+@model UserQueriesViewModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>Opus Technologies Bot</title>
+    <!-- 引入 WeUI -->
+    <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.3/weui.min.css" />
+    <style>
+        .swal2-icon {
+            width: 2em !important;
+            height: 2em !important;
+            margin: 0.25em auto 0.5em !important;
+            border: 0.25em solid transparent;
+        }
+     
+         .loader {
+            border: 5px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 5px solid #3498db;
+            width: 40px;
+            height: 40px;
+            -webkit-animation: spin 1s linear infinite; /* Safari */
+            animation: spin 1s linear infinite;
+        }
+
+        /* Safari */
+        @@-webkit-keyframes spin {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
+        }
+
+        @@keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <article class="weui-article">
+        <h1>@Model.quizeLang.hello @Model.userName,</h1>
+        <section>
+            <h2 class="title">@Model.quizeLang.welcome</h2>
+            <section>
+                <p style="text-align: justify;">@Model.quizeLang.questionandsubject</p>
+            </section>
+        </section>
+
+        <form asp-antiforgery="false" asp-controller="Queries" asp-action="UserQuery" method="post" onsubmit="return validationCheck()">
+
+            <input type="hidden" name="userId" value="@Model.userId" />
+            <input type="hidden" name="userName" value="@Model.userName" />
+            <input type="hidden" name="fbPageId" value="@Model.fbPageId" />
+
+            <div class="weui-cells__title">@Model.quizeLang.yourQuestion</div>
+            <div class="weui-cells weui-cells_form">
+                <div class="weui-cell">
+                    <div class="weui-cell__bd">
+                        <textarea class="weui-textarea" name="userQuestion" id="userQuestion" placeholder="@Model.quizeLang.writeQuestion" rows="6" maxlength="1000"></textarea>
+                        <div class="weui-textarea-counter"><span>0</span>/1000</div>
+                    </div>
+                </div>
+            </div>
+
+            <label for="weuiAgree" class="weui-agree">
+                <input id="weuiAgree" type="checkbox" class="weui-agree__checkbox">
+                <span class="weui-agree__text">
+                    @Model.quizeLang.agree: <a href="javascript:void(0);">@Model.quizeLang.rule</a>
+                </span>
+            </label>
+
+            <div class="weui-btn-area">
+                <div id="page_loader" style="padding-left: 32vw; display: none;">
+                    <div class="loader"></div>
+                </div>
+
+                <input type="submit"  class="weui-btn weui-btn_primary" href="javascript:" id="page_submit_button" value="@Model.quizeLang.submit">
+            </div>
+
+        </form>
+
+    </article>
+
+    <!-- Sweet Alert Package -->
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    
+    @*JQuery Package*@
+    <script src="~/vendor/jquery/jquery.min.js"></script>
+
+    <script>
+
+        function validationCheck() {
+            if ($("#userQuestion").val() == "" || $("#userQuestion").val() == null) {
+                swal("Opps!!!", "Question Field Require!", "error");
+                return false;
+            }
+            $("#page_loader").css("display", "block");
+            $("#page_submit_button").css("display", "none");
+
+            return true;
+        }
+
+    </script>
+</body>
+</html>

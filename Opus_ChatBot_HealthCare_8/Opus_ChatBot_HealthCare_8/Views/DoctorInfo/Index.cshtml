@@ -1,0 +1,202 @@
+﻿@model DoctorListViewModel
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Doctor Information
+    </div>
+    <div class="card-body" id="EditSection">
+
+        <form asp-controller="DoctorInfo" asp-action="Index" onsubmit="return CheckStatus()" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <input type="hidden" class="form-control" id="Id" name="Id" value="">
+            <div class="form-group">
+                <label for="menuId">Specialities</label>
+
+                <select class="form-control" name="menuId" id="menuId">
+                    <option value="">Select Specialities</option>
+                    @foreach (var data in Model.menus)
+                    {
+                        <option style="border-radius:23px" value="@data.Id">@data.MenuNameEN</option>
+                    }
+                </select>
+
+            </div>
+
+            <div class="form-group">
+                <label for="ParrentMenuName">Doctor Name</label>
+                <input type="text" class="form-control" id="doctorName" value="" name="doctorName" required>
+            </div>
+
+            <div class="form-group">
+                <label for="ParrentMenuName">Designation</label>
+                <input type="text" class="form-control" id="designationName" value="" name="designationName" required>
+            </div>
+
+            <div class="form-group">
+                <label for="ParrentMenuName">Details</label>
+                <textarea class="form-control" id="details" value="" name="details"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="ParrentMenuName">Gender</label>
+                <select class="form-control" id="gender" name="gender">
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+            </div>
+
+
+            <input type="submit" class="btn btn-primary" value="Save Changes">
+        </form>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Doctor List
+    </div>
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>#SL</th>
+                        <th>Specialities</th>
+                        <th>Doctor Name</th>
+                        @*<th>More</th>*@
+                        @*<th>Category</th>*@
+                        <th>Designation</th>
+                        <th>Details</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var count = 1;
+                    }
+                    @foreach (var data in Model.doctorInfos)
+                    {
+                        <tr>
+                            <td>@count</td>
+                            <td>@data.menu.MenuNameEN</td>
+                            <td>@data.name</td>
+                            <td>@data.designationName</td>
+                            <td>@data.details</td>
+                            <td>
+                                <a href="#EditSection" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Edit Question" onclick="Edit('@data.Id',@data.menuId,'@data.designationName','@data.name','@data.gender','@data.details')"><i class="fas fa-edit"></i></a>
+
+                                <form asp-controller="Knowledge" asp-action="Delete" method="post">
+                                    <input type="hidden" name="id" value="@data.Id" />
+                                    <button type="submit" class="btn btn-danger btn-sm" data-toggle="confirmation-singleton" data-singleton="true" data-btn-ok-icon-class="material-icons" data-btn-ok-icon-content="check" data-btn-cancel-icon-class="material-icons" data-btn-cancel-icon-content="close" data-title="Are sure to delete it?">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+
+                            </td>
+                        </tr>
+                        count++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $("#IsLoop").change(function () {
+
+                if ($(this).val() == 1) {
+
+                    $(this).val(0);
+                }
+                else {
+                    $(this).val(1);
+                }
+
+                if ($(this).val() == 1) {
+
+                    $("#loopof").show();
+                }
+                else {
+                    $("#loopof").hide();
+                }
+                Common.Ajax('GET', '/knowledge/Getquesrion/', [], 'json', orgquestion);
+
+            });
+            $("#questioncategoryId").change(function () {
+                var id = $(this).val();
+                //Common.Ajax('GET', '/knowledge/GetquesrionbycatId/' + id, [], 'json', orgquestion);
+                Common.Ajax('GET', '/knowledge/GetquesrionbycatId/' + id, [], 'json', orgquestion);
+            });
+
+            $('#dataTable').DataTable({
+                "columnDefs": [
+                    { "width": "5%", "targets": 0 },
+                    { "width": "35%", "targets": 1 },
+                    { "width": "35%", "targets": 2 },
+                    { "width": "15%", "targets": 3 },
+                    { "width": "10%", "targets": 4 }
+                ],
+                "pageLength": 100
+            });
+
+
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            });
+
+        });
+        function orgquestion(response) {
+            console.log(response);
+            var options = '<option value="">Select</option>';
+            $.each(response, function (i, item) {
+                //alert(item.question);
+                options += '<option value="' + item.id + '">' + item.question + '-' + item.answer + '</option>';
+            });
+            console.log(options);
+            $('#keyWordQuesAnssId').empty();
+            $('#keyWordQuesAnssId').append(options);
+
+
+        }
+
+
+        function Edit(id, menuId, designation, name, gender, details) {
+            $("#Id").val(id);
+            $("#menuId").val(menuId);
+            $("#doctorName").val(name);
+            $("#designationName").val(designation);
+            $("#details").val(details);
+            $("#gender").val(gender);
+            
+        }
+
+        function CheckStatus() {
+            if ($("#doctorName").val() == "" || $("#doctorName").val() == null || $("#menuId").val() == "" || $("#menuId").val() == null) {
+                swal("Opps!!!", "Please enter correctly", "error");
+                return false;
+            }
+            return true;
+        }
+
+        $('[data-toggle=confirmation-singleton]').confirmation({
+            rootSelector: '[data-toggle=confirmation-singleton]',
+            container: 'body'
+        });
+
+    </script>
+}
+

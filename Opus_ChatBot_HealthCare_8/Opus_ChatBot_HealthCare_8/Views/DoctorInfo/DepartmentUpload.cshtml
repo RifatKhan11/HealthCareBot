@@ -1,0 +1,113 @@
+﻿@section Style{
+    <style>
+        .redStar {
+            color: red;
+        }
+
+        .card-header {
+            border-left: 19px solid #0F72B4;
+            font-family: Arial;
+            font-size: 10px !important;
+            background-color: white !important;
+        }
+    </style>
+}
+<div class="card" style="width: 100%;" id="div1">
+    <div class="card-header row outBox" style="background-color: #EAF6FA;padding: 0; color: black;">
+        <div class="col-md-4" style="display: flex; justify-content: flex-start; align-items: center; ">
+            <h5 class="card-title" style="color: black; margin: 8px;">Department List Upload</h5>
+        </div>
+         <div class="col-md-8">
+        <div style="float: right; margin: 16px;">
+                <a class='btn btn-info' style="" data-toggle='tooltip' title='Go Back' href='/DoctorInfo/DepartmentList'>Department List</a>
+        </div>
+        </div> 
+    </div>
+    <div class="card-body">
+        <div class="col-12">
+            <form asp-controller="DoctorInfo" asp-action="DepartmentUpload" accept=".xlsx" method="post" enctype="multipart/form-data">
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="row">
+                    <div class="col-2"><label for="file-input">Upload File</label></div>
+                    <div class="col-3">
+                        <input id="file-input" type="file" name="formFile" class="btn" style="border-radius:5px" required data-parsley-required="true" />
+                    </div>
+
+                    <div class="col-3">
+                        <input type="submit" class="btn btn-success" style="border-radius:5px" value="Upload" />
+                        <a href="/api/DownloadExcelDepartmentFile" class="btn btn-dark ml-1">File Format</a>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<br />
+<div class="card">
+    <div class="card-body" id="tblAll" style="display:none">
+        <form asp-area="Bulk" asp-controller="ReceiverSMSEmail" asp-action="MultiReceiver" method="post">
+            <table class="table table-striped table-bordered table-responsive-lg table-responsive-md table-responsive-sm" id="departmentTable">
+                <thead>
+                    <tr>
+                        
+                        <th>DepartmentCode</th>
+                        <th>DepartmentName</th>
+                     
+
+
+                        <!--<th>Action</th>-->
+                </thead>
+
+                <tbody id="AppandBody"></tbody>
+
+            </table>
+            @*<input type="submit" class="btn btn-success" style="border-radius:5px" value="save" />*@
+        </form>
+    </div>
+</div>
+<!-- Modal -->
+@section Scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.1/xlsx.core.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#attendenceTable').DataTable();
+
+        });
+        $("#file-input").on("change", function (event) {
+            var file = event.target.files[0];
+            var reader = new FileReader();
+            $("#tblAll").show();
+            reader.onload = function (event) {
+                var data = new Uint8Array(event.target.result);
+                var workbook = XLSX.read(data, { type: "array" });
+                var firstSheet = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheet];
+                var jsonData = XLSX.utils.sheet_to_json(worksheet);
+                console.log(jsonData);
+                $.each(jsonData, function (key, data) {
+                    console.log(data);
+
+                    var DepartmentCode = (data.DepartmentCode == null || data.DepartmentCode == '' || data.DepartmentCode == undefined || data.DepartmentCode == 'undefined') ? '' : data.DepartmentCode;
+                    var DepartmentName = (data.DepartmentName == null || data.DepartmentName == '' || data.DepartmentName == undefined || data.DepartmentName == 'undefined') ? '' : data.DepartmentName;
+
+
+                    var tblRow = `
+                                  <tr> 
+                                          <td>${DepartmentCode}</td>
+                                          <td>${DepartmentName}</td>
+                                  </tr>
+                                                                    `;
+                    $("#AppandBody").append(tblRow);
+                });
+            };
+
+            reader.readAsArrayBuffer(file);
+        });
+
+     
+
+    </script>
+}
+

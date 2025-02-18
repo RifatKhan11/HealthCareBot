@@ -1,0 +1,102 @@
+﻿@model FileViewModel
+
+@{
+    ViewData["Title"] = "Menu";
+}
+
+<!-- Breadcrumbs-->
+<ol class="breadcrumb">
+    <li class="breadcrumb-item">
+        <a href="#">Dashboard</a>
+    </li>
+    <li class="breadcrumb-item active">Files</li>
+</ol>
+
+<!-- Area Chart Example-->
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        All Files
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">File</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Link</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var count = 1;
+                }
+                @foreach (File file in Model.Files)
+                {
+                    var url = Model.baseUrl + file.Name;
+                    <tr>
+                        <th scope="row">@count</th>
+                        <td><img class="img-responsive" src="@file.Name" style="max-height: 150px;" alt="File" /></td>
+                        <td>@file.Type</td>
+                        <td>
+                            <div class="form-group">
+                                <input class="form-control" readonly value="@url" onClick="this.select();">
+                            </div>
+                        </td>
+                    </tr>
+                    count++;
+                }
+
+
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Add New File
+    </div>
+    <div class="card-body">
+        <form method="post" enctype='multipart/form-data' asp-controller="File" asp-action="Index" onsubmit=" return CheckStatus()">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                @*<div class="custom-file">
+            <input type="file" class="custom-file-input" id="customFile" name="MyFile">
+            <label class="custom-file-label" for="customFile">Choose file</label>
+        </div>*@
+                <input type="file" class="form-control" id="customFile" name="MyFile">
+            </div>
+
+            <div class="form-group">
+                <input type="submit" class="btn btn-primary" value="Upload">
+            </div>
+
+        </form>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+
+@section Scripts{
+
+    <script>
+        function CheckStatus() {
+
+            if (document.getElementById("customFile").files.length == 0) {
+                swal("Opps!!!", "No File Selected", "error");
+
+                return false;
+            } else {
+                console.log(document.getElementById("customFile").files);
+            }
+
+            return true;
+        }
+    </script>
+
+}

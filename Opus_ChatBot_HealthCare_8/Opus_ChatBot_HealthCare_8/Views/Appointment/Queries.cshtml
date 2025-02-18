@@ -1,0 +1,417 @@
+﻿@model UserFeedbackViewModel
+@{
+    ViewData["Title"] = "Queries List";
+}
+
+@section Style{
+    <link href="https://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="Stylesheet">
+    @*<link href="https://www.jqueryscript.net/demo/Material-Time-Picker-Plugin-jQuery-MDTimePicker/mdtimepicker.css" rel="Stylesheet">*@
+     
+    <link href="~/css/jquery.datetimepicker.css" rel="stylesheet" />
+    <link href="~/SweetAlert/sweetalert2.css" rel="stylesheet" />
+}
+<style>
+    .swal2-icon {
+        width: 2em !important;
+        height: 2em !important;
+        margin: 0.25em auto 0.5em !important;
+        border: 0.25em solid transparent;
+    }
+ 
+    .selectBtn{
+        width: 160px;
+        height: 37px;
+        text-align: left;
+        background-color: #138496;
+        color: white;
+        font-size: 14px;
+        margin: 2px;
+    }
+
+    .replyBtn{
+        width: 70px;
+        height: 37px;
+        color: white;
+        background-color: #138496;
+        margin: 2px;
+    }
+</style> 
+<div class="row mb-5">
+    <div class="col-md-4">
+        <label for="fromDate" class="col-sm-12 col-form-label text-left">From Date <span class="redStar">*</span></label>
+        <div class="col-sm-12 input-group">
+        @*  <input id="frmDate" class="form-control input-group-sm" value="@DateTime.Now.ToString("yyyy-MM-dd")" readonly />*@
+            <input id="frmDate" class="form-control input-group-sm" readonly />
+            
+        </div>
+    </div>
+    <div class="col-md-4">
+        <label for="fromDate" class="col-sm-12 col-form-label text-left">To Date <span class="redStar">*</span></label>
+        <div class="col-sm-12 input-group">
+            @*<input id="toDate" class="form-control input-group-sm" value="@DateTime.Now.ToString("yyyy-MM-dd")" readonly />*@
+            <input id="toDate" class="form-control input-group-sm" readonly />
+
+        </div>
+    </div>
+    <div class="col-md-4" style="padding: 30px 0px">
+        <button id="loadData" onclick="loadData()" style="float:left;font-size: 16px;" class="btn btn-primary ml-1 m-1" title="Preview"> Load</button>
+
+        <a href="#" id="ExcelButton" title="xlsx" style="float:left;font-size: 16px;" class="btn btn-info ml-1 m-1">xlsx</a>&nbsp;&nbsp;&nbsp;
+        <a href="#" id="ExcelButtonxls" title="xls" style="float:left;font-size: 16px;" class="btn btn-info ml-1 m-1">xls</a>&nbsp;&nbsp;&nbsp;
+        <a href="#" id="ExcelButtonCsv" title="csv" style="float:left;font-size: 16px;" class="btn btn-info ml-1 m-1">csv</a>&nbsp;&nbsp;&nbsp;
+
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Pending Queries
+          
+    </div>
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0" id="tblVisitorInfo">
+                <thead>
+                    <tr>
+                        <th>#SL</th>
+                        <th>UHID</th>
+                        <th>Phone</th>
+                        <th>Time</th> 
+                        <th>Date</th>
+                        <th>Message</th> 
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="dtVisitorInfo">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+
+ <!-- Modal -->
+<div class="modal fade" id="queryReply" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Reply</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group row">
+            <lable class="col-md-12">Reply To:</lable>
+            <div class="col-md-12">
+                <input type="text" id="toemail" name="toemail" readonly class="form-control" />
+                <input type="hidden" id="id" name="id" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <lable class="col-md-12">Message:</lable>
+            <div class="col-md-12">
+                <textarea class="form-control" readonly id="queryMessage" name="queryMessage"></textarea>
+            </div>
+        </div>
+        <div class="form-group row">
+            <lable class="col-md-12">Reply:</lable>
+            <div class="col-md-12">
+                <textarea class="form-control" id="queryReplyText" name="queryReplyText"></textarea>
+            </div>
+        </div>
+               
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="SendReply()">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+@section Scripts{
+    <script src="https://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+    @*<script src="https://www.jqueryscript.net/demo/Material-Time-Picker-Plugin-jQuery-MDTimePicker/mdtimepicker.js"></script>*@
+    <script src="~/SweetAlert/sweetalert2.common.js"></script>
+    <script src="~/SweetAlert/sweetalert2.js"></script>
+    <script src="~/js/jquery.datetimepicker.js"></script>
+    <script>
+        $(document).ready(function () {
+            var date = '@DateTime.Now.ToString("MM-dd-yyyy")';
+            $('#frmDate').datetimepicker();
+            $('#toDate').datetimepicker();
+            
+
+            $('#dataTable').DataTable({
+
+                "pageLength": 100
+            });
+
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            });
+
+
+              Common.Ajax('GET', '/Appointment/GetAllPendingQueryData', [], 'json', ajaxQueriesData, false);
+           
+              
+        });
+
+
+        function ajaxQueriesData(res) {
+            console.log("Queries", res);
+            var option = '';
+            $.each(res, function (i, item) {
+                var status = 'light';
+                if (item.querystatusType == 'Pending') {
+                    status = 'warning';
+                }
+                else if (item.querystatusType == 'Called') {
+                    status = 'info';
+                }
+                else if (item.querystatusType == 'Closed') {
+                    status = 'danger';
+                }
+                else {
+
+                }
+
+                var replied = '';
+                var replyBtn = ' ';
+                if (item.replied == 1) {
+                    replied = 'lightcyan';
+                    replyBtn = '';
+                }
+
+                option += `<tr style="background-color: ${replied}">
+                                         <td>${i + 1}</td>
+                                         <td>${item.uhid}</td>
+                                        <td>${item.phone}</td>
+                                         <td>${item.querytime}</td>
+                                         <td>${item.querydate}</td>
+                                         <td>${item.query}</td>
+                                         <td><span class="badge badge-${status}">${item.querystatusType}</span></td>
+                                         <td>
+                                              <a class="btn replyBtn" style="color: white;font-size: 14px;" onclick="Reply(${item.queryId}, '${item.uhid}', '${item.query}', '${item.email}')">Reply</a>
+
+                                              <select class="form-control btn selectBtn" name="querystatus" id="querystatus_${item.queryId}" onchange="updateStatus(${item.queryId}, this.value)">
+                                                  <option value="" selected disabled style="background-color: #138496; color: white; ">Waiting for Action</option>
+                                                  <option value="0" ${item.querystatus == 0}>Pending</option>
+                                                  <option value="1" ${item.querystatus == 1}>Called</option>
+                                                  <option value="2" ${item.querystatus == 2}>Closed</option>
+                                              </select>
+                                          </td>
+
+                                        </tr>`
+            })
+
+            $('#dtVisitorInfo').empty();
+            $('#dtVisitorInfo').append(option);
+        }
+
+
+        function loadData(){
+            var frmDate = $('#frmDate').val();
+            var toDate = $('#toDate').val();
+            Common.Ajax('GET', '/Appointment/GetAllPendingQueryData2?frmDate=' + frmDate + '&toDate=' + toDate, [], 'json', ajaxQueriesData, false);
+             
+
+        }
+ 
+
+        $("#ExcelButton").click(function (e) {
+            var frmDate = $('#frmDate').val();
+            var toDate = $('#toDate').val();
+            var a = document.createElement('a');
+            a.target = "_blank";
+            a.href = '/Appointment/QueryDataExcel?frmDate=' + frmDate + '&toDate=' + toDate, '_blank';
+            a.click();
+
+        });
+        $("#ExcelButtonxls").click(function (e) {
+            var frmDate = $('#frmDate').val();
+            var toDate = $('#toDate').val();
+            var a = document.createElement('a');
+            a.target = "_blank";
+            a.href = '/Appointment/QueryDataExcelxls?frmDate=' + frmDate + '&toDate=' + toDate, '_blank';
+            a.click();
+
+        });
+        $("#ExcelButtonCsv").click(function (e) {
+            var frmDate = $('#frmDate').val();
+            var toDate = $('#toDate').val();
+            var a = document.createElement('a');
+            a.target = "_blank";
+            a.href = '/Appointment/QueryDataExcelCsv?frmDate=' + frmDate + '&toDate=' + toDate, '_blank';
+            a.click();
+
+        });
+
+        function ajaxQueriesData2(res){
+             console.log("data",res);
+            var option = '';
+            $.each(res, function (i, item) {
+                var status = 'light';
+                if (item.querystatus == 0) {
+                    status = 'warning';
+                }
+                else if (item.querystatus == 1) {
+                    status = 'info';
+                }
+                else if (item.querystatus == 2) {
+                    status = 'danger';
+                }
+                else {
+
+                }
+
+                var replied = '';
+                var replyBtn = ' ';
+                if(item.replied == 1){
+                    replied = 'lightcyan';
+                    replyBtn = '';
+                }
+
+                option += `<tr style="background-color: ${replied}">
+                                 <td>${i + 1}</td>
+                                 <td>${item.uhid}</td>
+                                 <td>${item.querytime}</td>
+                                 <td>${item.querydate}</td>
+                                 <td>${item.query}</td>
+                                 <td><span class="badge badge-${status}">${item.querystatusType}</span></td>
+                                 <td>
+                                      <a class="btn replyBtn" style="color: white;font-size: 14px;" onclick="Reply(${item.queryId}, '${item.uhid}', '${item.query}', '${item.email}')">Reply</a>
+
+                                      <select class="form-control btn selectBtn" name="querystatus" id="querystatus_${item.queryId}" onchange="updateStatus(${item.queryId}, this.value)">
+                                          <option value="" selected disabled style="background-color: #138496; color: white; ">Waiting for Action</option>
+                                          <option value="0" ${item.querystatus == 0}>Pending</option>
+                                          <option value="1" ${item.querystatus == 1}>Called</option>
+                                          <option value="2" ${item.querystatus == 2}>Closed</option>
+                                      </select>
+                                  </td>
+                                    
+                                </tr>`
+            })
+
+            $('#dtVisitorInfo').empty();
+            $('#dtVisitorInfo').append(option);
+        }
+
+        function updateStatus(queryId, value) {
+            console.log("Data");
+            console.log(`Item ID: ${queryId}, New Status: ${value}`);
+            $.ajax({
+                url: "/Appointment/SendQueryChangeStatus?id=" + queryId + "&status=" + value,
+                type: "GET",
+                success: function (data) {
+                    console.log(data);
+                    if (data.status == 1) {
+                        swal('Called', 'Called Successfully', 'success').then(function () {
+                            location.reload();
+                        })
+                    }
+                    else if (data.status == 2) {
+                        swal('Closed', 'Closed Successfully', 'success').then(function () {
+                            location.reload();
+                        })
+                    }
+                    else{
+                        swal('Pandding', 'Send Pandding', 'success').then(function () {
+                            location.reload();
+                        })
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error:", status, error);
+                }
+            });
+        }
+
+        function Delete(id) {
+            swal({
+                title: 'Are you sure?', text: 'Do you want to delete this record!', type: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'Yes, delete it!'
+            }).then(function () {
+                $.ajax({
+                    url: '/Appointment/DeleteAppointment?id=' + id,
+                    method: 'GET',
+                    success: function (data) {
+                        location.reload();
+                    },
+                    error: function (error) {
+                        console.error('Error:', error);
+                    }
+                });
+            });
+        }
+        function Dismis() {
+            $('#createDoctor').hide();
+            $('#create').show();
+           location.reload();
+        }
+
+        function Add() {
+            $('#createDoctor').show();
+            $('#create').hode();
+        }
+
+
+        
+
+ 
+
+
+        function Reply(queryId, uhid, message, email, querystatus) {
+           
+            $('#toemail').val(email);
+            $('#queryMessage').val(message);
+            $('#id').val(queryId);
+            $('#querystatus').val(querystatus);
+            $('#queryReply').modal('show');
+             
+            //$.ajax({
+            //    url: "/Appointment/ReplyQuery?uhid=" + uhid + "&message=" + message,
+            //    type: 'GET',
+            //    dataType: 'json',
+            //    success: function(res) {
+            //        console.log(res);
+            //        alert(res);
+            //    }
+            //});
+        }
+
+        function SendReply(){
+            var email = $('#toemail').val();
+            var message = $('#queryMessage').val();
+            var reply = $('#queryReplyText').val();
+            var id = $('#id').val(); 
+
+            if(email != '' && message != '' && reply != ''){
+                $.ajax({
+                    url: "/Appointment/SendQueryReply?id=" + id + "&query=" + message + "&email=" + email + "&reply=" + reply,
+                    type: "GET",
+                    success: function(data) {
+                        console.log(data);
+                        if(data){
+                            swal('success', 'Sent Reply Successfully', 'success').then(function(){
+                                location.reload();
+                            })
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error:", status, error);
+                    }
+                });
+            }
+            else{
+                swal('warning', 'Something Wrong. Try again.', 'Warning');
+            }
+
+        }
+    </script>
+}

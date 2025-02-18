@@ -1,0 +1,103 @@
+﻿<div class="row">
+    <div class="col-12">
+        <a class="btn btn-info ml-1 m-1" title="Load" style="float: left; color:white;font-size: 12px;" onclick="UpdateEHDData()">Update EHD Data</a>
+        <a class="btn btn-info ml-1 m-1" title="Load" style="float: left; color:white;font-size: 12px;" onclick="UpdateEHCData()">Update EHC Data</a>
+        <a class="btn btn-info ml-1 m-1" title="Load" style="float: left; color:white;font-size: 12px;" onclick="UpdateData()">Update Data</a>
+
+    </div>
+     
+</div>
+@section Scripts{
+    <script src="~/js/jquery.datetimepicker.js"></script>
+    <script src="~/SweetAlert/sweetalert2.common.js"></script>
+    <script src="~/SweetAlert/sweetalert2.js"></script>
+    <script>
+
+
+
+        // function LoadAppointmentData() {
+        //     swal({
+        //         title: 'Are you sure?',
+        //         text: 'Do you want to Update All Data!',
+        //         type: 'warning',
+        //         showCancelButton: true,
+        //         confirmButtonColor: '#3085d6',
+        //         cancelButtonColor: '#d33',
+        //         confirmButtonText: 'Yes, update it!'
+        //     }).then(function () {
+        //         // Define each AJAX call as a function returning a promise
+        //         function updateEHD() {
+        //             return $.ajax({
+        //                 url: '/api/UpdateApiDataEHD',
+        //                 method: 'GET'
+        //             });
+        //         }
+
+        //         function updateEHC() {
+        //             return $.ajax({
+        //                 url: '/api/UpdateApiDataEHC',
+        //                 method: 'GET'
+        //             });
+        //         }
+
+        //         function updateSP() {
+        //             return $.ajax({
+        //                 url: '/api/UpdateApiDataSP',
+        //                 method: 'GET'
+        //             });
+        //         }
+
+        //         // Chain the AJAX calls
+        //         updateEHD()
+        //             .then(updateEHC)
+        //             .then(updateSP)
+        //             .then(function () {
+        //                 swal('Success', 'All data has been updated!', 'success');
+        //             })
+        //             .catch(function (error) {
+        //                 console.error('Error:', error);
+        //                 swal('Error', 'There was an error updating the data.', 'error');
+        //             });
+        //     });
+        // }
+
+
+        function UpdateEHDData() {
+ 
+            swal({
+                title: 'Are you sure?', text: 'Do you want to update this record!', type: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'Yes, update it!'
+            }).then(function () {
+                $.ajax({
+                    url: '/api/UpdateApiDataEHD',
+                    method: 'GET',
+                    success: function (data) {
+                        location.reload();
+ 
+                    },
+                    error: function (error) {
+                        console.error('Error:', error);
+                    }
+                });
+            });
+        }
+
+        function UpdateEHCData() {
+
+            swal({
+                title: 'Are you sure?', text: 'Do you want to update this record!', type: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'Yes, update it!'
+            }).then(function () {
+                $.ajax({
+                    url: '/api/UpdateApiDataEHC',
+                    method: 'GET',
+                     success: function (data) {
+                        location.reload();
+
+                    },
+                    error: function (error) {
+                        console.error('Error:', error);
+                    }
+                });
+            });
+        }
+    </script>
+}

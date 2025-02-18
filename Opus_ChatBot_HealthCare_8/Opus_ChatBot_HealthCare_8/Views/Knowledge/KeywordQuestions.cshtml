@@ -1,0 +1,283 @@
+﻿@model BotKnowledgeViewModel
+@{
+    ViewData["Title"] = "BotKnowledge";
+}
+<style>
+    .inputs input{
+        width: auto !important;
+    }
+</style>
+
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+         Bot Questions
+    </div>
+
+
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <table class="table table-responsive" id="Tbl" style="white-space: nowrap;">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Actions</th>
+                        <th>Question</th>
+                        <th>Answer</th>
+                        <th>Priority</th>
+                        <th>Type</th>
+                        <th>Order</th>
+                        <th>Status</th>
+                        <th>Is Question</th>
+                        <th>Next Node</th>
+                        <th>Response API</th>
+                        <th>SMS OTP</th>
+                        <th>Ref Name</th>
+                        <th>Department</th>
+                        <th>Doctor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <input type="text" name="question" value="${item.adsas}" class="form-control" />
+                        </td>
+                        <td>
+                            <input type="text" name="answer" value="${item.adsas}" class="form-control" />
+                        </td>
+                        <td>
+                            <input type="text" name="priority" value="${item.adsas}" class="form-control" />
+                        </td>
+                        <td>
+                            <input type="text" name="Type" value="${item.adsas}" class="form-control" />
+                        </td>
+                        <td>
+                            <input type="text" name="Order" value="${item.adsas}" class="form-control" />
+                        </td>
+                        <td>
+                            <input type="text" name="Status" value="${item.adsas}" class="form-control" />
+                        </td>
+                        <td>
+                            <input type="text" name="IsQuestion" value="${item.adsas}" class="form-control" />
+                        </td>
+                        <td>
+                            <input type="text" name="NextNode" value="${item.adsas}" class="form-control" />
+                        </td>
+                        <td>
+                            <input type="text" name="ResponseApi" value="${item.adsas}" class="form-control" />
+                        </td>
+                        <td>
+                            <input type="text" name="SMSOTP" value="${item.adsas}" class="form-control" />
+                        </td>
+                        <td>
+                            <input type="text" name="RefName" value="${item.adsas}" class="form-control" />
+                        </td>
+                        <td>
+                            <input type="text" name="Department" value="${item.adsas}" class="form-control" />
+                        </td>
+                        <td>
+                            <input type="text" name="Doctor" value="${item.adsas}" class="form-control" />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+</div>
+
+@section Scripts{
+
+    <script>
+
+        $(document).ready(function () {
+
+            GetAllKeywordQuesAns();
+
+            $('#CreateBotKnowledge').DataTable({
+                "columnDefs": [
+                    { "width": "15%", "targets": 0 },
+                    { "width": "25%", "targets": 1 },
+                    { "width": "20%", "targets": 2 },
+                    { "width": "25%", "targets": 3 },
+                    { "width": "15%", "targets": 4 },
+                    { "width": "15%", "targets": 5 }
+
+                ],
+                "pageLength": 100
+            });
+
+
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            });
+
+
+        });
+
+
+        function GetAllKeywordQuesAns() {
+            Common.Ajax('GET', '/global/api/GetAllKeywordQuesAns', [], 'json', ajaxGetAllKeywordQuesAns, false);
+        }
+
+        function ajaxGetAllKeywordQuesAns(res) {
+            console.log("res", res);
+            var option = '';
+            var sl = 1;
+            var status = '';
+            var question = '';
+            var answer = '';
+            var isQuestion = 0;
+            var nextNodeId = '';
+            var responseApi = '';
+            var smsOtp = 0;
+            var refName = '';
+            var departmentId = '';
+            var doctorId = '';
+
+            $.each(res, function (i, item) {
+                if (item.status == 1) {
+                    status = 'Active';
+                }
+                else {
+                    status = 'InActive';
+                }
+
+                question = question == null ? '' : item.question;
+                answer = answer == null ? '' : item.answer;
+                isQuestion = isQuestion == null ? 0 : item.isQuestion;
+                nextNodeId = nextNodeId == null ? '' : item.nextNodeId;
+                responseApi = responseApi == null ? '' : item.responseApi;
+                smsOtp = smsOtp == null ? 0 : item.smsOtp;
+                refName = refName == null ? '' : item.refName;
+                departmentId = departmentId == null ? '' : item.departmentId;
+                doctorId = doctorId == null ? '' : item.doctorId;
+
+                option += `<tr class="inputs" id="id_${item.id}">
+                                <td>
+                                    <input type="text" name="id" value="${item.id}" class="form-control" />
+                                </td>
+                                <td>
+                                    <a class="btn btn-warning btn-sm" onclick="UpdateKeywordQues(${item.id})">Update</a>
+                                </td>
+                                <td>
+                                    <input type="text" name="question" value="${question}" class="form-control" />
+                                </td>
+                                <td>
+                                    <input type="text" name="answer" value="${answer}" class="form-control" />
+                                </td>
+                                <td>
+                                    <input type="text" name="priority" value="${item.priority}" class="form-control" />
+                                </td>
+                                <td>
+                                    <input type="text" name="Type" value="${item.type}" class="form-control" />
+                                </td>
+                                <td>
+                                    <input type="text" name="Order" value="${item.questionOrder}" class="form-control" />
+                                </td>
+                                <td>
+                                    <input type="text" name="Status" value="${item.status}" class="form-control" />
+                                </td>
+                                <td>
+                                    <input type="text" name="IsQuestion" value="${isQuestion}" class="form-control" />
+                                </td>
+                                <td>
+                                    <input type="text" name="NextNode" value="${nextNodeId}" class="form-control" />
+                                </td>
+                                <td>
+                                    <input type="text" name="ResponseApi" value="${responseApi}" class="form-control" />
+                                </td>
+                                <td>
+                                    <input type="text" name="SMSOTP" value="${smsOtp}" class="form-control" />
+                                </td>
+                                <td>
+                                    <input type="text" name="RefName" value="${refName}" class="form-control" />
+                                </td>
+                                <td>
+                                    <input type="text" name="Department" value="${departmentId}" class="form-control" />
+                                </td>
+                                <td>
+                                    <input type="text" name="Doctor" value="${doctorId}" class="form-control" />
+                                </td>
+                            </tr>`
+                sl = sl + 1;
+            });
+
+            $('#Tbl tbody').empty();
+            $('#Tbl tbody').append(option);
+        }
+
+
+
+        function UpdateKeywordQues(){
+            var data = $('#id_145').find('input, select, textarea').serialize();
+
+
+
+            $.ajax({
+                type: 'POST',
+                url: '/Knowledge/SaveOrUpdateKeywordQues',
+                data: { data: data },
+                success: function (response) {
+                    alert('Success');
+                    console.log('Success:', response);
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                }
+            });
+        }
+
+
+
+        function SaveKnowledge() {
+            var formData = $('#CreateBotKnowledgeId').serialize();
+          
+
+            $.ajax({
+                type: 'POST',
+                url: '/api/Knowledge/CreateBotKnowledge',
+                //contentType: 'application/json',
+                data: formData,
+                async: false,
+                success: function (response) {
+                    if (parseInt(response) > 0) {
+                        swal('Success', 'Saved Success', 'success').then(function () {
+                            GetAllBotKnowledge();
+                        });
+
+                    }
+                },
+                error: function (error) {
+                    swal('Warning', 'Saved Faild', 'warning');
+                }
+            });
+        }
+        function EditKnowledge(id, question, textReply, keyWordQuesAnsId, status) {
+            $("#CreateBotKnowledgeId #Id").val(id);
+            $("#CreateBotKnowledgeId #QuestionId").val(question);
+            $("#CreateBotKnowledgeId #TextReplyId").val(textReply);
+            $("#CreateBotKnowledgeId #KeyWordQuesAnsId").val(keyWordQuesAnsId);
+            $("#CreateBotKnowledgeId #StatusId").val(status);
+
+
+        }
+        function RemoveKnowledge(id) {
+            Common.Ajax('GET', '/global/api/DeleteBotKnowledge?bkId=' + id, [], 'json', ajaxRemoveKnowledge, false);
+        }
+
+        function ajaxRemoveKnowledge(res) {
+            if (res == 1) {
+                swal('Success', 'Delete Success', 'success').then(function () {
+                    location.reload();
+                });
+            }
+            else {
+                swal('Warning', 'Delete Faild', 'warning');
+            }
+        }
+
+    </script>
+  }

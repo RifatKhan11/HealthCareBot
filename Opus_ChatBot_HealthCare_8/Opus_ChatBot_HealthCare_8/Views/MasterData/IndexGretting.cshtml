@@ -1,0 +1,146 @@
+﻿@model OperatorViewModel
+@{
+    ViewData["Title"] = "Last Gretting";
+}
+
+<ol class="breadcrumb">
+    <li class="breadcrumb-item">
+        <a href="/">Dashboard</a>
+    </li>
+    <li class="breadcrumb-item active">Last Gretting</li>
+</ol>
+
+<!-- Area Chart Example-->
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Last Gretting
+    </div>
+    <div class="card-body" id="EditSection">
+
+        <form asp-controller="MasterData" asp-action="IndexGretting" onsubmit="return CheckStatus()" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <input type="hidden" class="form-control" id="Id" name="Id" value="">
+
+
+
+            <div class="form-group">
+                <label for="NameEn">English</label>
+                <input type="text" class="form-control" id="NameEn" value="" name="NameEn" required>
+            </div>
+
+            <div class="form-group">
+                <label for="NameBn">Bangla</label>
+                <input type="text" class="form-control" id="NameBn" value="" name="NameBn" required>
+            </div>
+
+
+
+
+            <input type="submit" class="btn btn-primary" value="Save Changes">
+        </form>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Last Gretting List
+    </div>
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>#SL</th>
+                        <th>English</th>
+                        <th>Bangla</th>
+                        
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var count = 1;
+                    }
+                    @foreach (var data in Model.lastGrettings)
+                    {
+                    <tr>
+                        <td>@count</td>
+                        <td>@data.NameEn</td>
+                        <td>@data.NameBn</td>
+                       
+                        <td>
+                            <a href="#EditSection" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Edit Question" onclick="Edit('@data.Id','@Html.Raw(HttpUtility.JavaScriptStringEncode(data.NameEn))','@Html.Raw(HttpUtility.JavaScriptStringEncode(data.NameBn))')"><i class="fas fa-edit"></i></a>
+
+                            <form asp-controller="MasterData" asp-action="DeleteGretting" method="post">
+                                <input type="hidden" name="id" value="@data.Id" />
+                                <button type="submit" class="btn btn-danger btn-sm" data-toggle="confirmation-singleton" data-singleton="true" data-btn-ok-icon-class="material-icons" data-btn-ok-icon-content="check" data-btn-cancel-icon-class="material-icons" data-btn-cancel-icon-content="close" data-title="Are sure to delete it?">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+
+                        </td>
+                    </tr>
+                        count++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('#dataTable').DataTable({
+                "columnDefs": [
+                    { "width": "10%", "targets": 0 },
+                    { "width": "40%", "targets": 1 },
+                    { "width": "40%", "targets": 2 },
+                    { "width": "10%", "targets": 3 },
+                    
+                ],
+                "pageLength": 100
+            });
+
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            });
+
+        });
+
+        
+
+        function Edit(id, NameEn, NameBn) {
+            $("#Id").val(id);
+            $("#NameEn").val(NameEn);
+            $("#NameBn").val(NameBn);
+        }
+
+        function CheckStatus() {
+            if ($("#NameEn").val() == "" ) {
+                swal("Opps!!!", "Please enter English correctly", "error");
+                return false;
+            }
+
+            if ($("#NameBn").val() == "") {
+                swal("Opps!!!", "Please enter Bangla correctly", "error");
+                return false;
+            }
+
+            return true;
+        }
+
+        $('[data-toggle=confirmation-singleton]').confirmation({
+            rootSelector: '[data-toggle=confirmation-singleton]',
+            container: 'body'
+        });
+
+    </script>
+}

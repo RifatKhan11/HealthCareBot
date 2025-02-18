@@ -1,0 +1,542 @@
+﻿@model WrapperHeaderVM
+@{
+    ViewData["Title"] = "Wrapper Header List";
+}
+
+@section Style{
+    <link href="https://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="Stylesheet">
+    <link href="https://www.jqueryscript.net/demo/Material-Time-Picker-Plugin-jQuery-MDTimePicker/mdtimepicker.css" rel="Stylesheet">
+    <link href="~/SweetAlert/sweetalert2.css" rel="stylesheet" />
+}
+
+
+<div class="row" id="create">
+    <div class="col-md-12">
+        <a onclick="Add()" class="btn btn-primary" style="float: right; margin: 20px;">Create Department</a>
+    </div>
+</div>
+<div class="card mb-3" id="createWrapper" style="display:none;">
+    <div class="card-header">
+        <h5 class="card-title">Create new Department</h5>
+    </div>
+    <div class="card-body">
+
+
+        <form id="WrapperForm" enctype="multipart/form-data">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="col-md-12">Header Name</label>
+                            <div class="col-md-12">
+                                <input type="hidden" id="WrapperHeaderId" name="WrapperHeaderId" class="form-control" />
+                                <input type="hidden" value="@ViewBag.botkey" id="botkey" name="botkey" class="form-control" />
+                                <input type="text" id="heading" name="heading" class="form-control" />
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="col-md-12">Subheader Name</label>
+                            <div class="col-md-12">
+                                <input type="text" id="subHeading" name="subHeading" class="form-control" />
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="col-md-12">Button Url</label>
+                            <div class="col-md-12">
+                                <input type="text" id="url" name="url" class="form-control" />
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                       
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-small btn-danger" onclick="Dismis()">Close</a>
+                <a class="btn btn-small btn-success" onclick="SaveWrapper()" id="SaveWrapper">Save</a>@*
+                <button class="btn btn-small btn-success d-none" id="submit" type="submit">Save</button>*@
+                <a class="btn btn-small btn-warning" onclick="UpdateWrapper()" id="UpdateWrapper" style="display:none;">Update</a>
+
+            </div>
+        </form>
+
+         
+    </div>
+</div>
+ 
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Appointment List
+    </div>
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0" id="tblVisitorInfo">
+                <thead>
+                    <tr>
+                        <th>#SL</th>
+                        <th>Header </th>
+                        <th>Subheader</th>
+                        <th>url</th> 
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="dtVisitorInfo">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+<br /><br />
+<div class="row" id="createImg">
+    <div class="col-md-12">
+        <a onclick="AddImg()" class="btn btn-primary" style="float: right; margin: 20px;">Create Wrapper</a>
+    </div>
+</div>
+<div class="card mb-3" id="createImage" style="display:none;">
+    <div class="card-header">
+        <h5 class="card-title">Create Wrapper Image</h5>
+    </div>
+    <div class="card-body">
+        <form id="WrapperImgForm" asp-action="SaveWrapperHeaderImg" enctype="multipart/form-data">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="col-md-12">Sort Order</label>
+                            <div class="col-md-12">
+                                <input type="hidden" id="WrapperHeaderImgId" name="WrapperHeaderImgId" class="form-control" />
+                                <input type="hidden" value="@ViewBag.botkey" id="botkey" name="botkey" class="form-control" />
+                                <input type="number" id="sortOrder" name="sortOrder" class="form-control" />
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="col-md-12">Status</label>
+                            <div class="col-md-12">
+                                <input type="hidden" id="heading" name="heading" class="form-control" />
+                                <select class="form-control" name="WrapperHeaderId" id="WrapperHeaderId">
+                                    <option value="">Select Deparment</option>
+                                    @foreach (var item in Model.wrapperHeader)
+                                    {
+                                        @if (Model.wrapperHeader?.FirstOrDefault().Id == item.Id)
+                                        {
+                                            <option value="@item.Id" selected>@item.heading</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.Id">@item.heading</option>
+
+                                        }
+                                    }
+
+
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+
+                        <div class="form-group row">
+
+                            <div class="col-md-8" style="padding-left: 60px;">
+                                @if (Model.imgUrl == null || Model.imgUrl == "")
+                                {
+                                    <img id="docFile" src="~/chatbox/other.png" style="height:100px;width:100px;cursor:pointer!important;" />
+
+                                }
+                                else
+                                {
+                                    <img src="~/@Model.imgUrl" style="height:200px;width:200px;border:1px solid #ddd;background-color:#eee;cursor:pointer!important" id="docFile" />
+                                }
+
+                            </div>
+
+                            <input type="hidden" id="userDocFile" />
+                            <input type="hidden" name="imgUrl" value="@Model.imgUrl" />
+                            <input type="file" style="display:none;" title="Photo Upload" id="userProfile" name="fileUrl" class="img-thumbnail float-left" />
+                            <label class="col-md-8" style="margin-left: 35px; margin-top: 7px;">
+                                <input type="button" class="btn btn-info btn-sm" onclick="fnFileUpload()" value="Upload Image" style="font-size: 13px !important; width: 120px; height: 30px;" />
+
+                            </label>
+
+                        </div>
+
+
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-small btn-danger" onclick="Dismis()">Close</a>
+                <a class="btn btn-small btn-success" onclick="Save()" id="Save">Save</a>
+                <button class="btn btn-small btn-success d-none" id="submit" type="submit">Save</button>
+                <a class="btn btn-small btn-warning" onclick="Update()" id="Update" style="display:none;">Update</a>
+
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Appointment List
+    </div>
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0" id="tblImgInfo">
+                <thead>
+                    <tr>
+                        <th>#SL</th>
+                        <th>Sort Order </th>
+                        <th>Image</th> 
+                        <th>Header</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="dtImgInfo">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+
+
+ 
+
+
+@section Scripts{
+    <script src="https://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+    <script src="https://www.jqueryscript.net/demo/Material-Time-Picker-Plugin-jQuery-MDTimePicker/mdtimepicker.js"></script>
+    <script src="~/SweetAlert/sweetalert2.common.js"></script>
+    <script src="~/SweetAlert/sweetalert2.js"></script>
+    <script>
+        $(document).ready(function () {
+            var date = '@DateTime.Now.ToString("MM-dd-yyyy")';
+
+
+            $('#frmDate').datepicker({ dateFormat: "dd-M-yy", showAnim: "scale", changeMonth: true, changeYear: true, yearRange: "1900:2100" });
+            $('#frmTime').mdtimepicker({
+                timeFormat: 'hh:mm:ss.000',
+                format: 'hh:mm',
+                pick12HourFormat: false,
+                theme: 'dark',
+                readOnly: true,
+                hourPadding: true,
+                clearBtn: false
+            });
+
+
+
+            $('#dataTable').DataTable({
+
+                "pageLength": 100
+            });
+
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            });
+
+            var botKey = '20dddd7c-734e-4c80-bbed-fae386e0291e';
+            Common.Ajax('GET', '/Appointment/GetWrapperHeaderData?', [], 'json', ajaxWrapperHeaderData, false);
+            Common.Ajax('GET', '/Appointment/GetWrapperHeaderImageData?', [], 'json', ajaxWrapperHeaderImageData, false);
+
+            //var interval = setInterval(function () {
+            //    Common.Ajax('GET', '/Appointment/GetTodayAppointmentData?date=' + date, [], 'json', ajaxTodayAppointmentData, false);
+            //}, 60000);
+        });
+
+
+        function ajaxWrapperHeaderData(res) {
+            console.log(res);
+            var option = '';
+            $('#tblVisitorInfo').dataTable().fnClearTable();
+            $('#tblVisitorInfo').dataTable().fnDestroy();
+            $.each(res, function (i, item) {
+                var status = 'light';
+                if (item.departmentstatus == "Active") {
+                    status = 'success';
+                }
+                else if (item.departmentstatus == "InActive") {
+                    status = 'warning';
+                }
+
+                else {
+
+                }
+                option += `<tr>
+                                           <td>${i + 1}</td>
+                                                   <td>${item.heading}</td>
+                                                   <td>${item.subHeading}</td>
+                                                   <td> ${item.url} </td>
+                                                    
+                                            <td>
+                                                 <a class="btn btn-sm btn-success" href="#" onclick="Edit(${item.id},'${item.heading}','${item.subHeading}','${item.url}')">Edit</a>
+                                                 <a class="btn btn-sm btn-danger" onclick="DeleteWrapperHeader(${item.id})">Delete</a>
+                                            </td>
+                                        </tr>`
+            })
+
+            $('#dtVisitorInfo').empty();
+            $('#dtVisitorInfo').append(option);
+            $('#tblVisitorInfo').DataTable({
+                "ordering": false,
+                scrollX: true,
+                scrollY: "490px",
+                "scrollCollapse": true
+            });
+        }
+
+
+        function ajaxWrapperHeaderImageData(res) {
+            console.log(res);
+            var option = '';
+            $('#tblImgInfo').dataTable().fnClearTable();
+            $('#tblImgInfo').dataTable().fnDestroy();
+            $.each(res, function (i, item) {
+                var status = 'light';
+                if (item.departmentstatus == "Active") {
+                    status = 'success';
+                }
+                else if (item.departmentstatus == "InActive") {
+                    status = 'warning';
+                }
+
+                else {
+
+                }
+                option += `<tr>
+                                                   <td>${i + 1}</td>
+                                                         <td>${item.sortOrder}</td>
+                                                         <td><img src='/${item.imgUrl}' class="img-circle clsImg" style="height:80px;width:80px;" /></td>
+                                                         <td>${item.wrapperHeader.heading}</span></td>
+                                                    <td>
+                                                            <a class="btn btn-sm btn-success" onclick="EditWrapper(${item.id},'${item.sortOrder}','${item.imgUrl}','${item.wrapperHeader.id}','${item.wrapperHeader.heading}')">Edit</a>
+                                                            <a class="btn btn-sm btn-danger" onclick="DeleteWrapperHeaderImg(${item.id})">Delete</a>
+                                                    </td>
+                                                </tr>`
+            })
+
+            $('#dtImgInfo').empty();
+            $('#dtImgInfo').append(option);
+            $('#tblImgInfo').DataTable({
+                "ordering": false,
+                scrollX: true,
+                scrollY: "490px",
+                "scrollCollapse": true
+            });
+        }
+
+
+        function DeleteWrapperHeader(id) {
+            swal({
+                title: 'Are you sure?', text: 'Do you want to delete this record!', type: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'Yes, delete it!'
+            }).then(function () {
+                $.ajax({
+                    url: '/Appointment/DeleteWrapperHeader?id=' + id,
+                    method: 'GET',
+                    success: function (data) {
+                        location.reload();
+                    },
+                    error: function (error) {
+                        console.error('Error:', error);
+                    }
+                });
+            });
+        }
+        function DeleteWrapperHeaderImg(id) {
+            swal({
+                title: 'Are you sure?', text: 'Do you want to delete this record!', type: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'Yes, delete it!'
+            }).then(function () {
+                $.ajax({
+                    url: '/Appointment/DeleteWrapperHeaderImg?id=' + id,
+                    method: 'GET',
+                    success: function (data) {
+                        location.reload();
+                    },
+                    error: function (error) {
+                        console.error('Error:', error);
+                    }
+                });
+            });
+        }
+        function Dismis() {
+            $('#createDepartment').hide();
+            $('#create').show();
+            location.reload();
+        }
+
+        function Add() {
+            $('#createWrapper').show();
+            $('#create').hide();
+        }
+        function AddImg() {
+            $('#createImage').show();
+            $('#createImg').hide();
+        }
+
+        function Edit(id, heading, subHeading,url) {
+            $('#WrapperHeaderId').val(id);
+            $('#heading').val(heading);
+            $('#subHeading').val(subHeading);
+            $('#url').val(url);
+            //$('#status').val(status);
+            //$('#docFile').attr('src', '/' + thumbUrl);
+            $('#createWrapper').show();
+            $('#UpdateWrapper').show();
+            $('#SaveWrapper').hide();
+        }
+        function EditWrapper(id, sortOrder, imgUrl, heading, WrapperHeaderId) {
+            $('#WrapperHeaderImgId').val(id);
+            $('#sortOrder').val(sortOrder);
+            $('#docFile').attr('src', '/' + imgUrl);
+            $('#heading').val(heading);
+            $('#subHeading').val(subHeading);
+            $('#createImage').show();
+            $('#createImg').hide();
+            $('#Update').show();
+            $('#Save').hide();
+        }
+
+
+        function SaveWrapper() {
+            var data = $('#WrapperForm').serialize();
+
+            swal({
+                title: 'Are you sure?', text: 'Do you want to Save this record!', type: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'Yes, update it!'
+            }).then(function () {
+                //$('#submit').click();
+                $.ajax({
+                    url: '/Appointment/SaveWrapperHeader',
+                    method: 'POST',
+                    data: data,
+                    success: function (data) {
+                        location.reload();
+                    },
+                    error: function (error) {
+                        console.error('Error:', error);
+                    }
+                });
+
+            });
+        }
+
+        function UpdateWrapper() {
+            var data = $('#WrapperForm').serialize();
+
+            swal({
+                title: 'Are you sure?', text: 'Do you want to update this record!', type: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'Yes, update it!'
+            }).then(function () {
+               // $('#submit').click();
+                $.ajax({
+                    url: '/Appointment/UpdateWrapperHeader',
+                    method: 'POST',
+                    data: data,
+                    success: function (data) {
+                        location.reload();
+                    },
+                    error: function (error) {
+                        console.error('Error:', error);
+                    }
+                });
+
+            });
+        }
+
+
+        function Save() {
+            var data = $('#WrapperImgForm').serialize();
+
+            swal({
+                title: 'Are you sure?', text: 'Do you want to Save this record!', type: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'Yes, update it!'
+            }).then(function () {
+                $('#submit').click();
+
+            });
+        }
+
+        function Update() {
+            var data = $('#WrapperImgForm').serialize();
+
+            swal({
+                title: 'Are you sure?', text: 'Do you want to update this record!', type: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'Yes, update it!'
+            }).then(function () {
+                $('#submit').click();
+
+            });
+        }
+
+         
+
+        function fnFileUpload() {
+            $('#userProfile').click();
+
+        }
+
+        $("#userProfile").change(function () {
+            readURLuserProfile(this);
+        });
+
+
+        function readURLuserProfile(input) {
+            if (input.files && input.files[0]) {
+                var filerdr = new FileReader();
+                filerdr.onload = function (e) {
+                    var srcUrl = e.target.result;
+
+                    var fileExtension = (input.files[0].name || '').split('.').pop().toLowerCase();
+
+                    switch (fileExtension) {
+                        case 'pdf':
+
+                            $('#docFile').attr("src", "/images/PDF_file_icon.webp");
+                            $('#userDocFile').val(e.target.result);
+
+                            console.log('PDF file selected');
+
+                            break;
+
+                        default:
+                            $('#docFile').attr('src', e.target.result);
+
+                            console.log('Unknown file type selected');
+
+                    }
+                };
+                filerdr.readAsDataURL(input.files[0]);
+            }
+        }
+
+    </script>
+}

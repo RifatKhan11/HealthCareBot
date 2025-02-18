@@ -1,0 +1,998 @@
+﻿@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@model DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+@section Style{
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+}
+
+<!-- Breadcrumbs-->
+<ol class="breadcrumb">
+    <li class="breadcrumb-item">
+        <a href="/">Dashboard</a>
+    </li>
+    <li class="breadcrumb-item active">Overview</li>
+</ol>
+
+<!-- Icon Cards-->
+<div class="row">
+    <div class="col-xl-4 col-sm-6 mb-4">
+        <div class="card text-white bg-primary o-hidden h-100">
+            <div class="card-body">
+                <div class="card-body-icon">
+                    <i class="fas fa-fw fa-comments"></i>
+                </div>
+                <div class="mr-5">@Model.queries New Queries!</div>
+            </div>
+            <a class="card-footer text-white clearfix small z-1" asp-area="" asp-controller="Queries" asp-action="Index">
+                <span class="float-left">View Details</span>
+                <span class="float-right">
+                    <i class="fas fa-angle-right"></i>
+                </span>
+            </a>
+        </div>
+    </div>
+    <div class="col-xl-4 col-sm-6 mb-4">
+        <div class="card text-white bg-info o-hidden h-100">
+            <div class="card-body">
+                <div class="card-body-icon">
+                    <i class="fas fa-fw fa-list"></i>
+                </div>
+                <div class="mr-5">@Model.menuHitLogs.Sum(x => x?.totalHit) Menu Hit</div>
+            </div>
+            @*<a class="card-footer text-white clearfix small z-1" asp-area="" asp-controller="Menu" asp-action="Index">
+                    <span class="float-left">View Details</span>
+                    <span class="float-right">
+                        <i class="fas fa-angle-right"></i>
+                    </span>
+                </a>*@
+            <a class="card-footer text-white clearfix small z-1" href="javascript:void(0)" onclick="getRangeDataMenuHitLog();">
+                <span class="float-left">View Details</span>
+                <span class="float-right">
+                    <i class="fas fa-angle-right"></i>
+                </span>
+            </a>
+        </div>
+    </div>
+    @*<div class="col-xl-4 col-sm-6 mb-4" style="display:none">
+        <div class="card text-white bg-success o-hidden h-100">
+            <div class="card-body">
+                <div class="card-body-icon">
+                    <i class="fas fa-fw fa-shopping-cart"></i>
+                </div>
+                <div class="mr-5">@Model.questions Questions & Replies</div>
+            </div>
+            <a class="card-footer text-white clearfix small z-1" asp-area="" asp-controller="QuestionReplay" asp-action="Index">
+                <span class="float-left">View Details</span>
+                <span class="float-right">
+                    <i class="fas fa-angle-right"></i>
+                </span>
+            </a>
+        </div>
+    </div>*@
+    <div class="col-xl-4 col-sm-6 mb-4" >
+        <div class="card text-white bg-success o-hidden h-100">
+            <div class="card-body">
+                <div class="card-body-icon">
+                    <i class="fas fa-fw fa-shopping-cart"></i>
+                </div>
+                <div class="mr-5">@Model.totalHitKnowledgeLogViewModels.Count() Knowledge Question Hit</div>
+            </div>
+            <a class="card-footer text-white clearfix small z-1" href="javascript:void(0)" onclick="getRangeDataKnowledgeHitLog();">
+                <span class="float-left">View Details</span>
+                <span class="float-right">
+                    <i class="fas fa-angle-right"></i>
+                </span>
+            </a>
+        </div>
+    </div>
+</div>
+
+
+<div class="row" style="display:none">
+    <div class="col-xl-4 col-sm-6 mb-4" style="display:none">
+        <div class="card text-white bg-secondary o-hidden h-100">
+            <div class="card-body">
+                <div class="card-body-icon">
+                    <i class="fas fa-fw fa-user"></i>
+                </div>
+                <div class="mr-5">@Model.todaysNewUser New User!</div>
+            </div>
+            <a class="card-footer text-white clearfix small z-1" href="#">
+                <span class="float-left">View Details</span>
+                <span class="float-right">
+                    <i class="fas fa-angle-right"></i>
+                </span>
+            </a>
+        </div>
+    </div>
+    <div class="col-xl-4 col-sm-6 mb-4" style="display:none">
+        <div class="card text-white bg-warning o-hidden h-100">
+            <div class="card-body">
+                <div class="card-body-icon">
+                    <i class="fas fa-fw fa-user-alt-slash"></i>
+                </div>
+                <div class="mr-5">@Model.todaysRepeatedUser Repeated User</div>
+            </div>
+            <a class="card-footer text-white clearfix small z-1" href="#">
+                <span class="float-left">View Details</span>
+                <span class="float-right">
+                    <i class="fas fa-angle-right"></i>
+                </span>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-sm-6 mb-4" style="display:none">
+        <div class="card text-white bg-success o-hidden h-100">
+            <div class="card-body">
+                <div class="card-body-icon">
+                    <i class="fas fa-fw fa-shopping-cart"></i>
+                </div>
+                <div class="mr-5">@Model.questions Questions & Replies</div>
+            </div>
+            <a class="card-footer text-white clearfix small z-1" asp-area="" asp-controller="QuestionReplay" asp-action="Index">
+                <span class="float-left">View Details</span>
+                <span class="float-right">
+                    <i class="fas fa-angle-right"></i>
+                </span>
+            </a>
+        </div>
+    </div>
+
+</div>
+
+@if (@UserManager.GetUserName(User) == "police")
+{
+    <!-- Daily Update Example-->
+    <div class="card mb-3" ">
+        <div class="card-header">
+            <i class="fas fa-chart-area"></i>
+            Today's Police Clearance Update
+        </div>
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-xl-4 col-sm-6 mb-4">
+                    <div class="card text-white bg-success o-hidden h-100">
+                        <div class="card-body">
+                            <div class="card-body-icon">
+                                <i class="fas fa-fw fa-shopping-cart"></i>
+                            </div>
+                            <div class="mr-5">@Model.totalCountViewModels.FirstOrDefault().TotalSuccess Successfull Hit</div>
+                        </div>
+                        <a class="card-footer text-white clearfix small z-1" href="javascript:void(0)" onclick="totalSuccessHitInfotViewModels()">
+                            <span class="float-left">View Details</span>
+                            <span class="float-right">
+                                <i class="fas fa-angle-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-xl-4 col-sm-6 mb-4">
+                    <div class="card text-white bg-danger o-hidden h-100">
+                        <div class="card-body">
+                            <div class="card-body-icon">
+                                <i class="fas fa-fw fa-shopping-cart"></i>
+                            </div>
+                            <div class="mr-5">@Model.totalCountViewModels.FirstOrDefault().TotalUnSuccess Unsuccessfull Hit</div>
+                        </div>
+                        <a class="card-footer text-white clearfix small z-1" href="javascript:void(0)" onclick="totalUnSuccessHitInfotViewModels()">
+                            <span class="float-left">View Details</span>
+                            <span class="float-right">
+                                <i class="fas fa-angle-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        <div class="card-footer small text-muted">Updated Today- @DateTime.Now</div>
+    </div>
+
+    <!-- Date Range Update Example-->
+    <div class="card mb-3" ">
+        <div class="card-header">
+            <i class="fas fa-chart-area"></i>
+            Police Clearance Update With Date Range
+        </div>
+        <div class="card-body">
+
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group row" style="padding-top:5px;">
+                        <label class="col-md-3 text-center" style="color: #333;padding-top:2px;">From</label>
+                        <div class="col-md-9">
+                            <input type="text" id="fromDate" class="form-control clsSalesDate" style="display:inline-block" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-4">
+                    <div class="form-group row" style="padding-top:5px;">
+                        <label class="col-md-3 text-right" style="color: #333;padding-top:2px;">To</label>
+                        <div class="col-md-9">
+                            <input type="text" id="toDate" class="form-control clsSalesDate" style="display:inline-block" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <a class="btn btn-info" href="javascript:void(0)" onclick="getRangeData()" id="loadBtn" style="margin-top:5px;">Load</a>
+                </div>
+            </div>
+            <br />
+            <br />
+
+            <div class="row">
+                <div class="col-xl-2 col-sm-4 mb-2"></div>
+                <div class="col-xl-4 col-sm-6 mb-4">
+                    <div class="card text-white bg-success o-hidden h-100">
+                        <div class="card-body">
+                            <div class="card-body-icon">
+                                <i class="fas fa-fw fa-shopping-cart"></i>
+                            </div>
+                            <div class="mr-5"><span id="successHit">@Model.totalCountViewModels.FirstOrDefault().TotalSuccess</span> Successfull Hit</div>
+                        </div>
+                        <a class="card-footer text-white clearfix small z-1" href="javascript:void(0)" onclick="getRangeDataSuccessful()">
+                            <span class="float-left">View Details</span>
+                            <span class="float-right">
+                                <i class="fas fa-angle-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-xl-4 col-sm-6 mb-4">
+                    <div class="card text-white bg-danger o-hidden h-100">
+                        <div class="card-body">
+                            <div class="card-body-icon">
+                                <i class="fas fa-fw fa-shopping-cart"></i>
+                            </div>
+                            <div class="mr-5"><span id="unsuccessHit">@Model.totalCountViewModels.FirstOrDefault().TotalUnSuccess</span> Unsuccessfull Hit</div>
+                        </div>
+                        <a class="card-footer text-white clearfix small z-1" href="javascript:void(0)" onclick="getRangeDataUnSuccessful()">
+                            <span class="float-left">View Details</span>
+                            <span class="float-right">
+                                <i class="fas fa-angle-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        <div class="card-footer small text-muted">Updated Today- @DateTime.Now</div>
+    </div>
+
+    <div class="card mb-3" style="display:none">
+        <div class="card-header">
+            <i class="fas fa-chart-area"></i>
+            Today's Menu Hit
+        </div>
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-xl-4 col-sm-6 mb-4">
+                    <div class="card text-white bg-success o-hidden h-100">
+                        <div class="card-body">
+                            <div class="card-body-icon">
+                                <i class="fas fa-fw fa-shopping-cart"></i>
+                            </div>
+                            <div class="mr-5">@Model.menuHitLogs.Sum(x => x?.totalHit)</div>
+                        </div>
+                        <a class="card-footer text-white clearfix small z-1" href="javascript:void(0)" onclick="getRangeDataMenuHitLog();">
+                            <span class="float-left">View Details</span>
+                            <span class="float-right">
+                                <i class="fas fa-angle-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+
+
+
+            </div>
+
+        </div>
+        <div class="card-footer small text-muted">Updated Today- @DateTime.Now</div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fas fa-chart-area"></i>
+            Menu Hit Date Range
+        </div>
+        <div class="card-body">
+
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group row" style="padding-top:5px;">
+                        <label class="col-md-3 text-center" style="color: #333;padding-top:2px;">From</label>
+                        <div class="col-md-9">
+                            <input type="text" id="fromDateH" class="form-control clsSalesDate" style="display:inline-block" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-4">
+                    <div class="form-group row" style="padding-top:5px;">
+                        <label class="col-md-3 text-right" style="color: #333;padding-top:2px;">To</label>
+                        <div class="col-md-9">
+                            <input type="text" id="toDateH" class="form-control clsSalesDate" style="display:inline-block" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <a class="btn btn-info" href="javascript:void(0)" onclick="getMenuRangeData()" id="loadBtnM" style="margin-top:5px;">Load</a>
+                </div>
+            </div>
+            <br />
+            <br />
+
+            <div class="row">
+                <div class="col-xl-2 col-sm-4 mb-2"></div>
+                <div class="col-xl-4 col-sm-6 mb-4">
+                    <div class="card text-white bg-success o-hidden h-100">
+                        <div class="card-body">
+                            <div class="card-body-icon">
+                                <i class="fas fa-fw fa-shopping-cart"></i>
+                            </div>
+                            <div class="mr-5"><span id="MenuHit">@Model.menuHitLogs.Sum(x => x?.totalHit)</span> </div>
+                        </div>
+                        <a class="card-footer text-white clearfix small z-1" href="javascript:void(0)" onclick="getRangeDataMenuHitLog()">
+                            <span class="float-left">View Details</span>
+                            <span class="float-right">
+                                <i class="fas fa-angle-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+
+
+
+            </div>
+
+        </div>
+        <div class="card-footer small text-muted">Updated Today- @DateTime.Now</div>
+    </div>
+
+    <div class="card mb-3" style="display:none">
+        <div class="card-header">
+            <i class="fas fa-chart-area"></i>
+            Today's  Knowledge Question Hit
+        </div>
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-xl-4 col-sm-6 mb-4">
+                    <div class="card text-white bg-success o-hidden h-100">
+                        <div class="card-body">
+                            <div class="card-body-icon">
+                                <i class="fas fa-fw fa-shopping-cart"></i>
+                            </div>
+                            <div class="mr-5">@Model.totalHitKnowledgeLogViewModels.Count()</div>
+                        </div>
+                        <a class="card-footer text-white clearfix small z-1" href="javascript:void(0)" onclick="getRangeDataKnowledgeHitLog();">
+                            <span class="float-left">View Details</span>
+                            <span class="float-right">
+                                <i class="fas fa-angle-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+
+
+
+            </div>
+
+        </div>
+        <div class="card-footer small text-muted">Updated Today- @DateTime.Now</div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fas fa-chart-area"></i>
+            Knowledge Question Hit Date Range
+        </div>
+        <div class="card-body">
+
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group row" style="padding-top:5px;">
+                        <label class="col-md-3 text-center" style="color: #333;padding-top:2px;">From</label>
+                        <div class="col-md-9">
+                            <input type="text" id="fromDateHK" class="form-control clsSalesDate" style="display:inline-block" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-4">
+                    <div class="form-group row" style="padding-top:5px;">
+                        <label class="col-md-3 text-right" style="color: #333;padding-top:2px;">To</label>
+                        <div class="col-md-9">
+                            <input type="text" id="toDateHK" class="form-control clsSalesDate" style="display:inline-block" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <a class="btn btn-info" href="javascript:void(0)" onclick="getKnowledgeRangeData()" id="loadBtnMK" style="margin-top:5px;">Load</a>
+                </div>
+            </div>
+            <br />
+            <br />
+
+            <div class="row">
+                <div class="col-xl-2 col-sm-4 mb-2"></div>
+                <div class="col-xl-4 col-sm-6 mb-4">
+                    <div class="card text-white bg-success o-hidden h-100">
+                        <div class="card-body">
+                            <div class="card-body-icon">
+                                <i class="fas fa-fw fa-shopping-cart"></i>
+                            </div>
+                            <div class="mr-5"><span id="MenuHitK">@Model.totalHitKnowledgeLogViewModels.Count()</span> </div>
+                        </div>
+                        <a class="card-footer text-white clearfix small z-1" href="javascript:void(0)" onclick="getRangeDataKnowledgeHitLog()">
+                            <span class="float-left">View Details</span>
+                            <span class="float-right">
+                                <i class="fas fa-angle-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+
+
+
+            </div>
+
+        </div>
+        <div class="card-footer small text-muted">Updated Today- @DateTime.Now</div>
+    </div>
+
+}
+
+<!-- Area Chart Example-->
+<div class="card mb-3" style="display:none;">
+    <div class="card-header">
+        <i class="fas fa-chart-area"></i>
+        Daily Message Analytics
+    </div>
+    <div class="card-body">
+        <canvas id="myAreaChart" width="100%" height="30"></canvas>
+    </div>
+    <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+</div>
+
+<!-- Page Greetings -->
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-chart-area"></i>
+        Page Greetings Message.
+    </div>
+    <div class="card-body" id="card-body-id">
+        <form asp-controller="Home" asp-action="Index" onsubmit="return CheckStatus()" method="post">
+
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <input type="hidden" id="FbPageId" name="FbPageId" value="@Model.FbPageId" />
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="GreetingsMessage"> গ্রিটিংস মেসেজ বাংলায়</label>
+                        <textarea class="form-control" id="GreetingsMessage" aria-describedby="GreetingsMessageHelp" placeholder="গ্রিটিংস মেসেজ লিখুন" rows="5" style="resize: none;" name="GreetingsMessage">@Model.GreetingsMessage</textarea>
+                        <small id="GreetingsMessageHelp" class="form-text text-muted">Edit Greetings Message in Bangla</small>
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="GreetingsMessageEN">Greetings Message</label>
+                        <textarea class="form-control" id="GreetingsMessageEN" aria-describedby="GreetingsMessageENHelp" placeholder="Enter Greetings Message" rows="5" style="resize: none;" name="GreetingsMessageEN">@Model.GreetingsMessageEN</textarea>
+                        <small id="GreetingsMessageENHelp" class="form-text text-muted">Edit Greetings Message in English</small>
+                    </div>
+                </div>
+
+            </div>
+
+
+
+
+            <div class="form-group">
+                <input type="submit" name="SubmitType" class="btn btn-primary" value="Save Changes">
+            </div>
+
+        </form>
+    </div>
+    <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+</div>
+
+<br>
+<br>
+<br>
+<br>
+
+<br>
+<br>
+<br>
+<br>
+
+
+<div class="modal fade" id="registerModal"  data-backdrop="static" data-keyboard="false"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="max-width:1200px;max-height:600px;overflow-y:auto">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row" style="width:100%;">
+                    <div class="col-2">
+                        @*<img src="~/images/JasonLogo.png" style="height:66px; width:168px;" />*@
+                    </div>
+                    <div class="col-9">
+                        <h3 class="modal-title text-center" id="exampleModalLabel" style="font-size: 20px;padding-top: 14px; color:black">Police Clearence History</h3>
+                    </div>
+                    <div class="col-1">
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered table-striped" style="line-height:.9;width:100%" id="tblInventoryInModalIn">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Passport Number</th>
+                            <th>Reference Number</th>
+                            <th>Date & Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="registerModal1" data-backdrop="static" data-keyboard="false"   tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="max-width:1200px;max-height:600px;overflow-y:auto">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row" style="width:100%;">
+                    <div class="col-2">
+                        @*<img src="~/images/JasonLogo.png" style="height:66px; width:168px;" />*@
+                    </div>
+                    <div class="col-9">
+                        <h3 class="modal-title text-center" id="exampleModalLabel" style="font-size: 20px;padding-top: 14px; color:black">Police Clearence History</h3>
+                        <h3 class="modal-title text-center" style="font-size: 15px;padding-top: 14px; color:black">Date Range - <span id="fromDateString"></span> To <span id="toDateString"></span></h3>
+                    </div>
+                    <div class="col-1">
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered table-striped" style="line-height:.9;width:100%" id="tblInventoryInModalIn1">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Passport Number</th>
+                            <th>Reference Number</th>
+                            <th>Date & Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="registermenuDayModal"  data-backdrop="static" data-keyboard="false"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="max-width:1200px;max-height:600px;overflow-y:auto">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row" style="width:100%;">
+                    <div class="col-2">
+                        @*<img src="~/images/JasonLogo.png" style="height:66px; width:168px;" />*@
+                    </div>
+                    <div class="col-9">
+                        <h3 class="modal-title text-center" id="exampleModalLabel" style="font-size: 20px;padding-top: 14px; color:black">Menu Hit History</h3>
+                        <h3 class="modal-title text-center" style="font-size: 15px;padding-top: 14px; color:black">Date Range - <span id="fromDateStringH"></span> To <span id="toDateStringH"></span></h3>
+                    </div>
+                    <div class="col-1">
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered table-striped" style="line-height:.9;width:100%" id="tblInventoryInModalInMenuday">
+                    <thead>
+                        <tr>
+                            <th>Menu Name </th>
+
+                            <th>Hit</th>
+
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="registerKnowledgeDayModal"  data-backdrop="static" data-keyboard="false"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="max-width:1200px;max-height:600px;overflow-y:auto">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row" style="width:100%;">
+                    <div class="col-2">
+                        @*<img src="~/images/JasonLogo.png" style="height:66px; width:168px;" />*@
+                    </div>
+                    <div class="col-9">
+                        <h3 class="modal-title text-center" id="exampleModalLabel" style="font-size: 20px;padding-top: 14px; color:black"> Knowledge Question Hit  History</h3>
+                        <h3 class="modal-title text-center" style="font-size: 15px;padding-top: 14px; color:black">Date Range - <span id="fromDateStringHK"></span> To <span id="toDateStringHK"></span></h3>
+                    </div>
+                    <div class="col-1">
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered table-striped" style="line-height:.9;width:100%" id="tblInventoryInModalInKnowledgeday">
+                    <thead>
+                        <tr>
+                            <th>Asking Question</th>
+
+                            <th>Matched Question</th>
+
+
+                            <th>Hit</th>
+
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+
+    <script src="~/js/demo/chart-area-demo.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+             var PageMessgae = "@Model.GreetingsMessage";
+            var PageMessgaeEn = "@Model.GreetingsMessageEN";
+           
+         
+            $("#tblInventoryInModalIn1").DataTable();
+        $('#fromDate').flatpickr({ dateFormat: "m-d-Y", maxDate: "@DateTime.Now.ToString("MM-dd-yyyy")" });
+        $('#toDate').flatpickr({ dateFormat: "m-d-Y", maxDate: "@DateTime.Now.ToString("MM-dd-yyyy")" });
+        $('#fromDateH').flatpickr({ dateFormat: "m-d-Y", maxDate: "@DateTime.Now.ToString("MM-dd-yyyy")" });
+        $('#toDateH').flatpickr({ dateFormat: "m-d-Y", maxDate: "@DateTime.Now.ToString("MM-dd-yyyy")" });
+         $('#fromDateHK').flatpickr({ dateFormat: "m-d-Y", maxDate: "@DateTime.Now.ToString("MM-dd-yyyy")" });
+        $('#toDateHK').flatpickr({ dateFormat: "m-d-Y", maxDate: "@DateTime.Now.ToString("MM-dd-yyyy")" });
+
+        $('#fromDate').val('@DateTime.Now.ToString("MM-dd-yyyy")');
+        $('#toDate').val('@DateTime.Now.ToString("MM-dd-yyyy")');
+        $('#fromDateH').val('@DateTime.Now.ToString("MM-dd-yyyy")');
+        $('#toDateH').val('@DateTime.Now.ToString("MM-dd-yyyy")');
+        $('#fromDateHK').val('@DateTime.Now.ToString("MM-dd-yyyy")');
+        $('#toDateHK').val('@DateTime.Now.ToString("MM-dd-yyyy")');
+        });
+
+
+        function CheckStatus() {
+
+            if (PageMessgae == $("#GreetingsMessage").val() && PageMessgaeEn == $("#GreetingsMessageEN").val()) {
+                swal("Opss!!!", "Both Same Value!", "info");
+                return false;
+            }
+
+            if ($("#GreetingsMessage").val() == "" || $("#GreetingsMessage").val() == null) {
+                swal("Opss!!!", "Enter Greetings Message In Bangla", "error");
+                return false;
+            }
+
+            if ($("#GreetingsMessageEN").val() == "" || $("#GreetingsMessageEN").val() == null) {
+                swal("Opss!!!", "Enter Greetings Message In English", "error");
+                return false;
+            }
+
+            return true;
+
+        }
+        function getMenuRangeData() {
+
+            let fromDate = $("#fromDateH").val();
+            let toDate = $("#toDateH").val();
+            Common.Ajax('GET', '/global/api/TotalCountMenuViewModelsDateRangeL/' + fromDate + '/' + toDate, [], 'json', GetRangeMenuData);
+        }
+        function GetRangeMenuData(response) {
+            console.log(response);
+            $("#MenuHit").text(response);
+
+        }
+        function getKnowledgeRangeData() {
+
+            let fromDate = $("#fromDateHK").val();
+            let toDate = $("#toDateHK").val();
+            Common.Ajax('GET', '/global/api/TotalCountKnowledgeViewModelsDateRangeL/' + fromDate + '/' + toDate, [], 'json', GetRangeKnowledgeData);
+        }
+        function GetRangeKnowledgeData(response) {
+            console.log(response);
+            //alert(response);
+            $("#MenuHitK").text(response);
+
+        }
+        function getRangeData() {
+            let fromDate = $("#fromDate").val();
+            let toDate = $("#toDate").val();
+            Common.Ajax('GET', '/global/api/TotalCountViewModelsDateRange/' + fromDate + '/' + toDate, [], 'json', GetRangeSuccessUnsuccessData);
+        }
+
+        function getRangeDataSuccessful() {
+            let fromDate = $("#fromDate").val();
+            let toDate = $("#toDate").val();
+            $("#fromDateString").text(fromDate);
+            $("#toDateString").text(toDate);
+           
+            $('#tblInventoryInModalIn1').DataTable().destroy();
+            $('#tblInventoryInModalIn1').DataTable({
+                ajax: {
+                    url: '/global/api/TotalHitInfoViewModels/' + fromDate + '/' + toDate + '/Successfully',
+                    dataSrc: ""
+                },
+                columns: [
+                    { data: "name" },
+                    { data: "passportNo" },
+                    { data: "refNo" },
+                    { data: "date" },
+                    { data: "status" }
+                ]
+            });
+            $("#registerModal1").modal("show");
+           
+        }
+
+        function getRangeDataUnSuccessful() {
+            let fromDate = $("#fromDate").val();
+            let toDate = $("#toDate").val();
+            $("#fromDateString").text(fromDate);
+            $("#toDateString").text(toDate);
+            //Common.Ajax('GET', '/global/api/TotalHitInfoViewModels/' + fromDate + '/' + toDate + '/Unsuccessfully', [], 'json', GetRangeUnSuccessData);
+
+            $('#tblInventoryInModalIn1').DataTable().destroy();
+            $('#tblInventoryInModalIn1').DataTable({
+                ajax: {
+                    url: '/global/api/TotalHitInfoViewModels/' + fromDate + '/' + toDate + '/Unsuccessfully',
+                    dataSrc: ""
+                },
+                columns: [
+                    { data: "name" },
+                    { data: "passportNo" },
+                    { data: "refNo" },
+                    { data: "date" },
+                    { data: "status" }
+                ]
+            });
+            $("#registerModal1").modal("show");
+        }
+
+        function GetRangeSuccessUnsuccessData(response) {
+            //console.log(response);
+            $("#successHit").text(response.totalSuccess);
+            $("#unsuccessHit").text(response.totalUnSuccess);
+        }
+
+        function GetRangeSuccessData(response) {
+          
+            $.each(response, function (key, value) {
+                var dtTableIn = $("#tblInventoryInModalIn1");
+                var tableBodyIn = dtTableIn.find('tbody');
+                var trHtmlIn = '<tr><td>' + value.name + '</td><td>' + value.passportNo + '</td><td>' + value.refNo + '</td><td>' + value.date + '</td><td>' + value.status + '</td></tr>';
+                tableBodyIn.append(trHtmlIn);
+                //$("#tblInventoryInModalIn1").DataTable();
+               
+            });
+            $('#registerModal1').modal('show');
+        }
+
+        function GetRangeUnSuccessData(response) {
+            $("#tblInventoryInModalIn1").DataTable().destroy();
+            //$("#tblInventoryInModalIn1 tbody>tr").remove();
+            $.each(response, function (key, value) {
+                var dtTableIn = $("#tblInventoryInModalIn1");
+                var tableBodyIn = dtTableIn.find('tbody');
+                var trHtmlIn = '<tr><td>' + value.name + '</td><td>' + value.passportNo + '</td><td>' + value.refNo + '</td><td>' + value.date + '</td><td>' + value.status + '</td></tr>';
+                tableBodyIn.append(trHtmlIn);
+                //$("#tblInventoryInModalIn1").DataTable();
+                $('#registerModal1').modal('show');
+            });
+        }
+
+        function totalSuccessHitInfotViewModels() {
+            //Common.Ajax('GET', '/global/api/TotalHitInfoViewModelsTodayS/', [], 'json', totalSuccessHitInfotViewModelsS);
+
+            $('#tblInventoryInModalIn').DataTable().destroy();
+            $('#tblInventoryInModalIn').DataTable({
+                ajax: {
+                    url: '/global/api/TotalHitInfoViewModelsTodayS/',
+                    dataSrc: ""
+                },
+                columns: [
+                    { data: "name" },
+                    { data: "passportNo" },
+                    { data: "refNo" },
+                    { data: "date" },
+                    { data: "status" }
+                ]
+            });
+            $("#registerModal").modal("show");
+        }
+
+        function totalSuccessHitInfotViewModelsS(response) {
+            $("#tblInventoryInModalIn").DataTable().destroy();
+            //console.log(response);
+            $("#tblInventoryInModalIn tbody>tr").remove();
+            $.each(response, function (key, value) {
+                var dtTableIn = $("#tblInventoryInModalIn");
+                var tableBodyIn = dtTableIn.find('tbody');
+                var trHtmlIn = '<tr><td>' + value.name + '</td><td>' + value.passportNo + '</td><td>' + value.refNo + '</td><td>' + value.date + '</td><td>' + value.status + '</td></tr>';
+                tableBodyIn.append(trHtmlIn);
+                $("#tblInventoryInModalIn").DataTable();
+                $('#registerModal').modal('show');
+            });
+        }
+
+        function totalUnSuccessHitInfotViewModels() {
+
+            //Common.Ajax('GET', '/global/api/TotalHitInfoViewModelsTodayU/', [], 'json', totalUnSuccessHitInfotViewModelsU);
+            $('#tblInventoryInModalIn').DataTable().destroy();
+            $('#tblInventoryInModalIn').DataTable({
+                ajax: {
+                    url: '/global/api/TotalHitInfoViewModelsTodayU/',
+                    dataSrc: ""
+                },
+                columns: [
+                    { data: "name" },
+                    { data: "passportNo" },
+                    { data: "refNo" },
+                    { data: "date" },
+                    { data: "status" }
+                ]
+            });
+            $("#registerModal").modal("show");
+        }
+
+        function totalUnSuccessHitInfotViewModelsU(response) {
+            $("#tblInventoryInModalIn").DataTable().destroy();
+            $("#tblInventoryInModalIn tbody>tr").remove();
+            $.each(response, function (key, value) {
+                console.log(response);
+                var dtTableIn = $("#tblInventoryInModalIn");
+                var tableBodyIn = dtTableIn.find('tbody');
+                var trHtmlIn = '<tr><td>' + value.name + '</td><td>' + value.passportNo + '</td><td>' + value.refNo + '</td><td>' + value.date + '</td><td>' + value.status + '</td></tr>';
+                tableBodyIn.append(trHtmlIn);
+                $("#tblInventoryInModalIn").DataTable();
+                $('#registerModal').modal('show');
+            });
+        }
+        function getRangeDataMenuHitLog() {
+            let fromDate = $("#fromDateH").val();
+            let toDate = $("#toDateH").val();
+            $("#fromDateStringH").text(fromDate);
+            $("#toDateStringH").text(toDate);
+            Common.Ajax('GET', '/global/api/TotalCountMenuViewModelsDateRange/' + fromDate + '/' + toDate, [], 'json', totalMenuHitInfotViewModelsT);
+
+            $('#tblInventoryInModalInMenuday').DataTable().destroy();
+            $('#tblInventoryInModalInMenuday').DataTable({
+                ajax: {
+                    url: '/global/api/TotalCountMenuViewModelsDateRange/' + fromDate + '/' + toDate,
+                    dataSrc: ""
+                },
+                columns: [
+                    { data: "menuNameEn" },
+                    { data: "totalHit" }
+                    
+                ]
+            });
+            $("#registermenuDayModal").modal("show");
+            
+        }
+        function totalMenuHitInfotViewModelsT(response) {
+            $("#tblInventoryInModalInMenuday").DataTable().destroy();
+            $("#tblInventoryInModalInMenuday tbody>tr").remove();
+
+            $.each(response, function (key, value) {
+                //console.log(response);
+                var dtTableIn = $("#tblInventoryInModalInMenuday");
+                var tableBodyIn = dtTableIn.find('tbody');
+                //var trHtmlIn = '<tr><td>' + value.menuName + '</td><td>' + value.menuNameEn + '</td><td>' + value.parentBangla + '</td><td>' + value.parentEnglish + '</td><td>' + value.dateTime + '</td></tr>';
+                var trHtmlIn = '<tr><td>' + value.menuNameEn + '</td><td>' + value.totalHit + '</td></tr>';
+               // console.log(trHtmlIn)
+                tableBodyIn.append(trHtmlIn);
+                $("#tblInventoryInModalInMenuday").DataTable();
+                $('#registermenuDayModal').modal('show');
+            });
+        }
+
+        function getRangeDataKnowledgeHitLog() {
+            let fromDate = $("#fromDateHK").val();
+            let toDate = $("#toDateHK").val();
+            $("#fromDateStringHK").text(fromDate);
+            $("#toDateStringHK").text(toDate);
+            //Common.Ajax('GET', '/global/api/TotalCountKnowledgerViewModelsDateRange/' + fromDate + '/' + toDate, [], 'json', totalKnowledgeHitInfotViewModelsT);
+            //Common.Ajax('GET', '/global/api/TotalCountMenuViewModelsDateRange/' + fromDate + '/' + toDate, [], 'json', totalMenuHitInfotViewModelsT);
+
+            $('#tblInventoryInModalInKnowledgeday').DataTable().destroy();
+            $('#tblInventoryInModalInKnowledgeday').DataTable({
+                ajax: {
+                    url: '/global/api/TotalCountKnowledgerViewModelsDateRange/' + fromDate + '/' + toDate,
+                    dataSrc: ""
+                },
+                columns: [
+                    { data: "uquestion" },
+                    { data: "question" },
+                    { data: "totalHit" }
+
+                ]
+            });
+            $("#registerKnowledgeDayModal").modal("show");
+        }
+        function totalKnowledgeHitInfotViewModelsT(response) {
+            $("#tblInventoryInModalInKnowledgeday").DataTable().destroy();
+            $("#tblInventoryInModalInKnowledgeday tbody>tr").remove();
+
+            $.each(response, function (key, value) {
+                //console.log(response);
+                var dtTableIn = $("#tblInventoryInModalInKnowledgeday");
+                var tableBodyIn = dtTableIn.find('tbody');
+                //var trHtmlIn = '<tr><td>' + value.question + '</td><td>' + value.answer + '</td><td>' + value.categoryName + '</td><td>' + value.dateTime + '</td></tr>';
+                var trHtmlIn = '<tr><td>' + value.question + '</td><td>' + value.totalHit + '</td></tr>';
+                // console.log(trHtmlIn)
+                tableBodyIn.append(trHtmlIn);
+                $("#tblInventoryInModalInKnowledgeday").DataTable();
+                $('#registerKnowledgeDayModal').modal('show');
+            });
+        }
+
+    </script>
+}

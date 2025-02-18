@@ -1,0 +1,313 @@
+﻿@model PassportInfoViewModel
+@{
+    ViewData["Title"] = "Menu";
+}
+
+@section Style{
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+}
+
+<ol class="breadcrumb">
+    <li class="breadcrumb-item">
+        <a href="/">Dashboard</a>
+    </li>
+    <li class="breadcrumb-item active">Apply for police verification certificate</li>
+</ol>
+
+<!-- Area Chart Example-->
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Passport Information
+    </div>
+    <div class="card-body" id="EditSection">
+
+        <form asp-controller="PassportInfo" asp-action="ExcelUpload" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <input type="hidden" class="form-control" id="Id" name="Id" value="0">
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label for="head" class="col-sm-4 col-form-label text-left">Select File<span style="color:red;">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="file" class="form-control input-sm" id="UpFile" name="UpFile" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+                    <a style="float:left;color:white" onclick="fnLoadBOMDetails()" class="btn btn-sm btn-info">ADD</a>
+                </div>
+            </div>
+            <div class="row">
+                <table class="table table-striped table-bordered table-responsive" id="productionDetailsTable">
+                    <thead>
+                        <tr>
+                            <th>
+                                <select data-parsley-required="true" class="columnName" name="dbField" id="dbField0"></select>
+                            </th>
+                            <th>
+                                <select data-parsley-required="true" class="columnName" name="dbField" id="dbField1"></select>
+                            </th>
+                            <th>
+                                <select data-parsley-required="true" class="columnName" name="dbField" id="dbField2"></select>
+                            </th>
+                            <th>
+                                <select data-parsley-required="true" class="columnName" name="dbField" id="dbField3"></select>
+                            </th>
+                            <th>
+                                <select data-parsley-required="true" class="columnName" name="dbField" id="dbField4"></select>
+                            </th>
+                            <th>
+                                <select data-parsley-required="true" class="columnName" name="dbField" id="dbField5"></select>
+                            </th>
+                            <th>
+                                <select data-parsley-required="true" class="columnName" name="dbField" id="dbField6"></select>
+                            </th>
+                            <th>
+                                <select data-parsley-required="true" class="columnName" name="dbField" id="dbField7"></select>
+                            </th>
+                            <th>
+                                <select data-parsley-required="true" class="columnName" name="dbField" id="dbField8"></select>
+                            </th>
+                            <th>
+                                <select data-parsley-required="true" class="columnName" name="dbField" id="dbField9"></select>
+                            </th>
+                            <th>
+                                <select data-parsley-required="true" class="columnName" name="dbField" id="dbField10"></select>
+                            </th>
+                            <th>
+                                <select data-parsley-required="true" class="columnName" name="dbField" id="dbField11"></select>
+                            </th>
+                            <th>
+                                <select data-parsley-required="true" class="columnName" name="dbField" id="dbField12"></select>
+                            </th>
+                            <th>
+                                <select data-parsley-required="true" class="columnName" name="dbField" id="dbField13"></select>
+                            </th>
+                           
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <input type="submit" class="btn btn-primary" value="Save Changes">
+        </form>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Knowledge Base
+    </div>
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>#SL</th>
+                        <th>Name</th>
+                        <th>Passport Number</th>
+                        <th>Mobile</th>
+                        <th>Email</th>
+                        <th>Nationality</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var count = 1;
+                    }
+                    @foreach (var data in Model.passportInfos)
+                    {
+                    <tr>
+                        <td>@count</td>
+                        <td>@data.name</td>
+                        <td>@data.passportNo</td>
+                        <td>@data.mobile</td>
+                        <td>@data.email</td>
+                        <td>@data.natonality</td>
+                        <td>
+                            <a href="#EditSection" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Edit Question" onclick="Edit('@data.Id','@data.name','@Html.Raw(HttpUtility.JavaScriptStringEncode(data.fname))','@Html.Raw(HttpUtility.JavaScriptStringEncode(data.mname))','@data.dob?.ToString("MM/dd/yyyy")','@data.applyDate?.ToString("MM/dd/yyyy")','@data.issueDate?.ToString("MM/dd/yyyy")','@data.expireDate?.ToString("MM/dd/yyyy")','@data.issuePlace','@data.natonality','@data.passportNo','@data.refNo','@data.email','@data.mobile','@data.gender')"><i class="fas fa-edit"></i></a>
+
+                            <form asp-controller="Knowledge" asp-action="Delete" method="post">
+                                <input type="hidden" name="id" value="@data.Id" />
+                                <button type="submit" class="btn btn-danger btn-sm" data-toggle="confirmation-singleton" data-singleton="true" data-btn-ok-icon-class="material-icons" data-btn-ok-icon-content="check" data-btn-cancel-icon-class="material-icons" data-btn-cancel-icon-content="close" data-title="Are sure to delete it?">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+
+                        </td>
+                    </tr>
+                        count++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+@section Scripts{
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        var formdata = new FormData();
+function fnLoadBOMDetails() {
+            var isValidItem = true;
+            if ($('#UpFile').val() == "") {
+                isValidItem = false;
+                alert("Please select file");
+            }
+
+            if (isValidItem) {
+                // Checking whether FormData is available in browser
+                if (window.FormData !== undefined) {
+                    var fileUpload = $("#UpFile").get(0);
+                    var files = fileUpload.files;
+                  
+                    console.log(files);
+                   
+                    for (var i = 0; i < files.length; i++) {
+                        formdata.append(files[i].name, files[i]);
+                    }
+
+                    $.ajax({
+                        url: '@Url.Action("LoadFile", "PassportInfo", "http")',
+                        type: "POST",
+                        contentType: false,
+                        processData: false,
+                        data: formdata,
+                        success: function (response) {
+                            $('#UpFile').val('');
+                            formdata = new FormData();
+                            console.log(response);
+                            if (response != null) {
+                                index = 0;
+                                var dtTable = $("#productionDetailsTable");
+                                var tableHead = dtTable.find('thead');
+                                var tableBody = dtTable.find('tbody');
+
+                                $.each(response, function (key, value) {
+                                    if (index == 0) {
+                                        tableHead.append(
+                                            '<tr id=' + index + '>' +
+                                            '<th>' + value.col0 + '</th>' +
+                                            '<th>' + value.col1 + '</th>' +
+                                            '<th>' + value.col2 + '</th>' +
+                                            '<th>' + value.col3 + '</th>' +
+                                            '<th>' + value.col4 + '</th>' +
+                                            '<th>' + value.col5 + '</th>' +
+                                            '<th>' + value.col6 + '</th>' +
+                                            '<th>' + value.col7 + '</th>' +
+                                            '<th>' + value.col8 + '</th>' +
+                                            '<th>' + value.col9 + '</th>' +
+                                            '<th>' + value.col10 + '</th>' +
+                                            '<th>' + value.col11 + '</th>' +
+                                            '<th>' + value.col12 + '</th>' +
+                                            '<th>' + value.col13 + '</th>' +
+                                            '</tr>'
+                                        );
+                                    }
+                                    else {
+                                        tableBody.append(
+                                            '<tr id=' + index + '>' +
+                                            '<td>' + value.col0 + '<input type="hidden" name="headName" value="' + value.col0 + '" /></td>' +
+                                            '<td style="text-align:right;">' + value.col1 + '<input type="hidden" name="col1" value="' + value.col1 + '" /></td>' +
+                                            '<td style="text-align:right;">' + value.col2 + '<input type="hidden" name="col2" value="' + value.col2 + '" /></td>' +
+                                            '<td style="text-align:right;">' + value.col3 + '<input type="hidden" name="col3" value="' + value.col3 + '" /></td>' +
+                                            '<td style="text-align:right;">' + value.col4 + '<input type="hidden" name="col4" value="' + value.col4 + '" /></td>' +
+                                            '<td style="text-align:right;">' + value.col5 + '<input type="hidden" name="col5" value="' + value.col5 + '" /></td>' +
+                                            '<td style="text-align:right;">' + value.col6 + '<input type="hidden" name="col6" value="' + value.col6 + '" /></td>' +
+                                            '<td style="text-align:right;">' + value.col7 + '<input type="hidden" name="col7" value="' + value.col7 + '" /></td>' +
+                                            '<td style="text-align:right;">' + value.col8 + '<input type="hidden" name="col8" value="' + value.col8 + '" /></td>' +
+                                            '<td style="text-align:right;">' + value.col9 + '<input type="hidden" name="col9" value="' + value.col9 + '" /></td>' +
+                                            '<td style="text-align:right;">' + value.col10 + '<input type="hidden" name="col10" value="' + value.col10 + '" /></td>' +
+                                            '<td style="text-align:right;">' + value.col11 + '<input type="hidden" name="col11" value="' + value.col11 + '" /></td>' +
+                                            '<td style="text-align:right;">' + value.col12 + '<input type="hidden" name="col12" value="' + value.col12 + '" /></td>' +
+                                            '<td style="text-align:right;">' + value.col13 + '<input type="hidden" name="col13" value="' + value.col13 + '" /></td>' +
+                                            '</tr>'
+                                        );
+                                    }
+                                    index = index + 1;
+                                })
+                                Common.Ajax('GET', '/global/api/getAllColumnBySp/', [], 'json', ajaxAllColumn);
+                            }
+                        },
+                        error: function (err) {
+                            alert(err.statusText);
+                        }
+                    });
+                } else {
+                    alert("FormData is not supported.");
+                }
+            }
+        }
+
+        function ajaxAllColumn(response) {
+            console.log(response);
+            var options = '<option value="">Select</option>';
+            $.each(response, function (i, item) {
+                options += '<option value="' + item.title + '">' + item.title + '</option>';
+            });
+            $('.columnName').empty();
+            $('.columnName').append(options);
+        }
+
+    $(document).ready(function () {
+        $('#dob').flatpickr({ dateFormat: "m/d/Y", maxDate: "@DateTime.Now.ToString("MM/dd/yyyy")" });
+        $('#applyDate').flatpickr({ dateFormat: "m/d/Y", maxDate: "@DateTime.Now.ToString("MM/dd/yyyy")" });
+        $('#issueDate').flatpickr({ dateFormat: "m/d/Y", maxDate: "@DateTime.Now.ToString("MM/dd/yyyy")" });
+        $('#expireDate').flatpickr({ dateFormat: "m/d/Y", minDate: "@DateTime.Now.ToString("MM/dd/yyyy")" });
+
+        $('#dataTable').DataTable({
+            "pageLength": 100
+    });
+
+    $(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+    });
+
+    });
+
+
+
+        function Edit(Id, name, fname, mname, dob, applyDate, issueDate, expireDate, issuePlace, natonality, passportNo, refNo, email, mobile, gender) {
+            $("#Id").val(Id);
+            $("#name").val(name);
+            $("#fname").val(fname);
+            $("#mname").val(mname);
+            $("#dob").val(dob);
+            $("#applyDate").val(applyDate);
+            $("#issueDate").val(issueDate);
+            $("#expireDate").val(expireDate);
+            $("#issuePlace").val(issuePlace);
+            $("#natonality").val(natonality);
+            $("#passportNo").val(passportNo);
+            $("#refNo").val(refNo);
+            $("#email").val(email);
+            $("#mobile").val(mobile);
+            $("#gender").val(gender);
+    }
+
+    function CheckStatus() {
+    if ($("#question").val() == "" || $("#question").val() == null || $("#answer").val() == "" || $("#answer").val() == null) {
+    swal("Opps!!!", "Please enter correctly", "error");
+    return false;
+    }
+    return true;
+    }
+
+    $('[data-toggle=confirmation-singleton]').confirmation({
+    rootSelector: '[data-toggle=confirmation-singleton]',
+    container: 'body'
+    });
+
+    </script>
+}

@@ -1,0 +1,389 @@
+﻿@model DoctorTimeSlotVm
+@{
+    ViewData["Title"] = "Doctor Time Slots";
+}
+
+@section Style {
+    <link href="https://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="Stylesheet">
+    <link href="https://www.jqueryscript.net/demo/Material-Time-Picker-Plugin-jQuery-MDTimePicker/mdtimepicker.css" rel="Stylesheet">
+    <link href="~/SweetAlert/sweetalert2.css" rel="stylesheet" />
+}
+
+<style>
+    .swal2-icon {
+        width: 2em !important;
+        height: 2em !important;
+        margin: 0.25em auto 0.5em !important;
+        border: 0.25em solid transparent;
+    } 
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 40px;
+        height: 20px;
+        background-color: lightslategray;
+        border-radius: 20px;
+        margin-left: 15px;
+        transition: background-color 0.3s;
+        cursor: pointer;
+        top: 15px;
+    }
+
+        .switch::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.3s;
+            left: 0;
+        }
+
+    input[type="checkbox"]:checked + .switch::before {
+        transform: translateX(20px);
+        background-color: greenyellow;
+    }
+
+    input[type="checkbox"] {
+        display: none;
+    }
+
+</style>
+<form id="frm">
+    <div class="card mb-3">
+        <div class="card-header row">
+            <div class="col-md-3">
+                <i class="fas fa-table"></i>
+                Doctor Time Slot
+            </div>
+            <div class="col-md-2">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="shiftPeriod" id="shiftPeriodMorning" value="Morning" onclick="CheckShiftMorning()">
+                            <label class="form-check-label" for="shiftPeriodMorning">
+                                Morning
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="shiftPeriod" id="shiftPeriodEvening" value="Evening" onclick="CheckShiftEvening()">
+                            <label class="form-check-label" for="shiftPeriodEvening">
+                                Evening
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+             <div class="col-md-1"></div>
+            <div class="col-md-4">
+                <select class="form-control" id="doctorId" name="doctorId">
+                    <option value="0">Choose Doctor</option>
+                    @foreach (var item in Model.DoctorInfos)
+                    {
+                        <option value="@item.Id">@item.name (@item.Department?.departmentName)</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <a class="btn btn-info btn-sm" onclick="LoadTimePeriod()">Load</a>
+                <a class="btn btn-info btn-sm" onclick="Save()">Save</a>
+            </div>
+
+
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" width="100%" cellspacing="0" id="tblVisitorInfo">
+                    <thead>
+                        <tr>
+                            <th style="text-align: center; width: 200px;">Slots</th>
+                            <th style="text-align: center;">Sunday <input type="checkbox" style="margin-left: 15px;" class="form-check-input sundayMain" id="sundayMain" onclick="CheckWeek('sunday')" /><label for="sundayMain" class="switch"></label></th>
+                            <th style="text-align: center;">Monday <input type="checkbox" style="margin-left: 15px;" class="form-check-input mondayMain" id="mondayMain" onclick="CheckWeek('monday')" /><label for="mondayMain" class="switch"></label></th>
+                            <th style="text-align: center;">Tuesday <input type="checkbox" style="margin-left: 15px;" class="form-check-input tuesdayMain" id="tuesdayMain" onclick="CheckWeek('tuesday')" /><label for="tuesdayMain" class="switch"></label></th>
+                            <th style="text-align: center;">Wednesday <input type="checkbox" style="margin-left: 15px;" class="form-check-input wednesdayMain" id="wednesdayMain" onclick="CheckWeek('wednesday')" /><label for="wednesdayMain" class="switch"></label></th>
+                            <th style="text-align: center;">Thursday <input type="checkbox" style="margin-left: 15px;" class="form-check-input thursdayMain" id="thursdayMain" onclick="CheckWeek('thursday')" /><label for="thursdayMain" class="switch"></label></th>
+                            <th style="text-align: center;">Friday <input type="checkbox" style="margin-left: 15px;" class="form-check-input fridayMain" id="fridayMain" onclick="CheckWeek('friday')" /><label for="fridayMain" class="switch"></label></th>
+                            <th style="text-align: center;">Saturday <input type="checkbox" style="margin-left: 15px;" class="form-check-input saturdayMain" id="saturdayMain" onclick="CheckWeek('saturday')" /><label for="saturdayMain" class="switch"></label></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbl">
+                        @*@foreach (var item in Model.TimePeriods)
+                        {
+                        <tr>
+                        <td class="text-center">@item.timeSlot (@item.shiftPeriod)</td>
+                        <td class="text-center">
+                        <input type="checkbox" name="" id="" class="form-check-input" />
+                        </td>
+                        <td class="text-center">
+                        <input type="checkbox" name="" id="" class="form-check-input" />
+                        </td>
+                        <td class="text-center">
+                        <input type="checkbox" name="" id="" class="form-check-input" />
+                        </td>
+                        <td class="text-center">
+                        <input type="checkbox" name="" id="" class="form-check-input" />
+                        </td>
+                        <td class="text-center">
+                        <input type="checkbox" name="" id="" class="form-check-input" />
+                        </td>
+                        <td class="text-center">
+                        <input type="checkbox" name="" id="" class="form-check-input" />
+                        </td>
+                        <td class="text-center">
+                        <input type="checkbox" name="" id="" class="form-check-input" />
+                        </td>
+                        </tr>
+                        }*@
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+        <div class="card-footer small text-muted"></div>
+    </div>
+</form>
+
+@section Scripts {
+    <script src="https://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+    <script src="https://www.jqueryscript.net/demo/Material-Time-Picker-Plugin-jQuery-MDTimePicker/mdtimepicker.js"></script>
+    <script src="~/SweetAlert/sweetalert2.common.js"></script>
+    <script src="~/SweetAlert/sweetalert2.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#doctorId').select2();
+        });
+
+        
+        function LoadTimePeriod() {             
+            var doctorId = $('#doctorId :selected').val();
+            Common.Ajax('GET', '/Appointment/GetTimeSlotsByDoctorId?doctorId=' + doctorId, [], 'json', ajaxGetDoctorVisitTimeListByDoctorId, false);
+            
+
+        }
+
+        function ajaxGetDoctorVisitTimeListByDoctorId(res) {
+            console.log(res);
+            
+            var option = '';
+            $.each(res, function (i, item) {
+                
+                option += `<tr id="slotId_${item.id}">
+                                <td class="text-center">${item.timeSlot} (${item.shiftPeriod})<input class="slotId" type="hidden" value="${item.id}" /><input type="checkbox" class="form-check-input main_${item.id}" id="main_${item.id}" style="margin-left: 15px" onclick="CheckSlot(${item.id})" /><label for="main_${item.id}" class="switch"></label></td>
+                                <td class="text-center">
+                                    <input type="checkbox" onclick="clickCheck(this)" ${item.sunday > 0 ? 'name="Sunday"' : ''} value="${item.sunday}" ${item.sunday > 0 ? "checked" : ""} id="Sunday_${item.id}" class="form-check-input myCheckbox sunday" /><label for="Sunday_${item.id}" class="switch"></label>
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" onclick="clickCheck(this)" ${item.monday > 0 ? 'name="Monday"' : ''} value="${item.monday}" ${item.monday > 0 ? "checked" : ""} id="Monday_${item.id}" class="form-check-input myCheckbox monday" /><label for="Monday_${item.id}" class="switch"></label>
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" onclick="clickCheck(this)" ${item.tuesDay > 0 ? ' name="Tuesday"' : ''} value="${item.tuesDay}" ${item.tuesDay > 0 ? "checked" : ""} id="Tuesday_${item.id}" class="form-check-input myCheckbox tuesday" /><label for="Tuesday_${item.id}" class="switch"></label>
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" onclick="clickCheck(this)" ${item.wednesday > 0 ? 'name="Wednesday"' : ''} value="${item.wednesday}" ${item.wednesday > 0 ? "checked" : ""} id="Wednesday_${item.id}" class="form-check-input myCheckbox wednesday" /><label for="Wednesday_${item.id}" class="switch"></label>
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" onclick="clickCheck(this)" ${item.thursday > 0 ? 'name="Thursday"' : ''} value="${item.thursday}" ${item.thursday > 0 ? "checked" : ""} id="Thursday_${item.id}" class="form-check-input myCheckbox thursday" /><label for="Thursday_${item.id}" class="switch"></label>
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" onclick="clickCheck(this)" ${item.friday > 0 ? 'name="Friday"' : ''} value="${item.friday}" ${item.friday > 0 ? "checked" : ""} id="Friday_${item.id}" class="form-check-input myCheckbox friday" /><label for="Friday_${item.id}" class="switch"></label>
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" onclick="clickCheck(this)" ${item.saturday > 0 ? 'name="Saturday"' : ''} value="${item.saturday}" ${item.saturday > 0 ? "checked" : ""} id="Saturday_${item.id}" class="form-check-input myCheckbox saturday" /><label for="Saturday_${item.id}" class="switch"></label>
+                                </td>
+                            </tr>`
+            });
+
+            $('#tbl').empty();
+            $('#tbl').append(option);
+        }
+
+
+
+         function CheckShiftMorning() {
+           debugger;
+             var shiftPeriod = $('input[name="shiftPeriod"]:checked').val();
+            var doctorId = $('#doctorId :selected').val(); 
+            Common.Ajax('GET', '/Appointment/GetTimeSlotsByDoctorId?doctorId=' + doctorId, [], 'json', ajaxGetDoctorVisitTimeListByDoctorIdShiftMorning, false);
+
+        }
+         function CheckShiftEvening() { 
+             var shiftPeriod = $('input[name="shiftPeriod"]:checked').val();
+            var doctorId = $('#doctorId :selected').val();
+              
+            Common.Ajax('GET', '/Appointment/GetTimeSlotsByDoctorId?doctorId=' + doctorId, [], 'json', ajaxGetDoctorVisitTimeListByDoctorIdShiftEvening, false);
+        }
+
+        function ajaxGetDoctorVisitTimeListByDoctorIdShiftMorning(res) {
+             
+            var option = '';
+            $.each(res, function (i, item) {
+                
+                if( item.shiftPeriod == "Morning"){
+                             option += `<tr id="slotId_${item.id}">
+                                <td class="text-center">${item.timeSlot} (${item.shiftPeriod})<input class="slotId" type="hidden" value="${item.id}" /><input type="checkbox" class="form-check-input main_${item.id}" id="main_${item.id}" style="margin-left: 15px" onclick="CheckSlot(${item.id})" /><label for="main_${item.id}" class="switch"></label></td>
+                                <td class="text-center">
+                                    <input type="checkbox" onclick="clickCheck(this)" ${item.sunday > 0 ? 'name="Sunday"' : ''} value="${item.sunday}" ${item.sunday > 0 ? "checked" : ""} id="Sunday_${item.id}" class="form-check-input myCheckbox sunday" /><label for="Sunday_${item.id}" class="switch"></label>
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" onclick="clickCheck(this)" ${item.monday > 0 ? 'name="Monday"' : ''} value="${item.monday}" ${item.monday > 0 ? "checked" : ""} id="Monday_${item.id}" class="form-check-input myCheckbox monday" /><label for="Monday_${item.id}" class="switch"></label>
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" onclick="clickCheck(this)" ${item.tuesDay > 0 ? ' name="Tuesday"' : ''} value="${item.tuesDay}" ${item.tuesDay > 0 ? "checked" : ""} id="Tuesday_${item.id}" class="form-check-input myCheckbox tuesday" /><label for="Tuesday_${item.id}" class="switch"></label>
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" onclick="clickCheck(this)" ${item.wednesday > 0 ? 'name="Wednesday"' : ''} value="${item.wednesday}" ${item.wednesday > 0 ? "checked" : ""} id="Wednesday_${item.id}" class="form-check-input myCheckbox wednesday" /><label for="Wednesday_${item.id}" class="switch"></label>
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" onclick="clickCheck(this)" ${item.thursday > 0 ? 'name="Thursday"' : ''} value="${item.thursday}" ${item.thursday > 0 ? "checked" : ""} id="Thursday_${item.id}" class="form-check-input myCheckbox thursday" /><label for="Thursday_${item.id}" class="switch"></label>
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" onclick="clickCheck(this)" ${item.friday > 0 ? 'name="Friday"' : ''} value="${item.friday}" ${item.friday > 0 ? "checked" : ""} id="Friday_${item.id}" class="form-check-input myCheckbox friday" /><label for="Friday_${item.id}" class="switch"></label>
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" onclick="clickCheck(this)" ${item.saturday > 0 ? 'name="Saturday"' : ''} value="${item.saturday}" ${item.saturday > 0 ? "checked" : ""} id="Saturday_${item.id}" class="form-check-input myCheckbox saturday" /><label for="Saturday_${item.id}" class="switch"></label>
+                                </td>
+                            </tr>`
+                }
+                
+            });
+
+            $('#tbl').empty();
+            $('#tbl').append(option);
+        }
+
+         function ajaxGetDoctorVisitTimeListByDoctorIdShiftEvening(res) {
+             
+            
+            var option = '';
+            $.each(res, function (i, item) {
+                if( item.shiftPeriod == "Evening"){
+                             option += `<tr id="slotId_${item.id}">
+                                <td class="text-center">${item.timeSlot} (${item.shiftPeriod})<input class="slotId" type="hidden" value="${item.id}" /><input type="checkbox" class="form-check-input main_${item.id}" id="main_${item.id}" style="margin-left: 15px" onclick="CheckSlot(${item.id})" /><label for="main_${item.id}" class="switch"></label></td>
+                                <td class="text-center">
+                                    <input type="checkbox" onclick="clickCheck(this)" ${item.sunday > 0 ? 'name="Sunday"' : ''} value="${item.sunday}" ${item.sunday > 0 ? "checked" : ""} id="Sunday_${item.id}" class="form-check-input myCheckbox sunday" /><label for="Sunday_${item.id}" class="switch"></label>
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" onclick="clickCheck(this)" ${item.monday > 0 ? 'name="Monday"' : ''} value="${item.monday}" ${item.monday > 0 ? "checked" : ""} id="Monday_${item.id}" class="form-check-input myCheckbox monday" /><label for="Monday_${item.id}" class="switch"></label>
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" onclick="clickCheck(this)" ${item.tuesDay > 0 ? ' name="Tuesday"' : ''} value="${item.tuesDay}" ${item.tuesDay > 0 ? "checked" : ""} id="Tuesday_${item.id}" class="form-check-input myCheckbox tuesday" /><label for="Tuesday_${item.id}" class="switch"></label>
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" onclick="clickCheck(this)" ${item.wednesday > 0 ? 'name="Wednesday"' : ''} value="${item.wednesday}" ${item.wednesday > 0 ? "checked" : ""} id="Wednesday_${item.id}" class="form-check-input myCheckbox wednesday" /><label for="Wednesday_${item.id}" class="switch"></label>
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" onclick="clickCheck(this)" ${item.thursday > 0 ? 'name="Thursday"' : ''} value="${item.thursday}" ${item.thursday > 0 ? "checked" : ""} id="Thursday_${item.id}" class="form-check-input myCheckbox thursday" /><label for="Thursday_${item.id}" class="switch"></label>
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" onclick="clickCheck(this)" ${item.friday > 0 ? 'name="Friday"' : ''} value="${item.friday}" ${item.friday > 0 ? "checked" : ""} id="Friday_${item.id}" class="form-check-input myCheckbox friday" /><label for="Friday_${item.id}" class="switch"></label>
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" onclick="clickCheck(this)" ${item.saturday > 0 ? 'name="Saturday"' : ''} value="${item.saturday}" ${item.saturday > 0 ? "checked" : ""} id="Saturday_${item.id}" class="form-check-input myCheckbox saturday" /><label for="Saturday_${item.id}" class="switch"></label>
+                                </td>
+                            </tr>`
+                }
+                
+            });
+
+            $('#tbl').empty();
+            $('#tbl').append(option);
+        }
+
+
+
+
+        function CheckSlot(id) {
+            var isChecked = $('.main_' + id).is(':checked');
+            if (isChecked) {
+                $('#slotId_' + id + ' .myCheckbox').attr('checked', true);
+
+                $('#slotId_' + id + ' .myCheckbox').each(function (index, element) {
+                    var id = $(element).attr('id');
+                    $(element).attr('name', id.split('_')[0]);
+                    $(element).val(id.split('_')[1]);
+                });
+            }
+            else {
+                $('#slotId_' + id + ' .myCheckbox').attr('checked', false);
+
+                $('#slotId_' + id + ' .myCheckbox').each(function (index, element) {
+                    var id = $(element).attr('id');
+                    $(element).removeAttr('name');
+                    $(element).val(0);
+                });
+            }
+        }
+
+        function CheckWeek(weekname) {
+            var isChecked = $('.' + weekname + 'Main').is(':checked');
+            if(isChecked){
+                $('.' + weekname).attr('checked', true);
+
+                $('.' + weekname).each(function (index, element) {
+                    var id = $(element).attr('id');
+                    $(element).attr('name', id.split('_')[0]);
+                    $(element).val(id.split('_')[1]);
+                    $(element).closest('.switch').find('::before').css('left', '20px');
+                });
+            }
+            else{
+                $('.' + weekname).attr('checked', false);
+                $('.' + weekname).each(function (index, element) {
+                    var id = $(element).attr('id');
+                    $(element).removeAttr('name');
+                    $(element).val(0);
+                });
+            }
+        }
+
+
+        function clickCheck(checkbox) {
+            console.log(checkbox.id);
+            if (checkbox.type === 'checkbox') {
+                if (checkbox.checked) {
+                    $(checkbox).attr('name', checkbox.id.split('_')[0]);
+                    $(checkbox).val(checkbox.id.split('_')[1]);
+                }
+                else {
+                    $(checkbox).removeAttr('name');
+                    $(checkbox).val(0);
+                }
+            } else {
+                console.log('Not a checkbox');
+
+            }
+        }
+
+
+        function Save() {
+            var data = $('#frm').serialize();
+            console.log(data);
+
+            $.ajax({
+                type: "POST",
+                url: "/Appointment/SaveDoctorTimeSlot",
+                data: data,
+                success: function (response) {
+                    if (response) {
+                        swal('success', 'Updated Successfully', 'Success').then(function () {
+                            LoadTimePeriod();
+                        })
+                    }
+                    else{
+                        swal('warning', 'Something Went Wrong!', 'Warning');
+                    }
+                },
+                error: function (error) {
+                    console.log("Error in request:", error);
+                    swal('warning', 'Something Went Wrong!', 'Warning');
+                }
+            });
+        }
+
+
+    </script>
+}

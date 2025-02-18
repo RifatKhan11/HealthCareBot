@@ -1,0 +1,677 @@
+﻿@model KnowledgeViewModel
+@{
+    ViewData["Title"] = "Menu";
+}
+<style>
+   /* .multipleChosen{
+       width: 300px !important;
+        max-width: 300px !important;
+    }*/
+
+     /*.select2-selection__choice {
+        width: 150px !important;
+        height:30px !important ;  
+        /* max-height:50px !important; */
+        
+    }*/
+
+    .select2-selection__choice__display {
+        width: 150px !important;
+        height: 50px !important;
+    }
+</style>
+@*<link href="~/css/bootstrap-multiselect.css" rel="stylesheet" />*@
+<link href="~/css/select2.min.css" rel="stylesheet" />
+
+<ol class="breadcrumb">
+    <li class="breadcrumb-item">
+        <a href="/">Dashboard</a>
+    </li>
+    <li class="breadcrumb-item active">Knowledge</li>
+</ol>
+
+<!-- Area Chart Example-->
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Knowledge
+    </div>
+    <div class="card-body" id="EditSection">
+
+        <form asp-controller="Knowledge" asp-action="Index" onsubmit="return CheckStatus()" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <input type="hidden" class="form-control" id="Id" name="Id" value="@Model.Id">
+           @* <input type="hidden" class="form-control" id="facebookId" name="facebookPageId" value="@Model.facebookPageId">*@
+           <div class="row">
+               <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="ParrentMenuName">Question</label>
+                                <input type="text" class="form-control" id="question" value="" name="question" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="ParrentMenuName">Answer</label>
+                                <input type="text" class="form-control" id="answer" value="" name="answer" required>
+                            </div>
+                        </div>
+                        @*<div class="col-md-6">
+                            <div class="form-group">
+                                <label for="ParrentMenuName">Keyword</label>
+                                <input type="text" class="form-control" id="keyword" value="" name="keyword">
+                            </div>
+                        </div>*@
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="ParrentMenuName">Question Order</label>
+                                <input type="number" class="form-control" id="questionOrder" value="" name="questionOrder">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="ParrentMenuName">Status</label>
+                                <select class="form-control" name="status" id="status">
+                                    @if (Model.status == 1)
+                                    {
+                                        <option value="1" selected>Active</option>
+                                        <option value="0">InActive</option>
+                                    }
+                                    else if (@Model.status == 0)
+                                    {
+                                        <option value="1">Active</option>
+                                        <option value="0" selected>InActive</option>
+                                    }
+                                    else  
+                                    {
+                                        <option value="1" selected>Active</option>
+                                        <option value="0">InActive</option>
+                                    }
+                                     
+
+                                </select>
+                            </div>
+                        </div>
+                          @*<div class="col-md-6">
+                            <div class="form-group">
+                                <label for="ParrentMenuName">Question Category</label>
+
+                                <select class="form-control" name="questioncategoryId" id="questioncategoryId">
+                                    <option value="">Select Category</option>
+                                    @foreach (var data in Model.questionCategories)
+                                    {
+                                        <option style="border-radius:23px" value="@data.Id">@data.categoryName</option>
+                                    }
+                                </select>
+
+                            </div>
+                        </div>*@
+                         
+                    </div>
+                    <div class="row">
+                         
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="ParrentMenuName">Priority</label>
+                                <select class="form-control" name="priority" id="priority">
+                                    @if (Model.priority == 1)
+                                    {
+                                        <option value="1" selected>1</option>
+                                        <option value="2">2</option>
+                                    }
+                                    else if (Model.priority == 2)
+                                    {
+                                        <option value="1">1</option>
+                                        <option value="2" selected>2</option>
+                                    }
+                                    else
+                                    {
+                                    <option value="1" selected>1</option>
+                                    <option value="2">2</option>
+                                    }
+                                     
+                                    
+                                </select>
+                            </div>
+                        </div>
+                          <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="ParrentMenuName">Is Question</label>
+                                <select class="form-control" name="isquestion" id="isquestion">
+                                    @if (Model.isquestion == 1)
+                                    {
+                                        <option value="0">No</option>
+                                        <option value="1" selected>Yes</option>
+                                    }
+                                    else if (Model.isquestion == 0)
+                                    {
+                                        <option value="0" selected>No</option>
+                                        <option value="1">Yes</option>
+                                    }
+                                    else 
+                                    {
+                                        <option value="0" selected>No</option>
+                                        <option value="1">Yes</option>
+                                    }
+                                </select>
+                                 
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="ParrentMenuName">Send Otp</label>
+                                <select class="form-control" name="smsOtp" id="smsOtp">
+                                    @if (Model.smsOtp == 1)
+                                    {
+                                        <option value="0">No</option>
+                                        <option value="1" selected>Yes</option>
+                                    }
+                                    else if (Model.smsOtp == 0)
+                                    {
+                                        <option value="0" selected>No</option>
+                                        <option value="1">Yes</option>
+                                    }
+                                    else 
+                                    {
+                                        <option value="0" selected>No</option>
+                                        <option value="1">Yes</option>
+                                    }
+                                     
+                                </select>
+
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="ParrentMenuName">Type</label>
+                                <select class="form-control" name="type" id="type">
+                                    @if (Model.type == 1)
+                                    {
+                                        <option value="1" selected>text</option>
+                                        <option value="2">button</option>
+                                        <option value="3">button group</option>
+                                        <option value="4">html</option>
+                                        <option value="5">Iframe Url</option>
+                                        <option value="6">card group</option>
+                                        <option value="7">input group</option>
+                                        <option value="110">by refname</option>
+                                        <option value="101">Doctor Name</option>
+                                    }
+                                    else if (Model.type == 2)
+                                    {
+                                        <option value="1">text</option>
+                                        <option value="2" selected>button</option>
+                                        <option value="3">button group</option>
+                                        <option value="4">html</option>
+                                        <option value="5">Iframe Url</option>
+                                        <option value="6">card group</option>
+                                        <option value="7">input group</option>
+                                        <option value="110">by refname</option>
+                                        <option value="101">Doctor Name</option>
+                                    }
+                                    else if (Model.type == 3)
+                                    {
+                                        <option value="1">text</option>
+                                        <option value="2">button</option>
+                                        <option value="3" selected>button group</option>
+                                        <option value="4">html</option>
+                                        <option value="5">Iframe Url</option>
+                                        <option value="6">card group</option>
+                                        <option value="7">input group</option>
+                                        <option value="110">by refname</option>
+                                        <option value="101">Doctor Name</option>
+                                    }
+                                    else if (Model.type == 4)
+                                    {
+                                        <option value="1">text</option>
+                                        <option value="2">button</option>
+                                        <option value="3">button group</option>
+                                        <option value="4" selected>html</option>
+                                        <option value="5">Iframe Url</option>
+                                        <option value="6">card group</option>
+                                        <option value="7">input group</option>
+                                        <option value="110">by refname</option>
+                                        <option value="101">Doctor Name</option>
+                                    }
+                                    else if (Model.type == 5)
+                                    {
+                                        <option value="1">text</option>
+                                        <option value="2">button</option>
+                                        <option value="3">button group</option>
+                                        <option value="4">html</option>
+                                        <option value="5" selected>Iframe Url</option>
+                                        <option value="6">card group</option>
+                                        <option value="7">input group</option>
+                                        <option value="110">by refname</option>
+                                        <option value="101">Doctor Name</option>
+                                    }
+                                    else if (Model.type == 6)
+                                    {
+                                        <option value="1">text</option>
+                                        <option value="2">button</option>
+                                        <option value="3">button group</option>
+                                        <option value="4">html</option>
+                                        <option value="5">Iframe Url</option>
+                                        <option value="6" selected>card group</option>
+                                        <option value="7">input group</option>
+                                        <option value="110">by refname</option>
+                                        <option value="101">Doctor Name</option>
+                                    }
+                                    else if (Model.type == 7)
+                                    {
+                                        <option value="1">text</option>
+                                        <option value="2">button</option>
+                                        <option value="3">button group</option>
+                                        <option value="4">html</option>
+                                        <option value="5">Iframe Url</option>
+                                        <option value="6">card group</option>
+                                        <option value="7" selected>input group</option>
+                                        <option value="110">by refname</option>
+                                        <option value="101">Doctor Name</option>
+                                    }
+                                    else if (Model.type == 110)
+                                    {
+                                        <option value="1">text</option>
+                                        <option value="2">button</option>
+                                        <option value="3">button group</option>
+                                        <option value="4">html</option>
+                                        <option value="5">Iframe Url</option>
+                                        <option value="6">card group</option>
+                                        <option value="7">input group</option>
+                                        <option value="110" selected>by refname</option>
+                                        <option value="101">Doctor Name</option>
+                                    }
+                                    else if (Model.type == 101)
+                                    {
+                                        <option value="1">text</option>
+                                        <option value="2">button</option>
+                                        <option value="3">button group</option>
+                                        <option value="4">html</option>
+                                        <option value="5">Iframe Url</option>
+                                        <option value="6">card group</option>
+                                        <option value="7">input group</option>
+                                        <option value="110">by refname</option>
+                                        <option value="101" selected>Doctor Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="1" selected>text</option>
+                                        <option value="2">button</option>
+                                        <option value="3">button group</option>
+                                        <option value="4">html</option>
+                                        <option value="5">Iframe Url</option>
+                                        <option value="6">card group</option>
+                                        <option value="7">input group</option>
+                                        <option value="110">by refname</option>
+                                        <option value="101">Doctor Name</option>
+                                    }
+                                     
+
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="ParrentMenuName">Sibling</label>
+
+                                <select class="form-control" name="questionkey" id="questionkey">
+                                    
+                                    @if (Model.questionkey == "")
+                                    {
+                                        <option value="" >Select questionkey</option>
+                                        @foreach (var item in Model.keyWordQuesAns.Where(x => x.nodeName != "" && x.nodeName != null))
+                                        {
+                                            <option value="@item.questionKey" selected>@item.nodeName</option>
+                                        }
+                                        
+                                    }
+                                    else
+                                    {
+                                        <option value="" selected>Select questionkey</option>
+                                        @foreach (var item in Model.keyWordQuesAns.Where(x => x.nodeName != "" && x.nodeName != null))
+                                        {
+                                            <option value="@item.questionKey">@item.nodeName</option>
+                                        }
+                                    }
+
+                                    
+                                </select>
+                                 
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="ParrentMenuName">Node Name</label>
+                                <input type="text" class="form-control" id="nodeName" value="" name="nodeName">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="ParrentMenuName">Nodes</label>
+                                <select class="multipleChosen form-control" id="nodes" name="nodes[]" multiple="multiple">
+                                   
+                                    @if (Model.nodes != null )
+                                    {
+                                        <option value="">Select Node</option>
+                                        @foreach (var item in Model.keyWordQuesAns.Where(x => x.nodeName != "" && x.nodeName != null))
+                                        {
+                                            <option value="@item.Id" selected>@item.nodeName</option>
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                        <option value="" selected>Select Node</option>
+                                        @foreach (var item in Model.keyWordQuesAns.Where(x => x.nodeName != "" && x.nodeName != null))
+                                        {
+                                            <option value="@item.Id">@item.nodeName</option>
+                                        }
+                                    }
+                                    
+                                    
+                                </select>
+                            </div>
+                        </div>
+                        @*<div class="col-md-6">
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="IsLoop" name="IsLoop" value="0">
+                                    <label class="form-check-label" for="IsLoop">
+                                        Make It As a  Loop
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group" id="loopof" style="display:none">
+                                <label for="ParrentMenuName">Loop Of</label>
+
+                                <select class="form-control" name="keyWordQuesAnssId" id="keyWordQuesAnssId">
+                                    <option value="0">Select</option>
+                                    @foreach (var data in Model.keyWordQuesAns)
+                                    {
+                                    <option style="border-radius:23px" value="@data.Id">@data.question-@data.answer</option>
+                                    }
+                                </select>
+
+                            </div>
+                        </div>
+*@
+                    </div>
+               </div>
+           </div>
+            
+
+             
+
+           
+            
+
+            @*<div class="form-group">
+                <label for="ParrentMenuName">More</label>
+                <input type="text" class="form-control" id="more" value="" name="more">
+            </div>*@
+            
+             
+
+            <input type="submit" class="btn btn-primary" value="Save Changes">
+        </form>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Knowledge Base
+    </div>
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>#SL</th>
+                        <th>Question</th>
+                        <th>Answer</th>
+                        @*<th>More</th>*@
+                        @*<th>Category</th>*@
+                        <th>Priority</th>
+                        <th>Node Name</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var count = 1;
+                    }
+                    @foreach (var data in Model.keyWordQuesAns)
+                    {
+                    <tr>
+                        <td>@count</td> 
+                        <td>@data.question</td>
+                        <td>@data.answer</td>
+                        @*<td>@data.more</td>*@
+                        @*<td>@data.questionCategory?.categoryName</td>*@
+                        <td>@data.priority</td>
+                        <td>@data.nodeName</td>
+                        <td>
+                                <a href="#EditSection" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Edit Question" onclick="Edit('@data.Id','@data.facebookPageId','@Html.Raw(HttpUtility.JavaScriptStringEncode(data.question))','@Html.Raw(HttpUtility.JavaScriptStringEncode(data.answer))','@Html.Raw(HttpUtility.JavaScriptStringEncode(data.more))','@data.questionCategoryId','@data.priority','@data.keyWord','@data.status','@data.type','@data.questionKey','@data.nodes','@data.smsOtp','@data.isQuestion','@data.questionOrder','@data.nodeName','@data.IsLoop','@data.keyWordQuesAnsId')"><i class="fas fa-edit"></i></a>
+
+                            <form asp-controller="Knowledge" asp-action="Delete" method="post">
+                                <input type="hidden" name="id" value="@data.Id" />
+                                <button type="submit" class="btn btn-danger btn-sm" data-toggle="confirmation-singleton" data-singleton="true" data-btn-ok-icon-class="material-icons" data-btn-ok-icon-content="check" data-btn-cancel-icon-class="material-icons" data-btn-cancel-icon-content="close" data-title="Are sure to delete it?">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+
+                        </td>
+                    </tr>
+                        count++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+@section Scripts{
+    
+    @*<script src="~/js/bootstrap-multiselect.min.js"></script>*@
+    <script src="~/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+
+            //$('select[multiple]').multiselect();
+            $('.multipleChosen').select2({
+                theme: "classic"
+            });
+
+            $("select").on("select2:select", function (evt) {
+              var element = evt.params.data.element;
+              var $element = $(element);
+
+              $element.detach();
+              $(this).append($element);
+              $(this).trigger("change");
+            });
+
+
+            $("#IsLoop").change(function () {
+
+                if ($(this).val() == 1) {
+
+                    $(this).val(0);
+                }
+                else {
+                    $(this).val(1);
+                }
+
+                if ($(this).val() == 1) {
+
+                    $("#loopof").show();
+                }
+                else {
+                    $("#loopof").hide();
+                }
+                Common.Ajax('GET', '/knowledge/Getquesrion/', [], 'json', orgquestion);
+
+            });
+            $("#questioncategoryId").change(function () {
+                var id = $(this).val();
+                //Common.Ajax('GET', '/knowledge/GetquesrionbycatId/' + id, [], 'json', orgquestion);
+                Common.Ajax('GET', '/knowledge/GetquesrionbycatId/' + id, [], 'json', orgquestion);
+            });
+
+            //$(".multipleChosen").chosen({
+            //    placeholder_text_multiple: "Select YOur Node" //placeholder
+            //});
+
+            $('#dataTable').DataTable({
+                "columnDefs": [
+                    { "width": "5%", "targets": 0 }, 
+                    { "width": "35%", "targets": 1 },
+                    { "width": "35%", "targets": 2 },
+                    { "width": "15%", "targets": 3 },
+                    { "width": "10%", "targets": 4 }
+                ],
+                "pageLength": 100
+            });
+           
+
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            });
+
+        });
+        function orgquestion(response) {
+            console.log(response);
+            var options = '<option value="">Select</option>';
+            $.each(response, function (i, item) {
+                //alert(item.question);
+                options += '<option value="' + item.id + '">' + item.question + '-' + item.answer + '</option>';
+            });
+            console.log(options);
+            $('#keyWordQuesAnssId').empty();
+            $('#keyWordQuesAnssId').append(options);
+
+
+        }
+
+
+        function Edit(id, fbPageId, question, answer, more, categoryId, priority, keyword, status, type, questionKey, nodes, smsOtp, isquestion, questionOrder, nodeName, isLoop, keyWordQuesAnsId,) {
+           console.log("Edit");
+           console.log(id);
+            $("#Id").val(id);
+            $("#facebookId").val(fbPageId);
+            $("#question").val(question);
+            $("#answer").val(answer);
+            $("#more").val(more);
+            $("#questioncategoryId").val(categoryId);
+            $("#priority").val(priority);
+            $("#keyword").val(keyword);
+            $("#status").val(status);
+            $("#type").val(type);
+            $("#questionkey").val(questionKey);
+
+
+
+            //$("#nodes").val(nodes);
+            $('#nodes').val(nodes.split(',')).change();
+
+
+            $("#smsOtp").val(smsOtp);
+            $("#isquestion").val(isquestion);
+             
+            $("#questionOrder").val(questionOrder);
+            $("#nodeName").val(nodeName);
+
+            //Common.Ajax('GET', '/knowledge/GetquesrionbycatId/' + categoryId, [], 'json', orgquestion, false);
+            Common.Ajax('GET', '/knowledge/Getquesrion/', [], 'json', orgquestion, false);
+            if (isLoop == 1) {
+              
+                $("#IsLoop").prop("checked", true);
+                $("#IsLoop").val(1);
+                if ($("#IsLoop").val() == 1) {
+
+                    $("#loopof").show();
+                }
+                else {
+                    $("#loopof").hide();
+                }
+
+            }
+            else
+            {
+                $("#IsLoop").prop("checked", false);
+                $("#IsLoop").val(0);
+                if ($("#IsLoop").val() == 1) {
+
+                    $("#loopof").show();
+                }
+                else {
+                    $("#loopof").hide();
+                }
+
+            }
+            if (keyWordQuesAnsId != null) {
+                $("#keyWordQuesAnssId").val(keyWordQuesAnsId);
+            }
+            else {
+                $("#keyWordQuesAnssId").val(0);
+            }
+        }
+
+        function CheckStatus() {
+            if ($("#question").val() == "" || $("#question").val() == null || $("#answer").val() == "" || $("#answer").val() == null) {
+                swal("Opps!!!", "Please enter correctly", "error");
+                return false;
+            }
+            return true;
+        }
+
+        $('[data-toggle=confirmation-singleton]').confirmation({
+            rootSelector: '[data-toggle=confirmation-singleton]',
+            container: 'body'
+        });
+
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                var r = Math.random() * 16 | 0,
+                    v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        function updateValue() {
+            var dropdown = document.getElementById("questionkey");
+            var selectedOption = dropdown.options[dropdown.selectedIndex].value;
+
+            if (selectedOption === "new") {
+                // Generate a new UUID as the unique ID
+                var newId = generateUUID();
+
+                // Update the value of the "New" option
+                dropdown.options[1].value = newId;
+
+                // Optionally, update the displayed text as well
+                dropdown.options[1].text = newId;
+             } 
+             //else if (selectedOption === "sibling") {
+                 
+            //    var siblingOption = document.createElement("option");
+            //    siblingOption.value = "sibling_option";  // You can customize this value
+            //    siblingOption.text = "Sibling Option";   // You can customize this text
+
+                
+            //    dropdown.add(siblingOption);
+            //}
+        }
+
+    </script>
+}

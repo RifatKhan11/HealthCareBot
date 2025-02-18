@@ -1,0 +1,246 @@
+﻿@model QuestionReplayViewModel
+@using System.Web
+@{
+    ViewData["Title"] = "Question & Replay";
+}
+
+<!-- Breadcrumbs-->
+<ol class="breadcrumb">
+    <li class="breadcrumb-item">
+        <a href="/">Dashboard</a>
+    </li>
+    <li class="breadcrumb-item active">Questions & Replay</li>
+</ol>
+
+
+<!-- Area Chart Example-->
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        All Questions & Replay
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>#SL</th>
+                        <th>Menu</th>
+                        <th>Question(Bangla)</th>
+                        <th>Answer(Bangla)</th>
+                        <th>Question(English)</th>
+                        <th>Answer(English)</th>
+
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>#SL</th>
+                        <th>Menu</th>
+                        <th>Question(Bangla)</th>
+                        <th>Answer(Bangla)</th>
+                        <th>Question(English)</th>
+                        <th>Answer(English)</th>
+
+                        <th>Action</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    @{
+                        var count = 1;
+                    }
+                    @foreach (MenuQuestionAnswer data in Model.menuQuestionAnswers)
+                    {
+                    <tr>
+                        <td>@count</td>
+                        <td>@data.MenuName</td>
+                        @if (data.TypeId == 1)
+                        {
+                            <td>@data.QuestionText</td>
+                            <td>@data.AnswerText</td>
+                            <td>@data.QuestionTextEN</td>
+                            <td>@data.AnswerTextEN</td>
+                        }
+                        else
+                        {
+                            <td>@data.QuestionText</td>
+                            <td>Template(@data.TypeName)</td>
+                            <td>@data.QuestionTextEN</td>
+                            <td>Template(@data.TypeName)</td>
+                        }
+
+
+                        <td>
+                            @if (data.TypeId == 1)
+                            {
+                                <a href="#EditSection" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Edit Question" onclick="SetValues('@data.QuestionId','@Html.Raw(HttpUtility.JavaScriptStringEncode(data.QuestionText))','@Html.Raw(HttpUtility.JavaScriptStringEncode(data.QuestionTextEN))','@data.AnswerId','@Html.Raw(HttpUtility.JavaScriptStringEncode(data.AnswerText))','@Html.Raw(HttpUtility.JavaScriptStringEncode(data.AnswerTextEN))')"><i class="fas fa-edit"></i></a>
+                            }
+
+                            <form asp-controller="QuestionReplay" asp-action="Delete" method="post">
+                                <input type="hidden" name="QuestionId" value="@data.QuestionId" />
+                                <input type="hidden" name="AnswerId" value="@data.AnswerId" />
+                                <button type="submit" class="btn btn-danger btn-sm" data-toggle="confirmation-singleton" data-singleton="true" data-btn-ok-icon-class="material-icons" data-btn-ok-icon-content="check"
+                                        data-btn-cancel-icon-class="material-icons" data-btn-cancel-icon-content="close" data-title="Are sure to delete it?">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                        count++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+
+
+<div class="card mb-3" id="EditSection">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Edit Question & Replay
+    </div>
+    <div class="card-body">
+
+        <div class="container">
+            <form asp-controller="QuestionReplay" asp-action="Index" onsubmit="return FormValidation()" method="post">
+                <input type="hidden" id="QuesId" name="QuestionId" value="" />
+                <input type="hidden" id="AnsId" name="AnswerId" value="" />
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="editQues">Edit Question</label>
+                            <textarea class="form-control" id="editQues" aria-describedby="editQuesHelp" placeholder="Enter question in Bangla" required rows="5" style="resize: none;" name="QuestionText"></textarea>
+                            <small id="editQuesHelp" class="form-text text-muted">Edit question text in Bangla</small>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="editQuesEN">Edit Question</label>
+                            <textarea class="form-control" id="editQuesEN" aria-describedby="editQuesENHelp" placeholder="Enter question in English" required rows="5" style="resize: none;" name="QuestionTextEN"></textarea>
+                            <small id="editQuesENHelp" class="form-text text-muted">Edit question text in English</small>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="editReplay">Edit Replay</label>
+                            <textarea class="form-control" id="editReplay" aria-describedby="editReplayHelp" placeholder="Enter Replay In Bangla" required rows="5" style="resize: none;" name="AnswereText"></textarea>
+                            <small id="editReplayHelp" class="form-text text-muted">Edit replay text in Bangla</small>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="editReplayEN">Edit Replay In English</label>
+                            <textarea class="form-control" id="editReplayEN" aria-describedby="editReplayENHelp" placeholder="Enter Replay In English" required rows="5" style="resize: none;" name="AnswereTextEN"></textarea>
+                            <small id="editReplayENHelp" class="form-text text-muted">Edit replay text in English</small>
+                        </div>
+                    </div>
+                </div>
+
+                <input type="submit" class="btn btn-primary" value="Save Changes">
+            </form>
+        </div>
+
+
+
+    </div>
+</div>
+
+
+@section Scripts{
+
+    <script>
+        var QuesText = "";
+        var QuesTextEN = "";
+        var AnsText = "";
+        var AnsTextEN = "";
+
+        $(document).ready(function () {
+            $('#dataTable').DataTable({
+                "columnDefs": [
+                    { "width": "5%", "targets": 0 },
+                    { "width": "20%", "targets": 1 },
+                    { "width": "20%", "targets": 2 },
+                    { "width": "20%", "targets": 3 },
+                    { "width": "20%", "targets": 4 },
+                    { "width": "10%", "targets": 5 },
+                    { "width": "5%", "targets": 6 }
+                ],
+                "pageLength": 100
+            });
+
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            });
+
+            // Add smooth scrolling to all links in navbar + footer link
+            $("a").on('click', function (event) {
+
+                // Make sure this.hash has a value before overriding default behavior
+                if (this.hash !== "") {
+                    // Prevent default anchor click behavior
+                    event.preventDefault();
+
+                    // Store hash
+                    var hash = this.hash;
+
+                    // Using jQuery's animate() method to add smooth page scroll
+                    // The optional number (900) specifies the number of milliseconds it takes to scroll to the specified area
+                    $('html, body').animate({
+                        scrollTop: $(hash).offset().top
+                    }, 900, function () {
+
+                        // Add hash (#) to URL when done scrolling (default click behavior)
+                        window.location.hash = hash;
+                    });
+                } // End if
+            });
+
+
+        });
+
+        function SetValues(QuestionId, QuestionText, QuestionTextEN, AnswerId, AnswerText, AnswerTextEN) {
+
+            QuesText = QuestionText;
+            QuesTextEN = QuestionTextEN;
+            AnsText = AnswerText;
+            AnsTextEN = AnswerTextEN;
+
+            $("#QuesId").val(QuestionId);
+            $("#editQues").val(QuestionText);
+            $("#editQuesEN").val(QuestionTextEN);
+            $("#AnsId").val(AnswerId);
+            $("#editReplay").val(AnswerText);
+            $("#editReplayEN").val(AnswerTextEN);
+        }
+
+        function FormValidation() {
+            if ($("#editQues").val() == QuesText && $("#editReplay").val() == AnsText && $("#editQuesEN").val() == QuesTextEN && $("#editReplayEN").val() == AnsTextEN) {
+                swal("Opss!!!", "The fields are same!", "info");
+                return false;
+            } if ($("#editQues").val() == null || $("#editQues").val() == "" || $("#editReplay").val() == "" || $("#editReplay").val() == null) {
+                swal("Opss!!!", "The fields must be non empty", "error");
+                return false;
+            }
+
+            if ($("#editQuesEN").val() == null || $("#editQuesEN").val() == "" || $("#editReplayEN").val() == "" || $("#editReplayEN").val() == null) {
+                swal("Opss!!!", "The fields must be non empty", "error");
+                return false;
+            }
+            return true;
+        }
+
+        $('[data-toggle=confirmation-singleton]').confirmation({
+            rootSelector: '[data-toggle=confirmation-singleton]',
+            container: 'body'
+        });
+
+    </script>
+}

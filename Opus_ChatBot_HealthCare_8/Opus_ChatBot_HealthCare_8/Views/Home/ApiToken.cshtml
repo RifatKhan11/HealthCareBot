@@ -1,0 +1,213 @@
+﻿@using static OpusBot.Controllers.HomeController
+ @model EvercareTokenVm
+@{
+    ViewData["Title"] = "Token List";
+}
+
+@section Style {
+    <link href="https://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="Stylesheet">
+    <link href="https://www.jqueryscript.net/demo/Material-Time-Picker-Plugin-jQuery-MDTimePicker/mdtimepicker.css" rel="Stylesheet">
+    <link href="~/SweetAlert/sweetalert2.css" rel="stylesheet" />
+}
+<style>
+    .swal2-icon {
+        width: 2em !important;
+        height: 2em !important;
+        margin: 0.25em auto 0.5em !important;
+        border: 0.25em solid transparent;
+    } 
+    .table td {
+        word-wrap: break-word;  
+        word-break: break-word; 
+        white-space: normal; 
+    }
+</style>
+
+ 
+<div class="card mb-3" id="createToken">
+    <div class="card-header">
+        <h5 class="card-title">Create new Token</h5>
+    </div>
+    <div class="card-body">
+
+
+        <form id="EditTokenForm">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group row">
+                            <label class="col-md-12">Token</label>
+                            <div class="col-md-12">
+                                <input type="hidden" id="frmid" name="id" class="form-control" />
+                                
+                                <input type="text" id="token" name="token" class="form-control" />
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="col-md-12">Create By</label>
+                            <div class="col-md-12">
+ 
+                                <input type="text" id="entryby" name="entryby" class="form-control" />
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="col-md-12">Phone</label>
+                            <div class="col-md-12">
+                                <input type="tel" id="phone" name="phone" class="form-control"
+                                       pattern="^0\d{10}$"
+                                       maxlength="11"
+                                       minlength="11"
+                                       title="Phone number must start with 0 and be exactly 11 digits"
+                                       required
+                                       oninput="this.value=this.value.replace(/[^0-9]/g,'');" />
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="col-md-12">Validity Start</label>
+                            <div class="col-md-12">
+                                <input type="date" id="entryDate" name="entryDate" class="form-control" />
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label class="col-md-12">Expiry Date</label>
+                            <div class="col-md-12">
+                                <input type="date" id="expiryDate" name="expiryDate" class="form-control" />
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                 <a class="btn btn-small btn-success" onclick="Save()" id="Save">Save</a>
+
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+       Token Data
+    </div>
+    <div class="card-body">
+
+        <div class="">
+            <table class="table table-bordered" width="100%">
+                <thead>
+                    <tr> 
+                        
+                        <th width="40%">Token</th>
+                        <th width="15%">Create By</th>
+                        <th width="15%">Phone</th>
+                        <th width="15%">Validity Start</th>
+                        <th width="15%">Expiry Date</th>
+                    </tr>
+                </thead>
+                <tbody id="dtVisitorInfo"> 
+                    @foreach (var item in @Model.evercareToken)
+                    {
+                        <tr>
+                            <td>@item.token</td>
+                            <td>@item.entryby</td>
+                            <td>@item.phone</td>
+                            <td>@item.entryDate?.ToString("yyyy-MM-dd")</td>
+                            <td>@item.expiryDate.ToString("yyyy-MM-dd")</td>
+                             
+                        </tr>
+                    }
+                     
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+
+
+
+
+@section Scripts {
+    <script src="https://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+    <script src="https://www.jqueryscript.net/demo/Material-Time-Picker-Plugin-jQuery-MDTimePicker/mdtimepicker.js"></script>
+    <script src="~/SweetAlert/sweetalert2.common.js"></script>
+    <script src="~/SweetAlert/sweetalert2.js"></script>
+    <script>
+        $(document).ready(function () {
+            var date = '@DateTime.Now.ToString("MM-dd-yyyy")';
+
+
+            $('#frmDate').datepicker({ dateFormat: "dd-M-yy", showAnim: "scale", changeMonth: true, changeYear: true, yearRange: "1900:2100" });
+            $('#frmTime').mdtimepicker({
+                timeFormat: 'hh:mm:ss.000',
+                format: 'hh:mm',
+                pick12HourFormat: false,
+                theme: 'dark',
+                readOnly: true,
+                hourPadding: true,
+                clearBtn: false
+            });
+
+            
+
+            $('#dataTable').DataTable({
+
+                "pageLength": 100
+            });
+
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            });
+           
+             
+        });
+
+
+
+
+        
+
+        
+        function Save() {
+            var data = $('#EditTokenForm').serialize();
+
+            swal({
+                title: 'Are you sure?', text: 'Do you want to Save this record!', type: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'Yes, update it!'
+            }).then(function () {
+                $.ajax({
+                    url: '/Home/SaveApiToken',
+                    method: 'POST',
+                    data: data,
+                    success: function (data) {
+                        location.reload();
+                    },
+                    error: function (error) {
+                        console.error('Error:', error);
+                    }
+                });
+            });
+        }
+    </script>
+}
+

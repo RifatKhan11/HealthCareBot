@@ -1,0 +1,166 @@
+﻿@{
+   // Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = null;
+
+}
+<!DOCTYPE html>
+<html class="gr__cdn_chatbot_com">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>chatbot.com</title>
+    <meta http-equiv="cache-control" content="max-age=0">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="expires" content="0">
+    <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT">
+    <meta http-equiv="pragma" content="no-cache">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link href="~/chatbox/Chat.css" rel="stylesheet">
+    <link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+    <link href="~/lib/bootstrap/dist/css/bootstrap-theme.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+    <style>
+        .dropbtn {
+            background-color: white;
+            color: rgb(0, 108, 255);
+            padding: 1px;
+            font-size: 20px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .dropdown {
+            position: relative;
+            float: left;
+            height: 100%;
+            padding: 16px 10px;
+            width: 40px;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            /*background-color: #f1f1f1;*/
+            background-color: white;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            min-width: 170px;
+            overflow: auto;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            top: -85px;
+            border-radius: 10px;
+        }
+
+            .dropdown-content a {
+                color: black;
+                padding: 6px 16px;
+                text-decoration: none;
+                display: block;
+            }
+
+        .dropdown a:hover {
+            background-color: #ddd;
+        }
+
+        .show {
+            display: block;
+        }
+
+        .anitem {
+            height: 100px;
+        }
+    </style>
+</head>
+<body data-gr-c-s-loaded="true">
+    <div id="app">
+        <div id="chat">
+            <div class="chat-window" id="chat-window" >
+                <div class="chat-window-wrapper" style="background: rgba(255, 255, 255, 0.95);">
+                    <div class="window-content-wrapper">
+                        <div class="head avatar-offset" style="background: rgb(0, 108, 255); color: rgb(255, 255, 255); height: 92px;">
+                            <div class="company" style="opacity: 1;">
+                                <div class="avatar-outer-wrapper"><div class="avatar-wrapper"><div class="avatar"><div class="lazy-img-wrapper"><!----> <img alt="" src="~/chatbox/TOTA.png" id="tota-logo-png-id" class="lazy-img lazy-img-loaded" style="visibility: visible;"></div></div> <div class="avatar-status" style="border-color: rgb(0, 108, 255);font-size:16px;"></div></div></div> <div class="name">
+                                    Police Clearance Helpdesk
+                                </div>
+                                <div class="status">
+                                    Online
+                                </div>
+                            </div>
+                        </div>
+                        <table></table>
+                        <div class="window-content" style="height: calc(100% - 92px);">
+                            <input type="hidden" name="totaBoxId" id="totaBoxId" value="plice123" />
+                            <div class="conversation">
+                                <div class="conversation-wrapper" id="totaMessagesContainer" style="overflow-y:scroll">
+                                   
+                                </div>
+                                <br />
+                                <div id="totaMessagesContainerLast" style="height:150px;">
+                                    @*<div id="totaMessagesContainerComplain" style="height:150px;display:none">
+                                        <textarea id="complain" placeholder="Write Complain"></textarea>
+                                        <button onclick="">Confirm</button>
+                                    </div>
+                                    <div id="totaMessagesContainerSuggestion" style="height:150px;display:none">
+                                        <textarea id="suggesstion" placeholder="Write Suggestion"></textarea>
+                                        <button onclick="">Confirm</button>
+                                    </div>*@
+                                </div>
+                            </div>
+                            <div class="typing" style="background: rgb(255, 255, 255); opacity: 0.6;">
+
+                                <div class="dropdown">
+                                    <button onclick="myFunction()" class="dropbtn"><i class="fa fa-align-justify dropbtni"></i></button>
+                                    <div id="myDropdown" class="dropdown-content">
+                                        <a href="#home" onclick="ClickedMenu('নতুন করে শুরু')">Refresh</a>
+                                        @*<a href="#ase" onclick="ClickedMenu('পুলিশ ক্লিয়ারেন্স')">পুলিশ ক্লিয়ারেন্স</a>*@
+                                    </div>
+                                </div>
+
+                                <input type="text" maxlength="256" placeholder="Type your message here" id="totaMessage" style="color: rgb(0, 0, 0);" autocomplete="off">
+
+                                <div class="actions"><div class="send" id="totaMessageSubmit" onclick="clickFun()"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" xml:space="preserve" class="" style="fill: rgb(0, 0, 0);"><path d="M22,11.7V12h-0.1c-0.1,1-17.7,9.5-18.8,9.1c-1.1-0.4,2.4-6.7,3-7.5C6.8,12.9,17.1,12,17.1,12H17c0,0,0-0.2,0-0.2c0,0,0,0,0,0c0-0.4-10.2-1-10.8-1.7c-0.6-0.7-4-7.1-3-7.5C4.3,2.1,22,10.5,22,11.7z"></path></svg></div></div>
+                            </div>
+                        </div>
+                    </div>
+                    @*<div class="window-close" id="window-close" style="background: rgb(0, 108, 255);"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" title="close the chat" style="fill: rgb(255, 255, 255);"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path> <path d="M0 0h24v24H0z" fill="none"></path></svg></div>*@ 
+                </div>
+            </div>
+
+            @*<div class="chat-button-theme-bubble" id="chat-button-theme-bubble">
+                <div class="chat-button" style="background: rgb(0, 108, 255); color: rgb(255, 255, 255);">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="chat-icon" style="stroke: rgb(255, 255, 255);"><path d="M9.37,1.34H10.8a8.2,8.2,0,0,1,0,16.39H9.37a10,10,0,0,1-2.68-.45c-.55-.15-2.23,1.81-2.63,1.36s.05-2.79-.41-3.23q-.28-.27-.54-.57A8.2,8.2,0,0,1,9.37,1.34Z" style="fill: none;"></path> <line x1="6.37" y1="7.04" x2="12.58" y2="7.04" style="fill: none; stroke-linecap: round;"></line> <line x1="6.37" y1="9.66" x2="14.31" y2="9.66" style="fill: none; stroke-linecap: round;"></line> <line x1="6.37" y1="12.28" x2="11.42" y2="12.28" style="fill: none; stroke-linecap: round;"></line></svg>
+                </div>
+            </div>*@
+        </div>
+    </div>
+
+
+    <div class="typing" style="background: rgb(255, 255, 255); opacity: 0.6;">
+
+    </div>
+
+
+    <script src="~/chatbox/signalr/signalr.min.js"></script>
+    <script crossorigin="anonymous" src="~/chatbox/ChatLF.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+
+    @section Scripts{
+
+        <script>
+            $(document).ready(function () {
+                //alert($("#chatbot-chat").val());
+                $("#chat-button-theme-bubble").click(function () {
+
+                  //  alert($("#chatbot-chat").val());
+
+                 });
+               
+            });
+        </script>
+    }
+
+</body>
+</html>

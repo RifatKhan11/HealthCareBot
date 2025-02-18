@@ -1,0 +1,647 @@
+﻿@model QuestionReplayViewModel
+
+@{
+    ViewData["Title"] = "New Question & Replay";
+}
+
+<!-- Breadcrumbs-->
+<ol class="breadcrumb">
+    <li class="breadcrumb-item">
+        <a href="/">Dashboard</a>
+    </li>
+    <li class="breadcrumb-item active">New Questions & Replay</li>
+</ol>
+
+<!-- Area Chart Example-->
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        All Menus
+    </div>
+    <div class="card-body" style="min-height: 500px;">
+        <div id="d3Content">
+            <img id="customLoaderMenu" src="~/images/loader-64x/Preloader_3.gif" alt="loader" style="margin-top: 200px; margin-left: 48%;" />
+        </div>
+    </div>
+    <div class="card-footer small text-muted"></div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        New Question & Replay
+    </div>
+
+    <div class="card-body">
+
+        <div class="container" id="modificationSec">
+
+            <form asp-controller="QuestionReplay" asp-action="Create" onsubmit="return CheckStatus()" method="post">
+                <div asp-validation-summary="All" class="text-danger"></div>
+
+                <input type="hidden" id="MenuId" name="MenuId" value="" />
+                <input type="hidden" id="QuestionId" name="QuestionId" value="" />
+                <input type="hidden" id="AnswerId" name="AnswerId" value="" />
+
+                <div class="form-group">
+                    <label for="ParrentMenuName">Selected Menu</label>
+                    <input type="text" class="form-control" id="MenuName" readonly value="" maxlength="20">
+                </div>
+
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="newQues">New Question In Bangla</label>
+                            <textarea class="form-control" id="newQues" name="QuestionText" aria-describedby="newQuesHelp" placeholder="Enter Question" rows="5" style="resize: none;"></textarea>
+                            <small id="newQuesHelp" class="form-text text-muted">New question text in Bangla</small>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="newQuesEN">New Question In English</label>
+                            <textarea class="form-control" id="newQuesEN" name="QuestionTextEN" aria-describedby="newQuesENHelp" placeholder="Enter Question" rows="5" style="resize: none;"></textarea>
+                            <small id="newQuesENHelp" class="form-text text-muted">New question text in English</small>
+                        </div>
+                    </div>
+
+                    <div class="col-12" style="display:none">
+                        <div class="form-group">
+                            <label for="responseType">Please select your desire template</label>
+                            <select class="form-control" id="responseType" value="1" name="AnswerTypeId">
+                                @foreach (var answerType in Model.AnswerTypes)
+                                {
+                                    <option  value="@answerType.Id">@answerType.Type</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="container-fluid">
+
+                        <div id="responseContent" class="row">
+
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="newReplay">Related Replay In Bangla</label>
+                                    <textarea class="form-control" id="newReplay" name="AnswereText" aria-describedby="newReplayHelp" placeholder="Enter Replay In Bangla" rows="5" style="resize: none;"></textarea>
+                                    <small id="newReplayHelp" class="form-text text-muted">new replay text in Bangla</small>
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="newReplayEN">Related Replay In English</label>
+                                    <textarea class="form-control" id="newReplayEN" name="AnswereTextEN" aria-describedby="newReplayENHelp" placeholder="Enter Replay In English" rows="5" style="resize: none;"></textarea>
+                                    <small id="newReplayENHelp" class="form-text text-muted">new replay text in English</small>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-primary" value="Save">
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+</div>
+
+
+@section Scripts{
+
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+
+    <script>
+
+        var gti = 0;
+
+        $(document).ready(function () {
+
+            $.get("../Menu/GetMenusJson?FbPageId=@Model.FbPageId", function (data, status) {
+                GenerateTree(data.menus, data.depth);
+            });
+            var selected_item = 1;
+
+            if (selected_item == 1) {
+                $("#responseContent").html('<div class="col-6">\
+                        <div class= "form-group" >\
+                        <label for="newReplay">Related Replay In Bangla</label>\
+                        <textarea class="form-control" id="newReplay" name="AnswereText" aria-describedby="newReplayHelp" placeholder="Enter Replay In Bangla" rows="5" style="resize: none;"></textarea>\
+                        <small id="newReplayHelp" class="form-text text-muted">new replay text in Bangla</small>\
+                                </div >\
+                            </div >\
+                        <div class="col-6">\
+                            <div class="form-group">\
+                                <label for="newReplayEN">Related Replay In English</label>\
+                                <textarea class="form-control" id="newReplayEN" name="AnswereTextEN" aria-describedby="newReplayENHelp" placeholder="Enter Replay In English" rows="5" style="resize: none;"></textarea>\
+                                <small id="newReplayENHelp" class="form-text text-muted">new replay text in English</small>\
+                            </div>\
+                        </div>');
+            } else if (selected_item == 2) {
+                $("#responseContent").html('\
+                        <div class="col-6">\
+                        <div class= "form-group" >\
+                        <label for="newReplay">Related Replay In Bangla</label>\
+                        <textarea class="form-control" id="newReplay" name="AnswereText" aria-describedby="newReplayHelp" placeholder="Enter Text In Bangla" rows="5" style="resize: none;"></textarea>\
+                        <small id="newReplayHelp" class="form-text text-muted">new replay text in Bangla</small>\
+                                </div >\
+                            </div >\
+                        <div class="col-6">\
+                            <div class="form-group">\
+                                <label for="newReplayEN">Related Text In English</label>\
+                                <textarea class="form-control" id="newReplayEN" name="AnswereTextEN" aria-describedby="newReplayENHelp" placeholder="Enter Replay In English" rows="5" style="resize: none;"></textarea>\
+                                <small id="newReplayENHelp" class="form-text text-muted">new replay text in English</small>\
+                            </div>\
+                        </div>\
+                        <div class= "col-12" >\
+                        <p class="alert alert-info">You must be fill all box of first button, & for other fill all if one missing system will be automatically ignore it.</p>\
+                        <div class="input-group mb-3" id="button2ForTextButton">\
+                            <input id="ButtonWithTextTitle1" type="text" class="form-control" placeholder="Button 1 Title in Bangla" maxlength="20" name="TextWithButton[0].Title" />\
+                            <input id="ButtonWithTextTitleEN2" type="text" class="form-control" placeholder="Button 1 Title in English" maxlength="20" name="TextWithButton[0].TitleEN" />\
+                            <input id="ButtonWithTextTitleLink1" type="text" class="form-control" placeholder="Button 1 Full Web Link" name="TextWithButton[0].url" />\
+                        </div>\
+                            </div >\
+                        <div class="col-12">\
+                            <div class="input-group mb-3" id="button2ForTextButton">\
+                                <input type="text" class="form-control" placeholder="Button 2 Title in Bangla" maxlength="20" name="TextWithButton[1].Title" />\
+                                <input type="text" class="form-control" placeholder="Button 2 Title in English" maxlength="20" name="TextWithButton[1].TitleEN" />\
+                                <input type="text" class="form-control" placeholder="Button 2 Full Web Link" name="TextWithButton[1].url" />\
+                            </div>\
+                        </div>\
+                        <div class="col-12">\
+                            <div class="input-group mb-3" id="button2ForTextButton">\
+                                <input type="text" class="form-control" placeholder="Button 3 Title in Bangla" maxlength="20" name="TextWithButton[2].Title" />\
+                                <input type="text" class="form-control" placeholder="Button 3 Title in English" maxlength="20" name="TextWithButton[2].TitleEN" />\
+                                <input type="text" class="form-control" placeholder="Button 3 Full Web Link" name="TextWithButton[2].url" />\
+                            </div>\
+                        </div>');
+            } else {
+                $("#responseContent").html('\
+                    <div class="col-12">\
+                        <p class="alert alert-info">You must be fill all * box of first template, & for other fill all if one missing system will be automatically ignore it.</p>\
+                        <div class="form-group">\
+                            <button onclick="AddAnotherTemplate()" type="button" class="btn btn-info btn-sm">\
+                                <span class="glyphicon glyphicon-ok"></span> Add Another Template\
+                                    </button>\
+                            <button onclick="RemoveLastTemplate()" type="button" class="btn btn-danger btn-sm pull-right">\
+                                <span class="glyphicon glyphicon-remove"></span> Remove Last Template\
+                                    </button>\
+                        </div>\
+                    </div>\
+                        <div class="col-12" id="genericTemplates">\
+                            <div class="card">\
+                                <div class="card-header">\
+                                    Template <span class="badge badge-light">1</span>\
+                              <span class= "sr-only" > unread messages</span>\
+                                </div>\
+                                <div class="card-body">\
+                                    <div class="input-group mb-3">\
+                                        <input type="text" id="genericTemplateText" class="form-control" placeholder="Title In Bangla*" maxlength="80" name="GenericTemplates[0].title" />\
+                                        <input type="text" id="genericTemplateTextEN" class="form-control" placeholder="Title In English*" maxlength="80" name="GenericTemplates[0].titleEN" />\
+                                    </div>\
+                                    <div class="input-group mb-3">\
+                                        <input type="text" class="form-control" placeholder="Sub Title In Bangla" maxlength="80" name="GenericTemplates[0].subtitle" />\
+                                        <input type="text" class="form-control" placeholder="Sub Title In English" maxlength="80" name="GenericTemplates[0].subtitleEN" />\
+                                    </div>\
+                                    <div class="form-group">\
+                                        <div class="input-group">\
+                                            <div class="input-group-prepend">\
+                                                <span class="input-group-text" id="">Image Url*</span>\
+                                            </div>\
+                                            <input type="text" id="genericTemplateTextURL" class="form-control" name="GenericTemplates[0].image_url">\
+                                            </div>\
+                                        </div>\
+                                        <div class="input-group mb-3">\
+                                            <input type="text" class="form-control" placeholder="Link 1 Title in Bangla" maxlength="20" name="GenericTemplates[0].buttons[0].Title" />\
+                                            <input type="text" class="form-control" placeholder="Link 1 Title in English" maxlength="20" name="GenericTemplates[0].buttons[0].TitleEN" />\
+                                            <input type="text" class="form-control" placeholder="Link 1 Full Web Link" name="GenericTemplates[0].buttons[0].url" />\
+                                        </div>\
+                                        <div class="input-group mb-3">\
+                                            <input type="text" class="form-control" placeholder="Link 2 Title in Bangla" maxlength="20" name="GenericTemplates[0].buttons[1].Title" />\
+                                            <input type="text" class="form-control" placeholder="Link 2 Title in English" maxlength="20" name="GenericTemplates[0].buttons[1].TitleEN" />\
+                                            <input type="text" class="form-control" placeholder="Link 2 Full Web Link" name="GenericTemplates[0].buttons[1].url" />\
+                                        </div>\
+                                        <div class="input-group mb-3">\
+                                            <input type="text" class="form-control" placeholder="Link 3 Title in Bangla" maxlength="20" name="GenericTemplates[0].buttons[2].Title" />\
+                                            <input type="text" class="form-control" placeholder="Link 3 Title in English" maxlength="20" name="GenericTemplates[0].buttons[2].TitleEN" />\
+                                            <input type="text" class="form-control" placeholder="Link 3 Full Web Link" name="GenericTemplates[0].buttons[2].url" />\
+                                        </div>\
+                                    </div>\
+                                </div>\
+                            </div>');
+            }
+            $('#responseType').change(function () {
+                 selected_item = $(this).val();
+
+                if (selected_item == 1) {
+                    $("#responseContent").html('<div class="col-6">\
+                        <div class= "form-group" >\
+                        <label for="newReplay">Related Replay In Bangla</label>\
+                        <textarea class="form-control" id="newReplay" name="AnswereText" aria-describedby="newReplayHelp" placeholder="Enter Replay In Bangla" rows="5" style="resize: none;"></textarea>\
+                        <small id="newReplayHelp" class="form-text text-muted">new replay text in Bangla</small>\
+                                </div >\
+                            </div >\
+                        <div class="col-6">\
+                            <div class="form-group">\
+                                <label for="newReplayEN">Related Replay In English</label>\
+                                <textarea class="form-control" id="newReplayEN" name="AnswereTextEN" aria-describedby="newReplayENHelp" placeholder="Enter Replay In English" rows="5" style="resize: none;"></textarea>\
+                                <small id="newReplayENHelp" class="form-text text-muted">new replay text in English</small>\
+                            </div>\
+                        </div>');
+                } else if (selected_item == 2) {
+                    $("#responseContent").html('\
+                        <div class="col-6">\
+                        <div class= "form-group" >\
+                        <label for="newReplay">Related Replay In Bangla</label>\
+                        <textarea class="form-control" id="newReplay" name="AnswereText" aria-describedby="newReplayHelp" placeholder="Enter Text In Bangla" rows="5" style="resize: none;"></textarea>\
+                        <small id="newReplayHelp" class="form-text text-muted">new replay text in Bangla</small>\
+                                </div >\
+                            </div >\
+                        <div class="col-6">\
+                            <div class="form-group">\
+                                <label for="newReplayEN">Related Text In English</label>\
+                                <textarea class="form-control" id="newReplayEN" name="AnswereTextEN" aria-describedby="newReplayENHelp" placeholder="Enter Replay In English" rows="5" style="resize: none;"></textarea>\
+                                <small id="newReplayENHelp" class="form-text text-muted">new replay text in English</small>\
+                            </div>\
+                        </div>\
+                        <div class= "col-12" >\
+                        <p class="alert alert-info">You must be fill all box of first button, & for other fill all if one missing system will be automatically ignore it.</p>\
+                        <div class="input-group mb-3" id="button2ForTextButton">\
+                            <input id="ButtonWithTextTitle1" type="text" class="form-control" placeholder="Button 1 Title in Bangla" maxlength="20" name="TextWithButton[0].Title" />\
+                            <input id="ButtonWithTextTitleEN2" type="text" class="form-control" placeholder="Button 1 Title in English" maxlength="20" name="TextWithButton[0].TitleEN" />\
+                            <input id="ButtonWithTextTitleLink1" type="text" class="form-control" placeholder="Button 1 Full Web Link" name="TextWithButton[0].url" />\
+                        </div>\
+                            </div >\
+                        <div class="col-12">\
+                            <div class="input-group mb-3" id="button2ForTextButton">\
+                                <input type="text" class="form-control" placeholder="Button 2 Title in Bangla" maxlength="20" name="TextWithButton[1].Title" />\
+                                <input type="text" class="form-control" placeholder="Button 2 Title in English" maxlength="20" name="TextWithButton[1].TitleEN" />\
+                                <input type="text" class="form-control" placeholder="Button 2 Full Web Link" name="TextWithButton[1].url" />\
+                            </div>\
+                        </div>\
+                        <div class="col-12">\
+                            <div class="input-group mb-3" id="button2ForTextButton">\
+                                <input type="text" class="form-control" placeholder="Button 3 Title in Bangla" maxlength="20" name="TextWithButton[2].Title" />\
+                                <input type="text" class="form-control" placeholder="Button 3 Title in English" maxlength="20" name="TextWithButton[2].TitleEN" />\
+                                <input type="text" class="form-control" placeholder="Button 3 Full Web Link" name="TextWithButton[2].url" />\
+                            </div>\
+                        </div>');
+                } else {
+                    $("#responseContent").html('\
+                    <div class="col-12">\
+                        <p class="alert alert-info">You must be fill all * box of first template, & for other fill all if one missing system will be automatically ignore it.</p>\
+                        <div class="form-group">\
+                            <button onclick="AddAnotherTemplate()" type="button" class="btn btn-info btn-sm">\
+                                <span class="glyphicon glyphicon-ok"></span> Add Another Template\
+                                    </button>\
+                            <button onclick="RemoveLastTemplate()" type="button" class="btn btn-danger btn-sm pull-right">\
+                                <span class="glyphicon glyphicon-remove"></span> Remove Last Template\
+                                    </button>\
+                        </div>\
+                    </div>\
+                        <div class="col-12" id="genericTemplates">\
+                            <div class="card">\
+                                <div class="card-header">\
+                                    Template <span class="badge badge-light">1</span>\
+                              <span class= "sr-only" > unread messages</span>\
+                                </div>\
+                                <div class="card-body">\
+                                    <div class="input-group mb-3">\
+                                        <input type="text" id="genericTemplateText" class="form-control" placeholder="Title In Bangla*" maxlength="80" name="GenericTemplates[0].title" />\
+                                        <input type="text" id="genericTemplateTextEN" class="form-control" placeholder="Title In English*" maxlength="80" name="GenericTemplates[0].titleEN" />\
+                                    </div>\
+                                    <div class="input-group mb-3">\
+                                        <input type="text" class="form-control" placeholder="Sub Title In Bangla" maxlength="80" name="GenericTemplates[0].subtitle" />\
+                                        <input type="text" class="form-control" placeholder="Sub Title In English" maxlength="80" name="GenericTemplates[0].subtitleEN" />\
+                                    </div>\
+                                    <div class="form-group">\
+                                        <div class="input-group">\
+                                            <div class="input-group-prepend">\
+                                                <span class="input-group-text" id="">Image Url*</span>\
+                                            </div>\
+                                            <input type="text" id="genericTemplateTextURL" class="form-control" name="GenericTemplates[0].image_url">\
+                                            </div>\
+                                        </div>\
+                                        <div class="input-group mb-3">\
+                                            <input type="text" class="form-control" placeholder="Link 1 Title in Bangla" maxlength="20" name="GenericTemplates[0].buttons[0].Title" />\
+                                            <input type="text" class="form-control" placeholder="Link 1 Title in English" maxlength="20" name="GenericTemplates[0].buttons[0].TitleEN" />\
+                                            <input type="text" class="form-control" placeholder="Link 1 Full Web Link" name="GenericTemplates[0].buttons[0].url" />\
+                                        </div>\
+                                        <div class="input-group mb-3">\
+                                            <input type="text" class="form-control" placeholder="Link 2 Title in Bangla" maxlength="20" name="GenericTemplates[0].buttons[1].Title" />\
+                                            <input type="text" class="form-control" placeholder="Link 2 Title in English" maxlength="20" name="GenericTemplates[0].buttons[1].TitleEN" />\
+                                            <input type="text" class="form-control" placeholder="Link 2 Full Web Link" name="GenericTemplates[0].buttons[1].url" />\
+                                        </div>\
+                                        <div class="input-group mb-3">\
+                                            <input type="text" class="form-control" placeholder="Link 3 Title in Bangla" maxlength="20" name="GenericTemplates[0].buttons[2].Title" />\
+                                            <input type="text" class="form-control" placeholder="Link 3 Title in English" maxlength="20" name="GenericTemplates[0].buttons[2].TitleEN" />\
+                                            <input type="text" class="form-control" placeholder="Link 3 Full Web Link" name="GenericTemplates[0].buttons[2].url" />\
+                                        </div>\
+                                    </div>\
+                                </div>\
+                            </div>');
+                }
+            });
+
+        });
+
+        function AddAnotherTemplate() {
+            if (gti < 9) {
+                gti++;
+                $('#genericTemplates').append(' <div class="card">\
+                    <div class="card-header">\
+                        Template <span class="badge badge-light">'+(gti+1)+'</span>\
+                    <span class= "sr-only" > unread messages</span>\
+                    </div>\
+                    <div class= "card-body">\
+                    <div class="input-group mb-3">\
+                        <input type="text" class="form-control" placeholder="Title In Bangla*" maxlength="80" name="GenericTemplates['+gti+'].title" />\
+                        <input type="text" class="form-control" placeholder="Title In English*" maxlength="80" name="GenericTemplates['+ gti +'].titleEN" />\
+                    </div>\
+                    <div class="input-group mb-3">\
+                        <input type="text" class="form-control" placeholder="Sub Title In Bangla" maxlength="80" name="GenericTemplates['+ gti +'].subtitle" />\
+                        <input type="text" class="form-control" placeholder="Sub Title In English" maxlength="80" name="GenericTemplates['+ gti +'].subtitleEN" />\
+                    </div>\
+                    <div class="form-group">\
+                        <div class="input-group">\
+                            <div class="input-group-prepend">\
+                                <span class="input-group-text" id="">Image Url*</span>\
+                            </div>\
+                            <input type="text" class="form-control" name="GenericTemplates['+ gti +'].image_url">\
+                        </div>\
+                        </div>\
+                        <div class="input-group mb-3">\
+                            <input type="text" class="form-control" placeholder="Link 1 Title in Bangla" maxlength="20" name="GenericTemplates['+ gti +'].buttons[0].Title" />\
+                            <input type="text" class="form-control" placeholder="Link 1 Title in English" maxlength="20" name="GenericTemplates['+ gti +'].buttons[0].TitleEN" />\
+                            <input type="text" class="form-control" placeholder="Link 1 Full Web Link" name="GenericTemplates['+ gti +'].buttons[0].url" />\
+                        </div>\
+                        <div class="input-group mb-3">\
+                            <input type="text" class="form-control" placeholder="Link 2 Title in Bangla" maxlength="20" name="GenericTemplates['+ gti +'].buttons[1].Title" />\
+                            <input type="text" class="form-control" placeholder="Link 2 Title in English" maxlength="20" name="GenericTemplates['+ gti +'].buttons[1].TitleEN" />\
+                            <input type="text" class="form-control" placeholder="Link 2 Full Web Link" name="GenericTemplates['+ gti +'].buttons[1].url" />\
+                        </div>\
+                        <div class="input-group mb-3">\
+                            <input type="text" class="form-control" placeholder="Link 3 Title in Bangla" maxlength="20" name="GenericTemplates['+ gti +'].buttons[2].Title" />\
+                            <input type="text" class="form-control" placeholder="Link 3 Title in English" maxlength="20" name="GenericTemplates['+ gti +'].buttons[2].TitleEN" />\
+                            <input type="text" class="form-control" placeholder="Link 3 Full Web Link" name="GenericTemplates['+ gti +'].buttons[2].url" />\
+                        </div>\
+                    </div>\
+                </div >');
+            } else {
+                swal("Opps!!!", "Atmost 10 Template At a time.", "info");
+            }
+           
+            
+        }
+
+        function RemoveLastTemplate() {
+            console.log(i);
+
+            if (gti > 0) {
+                gti--;
+                $('#genericTemplates').children().last().remove();
+            } else {
+                swal("Opps!!!", "You can't remove all.", "info");
+            }
+            
+        }
+
+        function ClearMenu() {
+            $("#MenuId").val(null);
+            $("#MenuName").val(null);
+            $("#newReplay").val(null);
+            $("#newReplayEN").val(null);
+            $("#newQues").val(null);
+            $("#newQuesEN").val(null);
+        }
+
+        function SelectMenu(id, menuName) {
+            $("#MenuId").val(id);
+            $("#MenuName").val(menuName);
+            Common.Ajax('GET', '/global/api/getmenuquestion/' + id, [], 'json', GetquestionData);
+        }
+        function GetquestionData(response) {
+            console.log(response);
+            $("#newQues").val(response.question.questionText);
+            $("#newQuesEN").val(response.question.questionTextEN);
+            $("#newReplay").val(response.answerText);
+            $("#newReplayEN").val(response.answerTextEN);
+            $("#QuestionId").val(response.questionId);
+            $("#AnswerId").val(response.id);
+            //$("#responseType").text(response.AnswerTextEN);
+            // $("#unsuccessHit").text(response.totalUnSuccess);
+        }
+
+        function CheckStatus() {
+            var ResponseType = 1;// $("#responseType").val();
+
+            if ($("#MenuId").val() == "" || $("#MenuId").val() == null) {
+                swal("Opps!!!", "Select A Menu First", "error");
+                return false;
+            }
+
+            if ($("#newQues").val() == "" || $("#newQues").val() == null) {
+                swal("Opps!!!", "Enter Related Question In Bangla", "error");
+                return false;
+            }
+
+            if ($("#newQuesEN").val() == "" || $("#newQuesEN").val() == null) {
+                swal("Opps!!!", "Enter Related Question In English", "error");
+                return false;
+            }
+
+            if (ResponseType == 1 || ResponseType == 2) {
+
+                if ($("#newReplay").val() == "" || $("#newReplay").val() == null) {
+                    swal("Opps!!!", "Enter Related Replay In Bangla", "error");
+                    return false;
+                }
+
+                if ($("#newReplayEN").val() == "" || $("#newReplayEN").val() == null) {
+                    swal("Opps!!!", "Enter Related Replay In English", "error");
+                    return false;
+                }
+            }
+
+            if (ResponseType == 2) {
+
+                if ($("#ButtonWithTextTitle1").val() == "" || $("#ButtonWithTextTitle1").val() == null || $("#ButtonWithTextTitleEN2").val() == "" || $("#ButtonWithTextTitleEN2").val() == null || $("#ButtonWithTextTitleLink1").val() == "" || $("#ButtonWithTextTitleLink1").val() == null ) {
+                    swal("Opps!!!", "Provide all information about button, You mast be fill first button", "error");
+                    return false;
+                }
+            }
+
+            if (ResponseType == 3) {
+
+                if ($("#genericTemplateText").val() == "" || $("#genericTemplateText").val() == null || $("#genericTemplateTextEN").val() == "" || $("#genericTemplateTextEN").val() == null || $("#genericTemplateTextURL").val() == "" || $("#genericTemplateTextURL").val() == null) {
+                    swal("Opps!!!", "Provide all * information Template, You mast be fill first template", "error");
+                    return false;
+                }
+            }
+
+
+            return true;
+        }
+
+        var treeData, treeDataDepth;
+
+        // ************** Generate the tree diagram	 *****************
+        var margin = { top: 20, right: 60, bottom: 20, left: 60 },
+            width = 960 - margin.right - margin.left,
+            height = 500 - margin.top - margin.bottom;
+
+        var i = 0,
+            duration = 750,
+            root;
+
+        var tree = d3.layout.tree()
+            .size([height, width]);
+
+        var diagonal = d3.svg.diagonal()
+            .projection(function (d) { return [d.y, d.x]; });
+        var svg;
+
+        function GenerateTree(tempData, tempdepth) {
+            $("#customLoaderMenu").hide();
+            treeData = JSON.parse(tempData);
+            treeDataDepth = tempdepth;
+            svg = d3.select("#d3Content").append("svg")
+                .attr("width", width + margin.right + margin.left)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            root = treeData[0];
+            root.x0 = height / 2;
+            root.y0 = 0;
+
+            update(root);
+
+            d3.select(self.frameElement).style("height", "500px");
+        }
+
+
+        function update(source) {
+
+            // Compute the new tree layout.
+            var nodes = tree.nodes(root).reverse(),
+                links = tree.links(nodes);
+
+            // Normalize for fixed-depth.
+            nodes.forEach(function (d) { d.y = d.depth * ((width-90) / treeDataDepth); });
+
+            // Update the nodes…
+            var node = svg.selectAll("g.node")
+                .data(nodes, function (d) { return d.id || (d.id = ++i); });
+
+            // Enter any new nodes at the parent's previous position.
+            var nodeEnter = node.enter().append("g")
+                .attr("class", "node")
+                .attr("transform", function (d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
+                .on("click", click);
+
+            nodeEnter.append("circle")
+                .attr("r", 1e-6)
+                .style("fill", function (d) {
+                    if (d.type == "parrent") return "lightsteelblue";
+                    return "#111";
+                });
+
+            nodeEnter.append("text")
+                .attr("x", function (d) { return d.children || d._children ? -13 : 13; })
+                .attr("dy", ".35em")
+                .attr("text-anchor", function (d) { return d.children || d._children ? "end" : "start"; })
+                .text(function (d) { return d.name; })
+                .style("fill-opacity", 1e-6);
+
+            // Transition nodes to their new position.
+            var nodeUpdate = node.transition()
+                .duration(duration)
+                .attr("transform", function (d) { return "translate(" + d.y + "," + d.x + ")"; });
+
+            nodeUpdate.select("circle")
+                .attr("r", 10)
+                .style("fill", function (d) {
+                    if (d.type == "parrent") return "lightsteelblue";
+                    return "#111";
+                });
+
+            nodeUpdate.select("text")
+                .style("fill-opacity", 1);
+
+            // Transition exiting nodes to the parent's new position.
+            var nodeExit = node.exit().transition()
+                .duration(duration)
+                .attr("transform", function (d) { return "translate(" + source.y + "," + source.x + ")"; })
+                .remove();
+
+            nodeExit.select("circle")
+                .attr("r", 1e-6);
+
+            nodeExit.select("text")
+                .style("fill-opacity", 1e-6);
+
+            // Update the links…
+            var link = svg.selectAll("path.link")
+                .data(links, function (d) { return d.target.id; });
+
+            // Enter any new links at the parent's previous position.
+            link.enter().insert("path", "g")
+                .attr("class", "link")
+                .attr("d", function (d) {
+                    var o = { x: source.x0, y: source.y0 };
+                    return diagonal({ source: o, target: o });
+                });
+
+            // Transition links to their new position.
+            link.transition()
+                .duration(duration)
+                .attr("d", diagonal);
+
+            // Transition exiting nodes to the parent's new position.
+            link.exit().transition()
+                .duration(duration)
+                .attr("d", function (d) {
+                    var o = { x: source.x, y: source.y };
+                    return diagonal({ source: o, target: o });
+                })
+                .remove();
+
+            // Stash the old positions for transition.
+            nodes.forEach(function (d) {
+                d.x0 = d.x;
+                d.y0 = d.y;
+            });
+        }
+
+        // Toggle children on click.
+        function click(d) {
+
+            //console.log(d.name);
+
+            if (d.children) {
+                d._children = d.children;
+                d.children = null;
+            } else {
+                d.children = d._children;
+                d._children = null;
+            }
+            update(d);
+
+            if (d.type != "parrent") {
+                SelectMenu(d.data, d.name);
+                $('html, body').animate({
+                    scrollTop: $("#modificationSec").offset().top
+                }, 2000);
+            } else {
+                ClearMenu();
+            }
+
+        }
+    </script>
+}
