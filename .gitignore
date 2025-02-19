@@ -15,3 +15,9 @@
 /Opus_ChatBot_HealthCare_8/.vs/Opus_ChatBot_HealthCare_8/v17/DocumentLayout.backup.json
 /Opus_ChatBot_HealthCare_8/.vs/Opus_ChatBot_HealthCare_8/v17/DocumentLayout.json
 /Opus_ChatBot_HealthCare_8/.vs/Opus_ChatBot_HealthCare_8/v17/fileList.bin
+*.vsidx
+/Opus_ChatBot_HealthCare_8/Opus_ChatBot_HealthCare_8/obj/Debug/net8.0/Opus_ChatBot_HealthCare_8.AssemblyInfo.cs
+/Opus_ChatBot_HealthCare_8/Opus_ChatBot_HealthCare_8/obj/Debug/net8.0/Opus_ChatBot_HealthCare_8.AssemblyInfoInputs.cache
+*.cache
+/Opus_ChatBot_HealthCare_8/Opus_ChatBot_HealthCare_8/obj/Debug/net8.0/Opus_ChatBot_HealthCare_8.csproj.FileListAbsolute.txt
+*.json
