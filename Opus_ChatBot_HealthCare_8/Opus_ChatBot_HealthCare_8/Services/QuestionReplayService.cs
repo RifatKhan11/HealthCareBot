@@ -4,6 +4,7 @@ using Opus_ChatBot_HealthCare_8.Data;
 using Opus_ChatBot_HealthCare_8.LogicAdaptar.Response;
 using Opus_ChatBot_HealthCare_8.Models.AdminViewModels;
 using Opus_ChatBot_HealthCare_8.Models.BotModels;
+using Opus_ChatBot_HealthCare_8.Services.Dapper.IInterfaces;
 using Opus_ChatBot_HealthCare_8.Services.IServices;
 using System;
 using System.Collections.Generic;
@@ -16,10 +17,11 @@ namespace Opus_ChatBot_HealthCare_8.Services
     public class QuestionReplayService : IQuestionReplayService
     {
         private readonly ApplicationDbContext _contex;
-
-        public QuestionReplayService(ApplicationDbContext contex)
+        private readonly IDapper _dapper;
+        public QuestionReplayService(ApplicationDbContext contex, IDapper dapper)
         {
             _contex = contex;
+            _dapper = dapper;
         }
 
         public IEnumerable<AnswerType> AnswerTypesAsync()
@@ -69,7 +71,7 @@ namespace Opus_ChatBot_HealthCare_8.Services
 
         public async Task<IEnumerable<MenuQuestionAnswer>> GetAllQuestionWithMenuAnser(int fbPageId)
         {
-            return await _contex.menuQuestionAnswers.FromSql("EXEC SP_MenuQuestionAnswers {0}", fbPageId).ToListAsync();
+            return await _dapper.FromSqlAsync<MenuQuestionAnswer>($"EXEC SP_MenuQuestionAnswers {0}, {fbPageId}");
         }
 
         public bool SaveNewCrousal(QuestionReplayViewModel model)

@@ -12,16 +12,18 @@ using System.IO;
 using Opus_ChatBot_HealthCare_8.Models.MasterData;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using Opus_ChatBot_HealthCare_8.Services.Dapper.IInterfaces;
 
 namespace Opus_ChatBot_HealthCare_8.Services
 {
     public class PassportInfoService : IPassportInfoService
     {
         private readonly ApplicationDbContext _contex;
-
-        public PassportInfoService(ApplicationDbContext contex)
+        private readonly IDapper _dapper;
+        public PassportInfoService(ApplicationDbContext contex, IDapper dapper)
         {
             _contex = contex;
+            _dapper = dapper;
         }
 
         public async Task<int> SavePassportInfo(PassportInfo passportInfo)
@@ -68,8 +70,8 @@ namespace Opus_ChatBot_HealthCare_8.Services
         }
         public async Task<IEnumerable<ColumnHeading>> GetAllColumnBySp()
         {
-            var data = _contex.columnHeadings.FromSql("sp_GetColumnName");
-            return await data.ToListAsync();
+            var data = await  _dapper.FromSqlAsync<ColumnHeading>($"sp_GetColumnName");
+            return  data;
         }
 
         #region PoliceClearenceLog

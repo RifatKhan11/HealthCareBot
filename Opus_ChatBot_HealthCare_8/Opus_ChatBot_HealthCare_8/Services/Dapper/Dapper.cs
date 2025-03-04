@@ -10,7 +10,7 @@ namespace Opus_ChatBot_HealthCare_8.Services.Dapper
     public class Dapper : IDapper
     {
         private readonly IConfiguration _config;
-        private string Connectionstring = "DbConnection";
+        private string Connectionstring = "DefaultConnection";
 
         public Dapper(IConfiguration config)
         {

@@ -1,12 +1,9 @@
 ﻿using Opus_ChatBot_HealthCare_8.Data;
 using Opus_ChatBot_HealthCare_8.IServices.IServices;
-using System;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace OPUSERP.SCM.SMSService
 {
-    public class SMSService: ISMSService
+    public class SMSService : ISMSService
     {
         private readonly ApplicationDbContext _context;
         public SMSService(ApplicationDbContext context)
@@ -15,7 +12,7 @@ namespace OPUSERP.SCM.SMSService
         }
         //hxIi6jyZ
 
-        public async Task<string> SendSMSAsync(string mobile, string message,string bpNo)
+        public async Task<string> SendSMSAsync(string mobile, string message, string bpNo)
         {
             // return "Skip";
             string reason = "";

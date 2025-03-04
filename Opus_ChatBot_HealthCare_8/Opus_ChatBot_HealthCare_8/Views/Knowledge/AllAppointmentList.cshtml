@@ -37,7 +37,7 @@
                 @foreach (var item in Model.AppoinmentInfos)
                 {
                     <tr>
-                        <td>@item.doctorInfo?.name</td>
+                        <td>@item?.doctorName</td>
                         <td>@item.date?.ToString("yyyy-MM-dd")</td>
                         <td>@item.time</td>
                         <td>@(item.status == 1 ? "Ongoing" : "Confirmed")</td>

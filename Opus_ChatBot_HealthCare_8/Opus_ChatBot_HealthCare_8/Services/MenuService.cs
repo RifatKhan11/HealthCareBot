@@ -2,6 +2,7 @@
 using Opus_ChatBot_HealthCare_8.Data;
 using Opus_ChatBot_HealthCare_8.Models.AdminViewModels;
 using Opus_ChatBot_HealthCare_8.Models.BotModels;
+using Opus_ChatBot_HealthCare_8.Services.Dapper.IInterfaces;
 using Opus_ChatBot_HealthCare_8.Services.IServices;
 using System;
 using System.Collections.Generic;
@@ -13,11 +14,12 @@ namespace Opus_ChatBot_HealthCare_8.Services
     public class MenuService : IMenuService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IDapper _dapper;
 
-
-        public MenuService(ApplicationDbContext context)
+        public MenuService(ApplicationDbContext context, IDapper dapper)
         {
             _context = context;
+            _dapper = dapper;
         }
 
         public async Task<IEnumerable<Menu>> GetMenus(int faceBookPageId)
@@ -224,12 +226,12 @@ namespace Opus_ChatBot_HealthCare_8.Services
     
         public async Task<IEnumerable<TotalHitMenuLogViewModel>> GetMenuHitLogByDate(DateTime FDate, DateTime TDate, int fbid)
         {
-            var data= await _context.totalHitMenuLogViewModels.FromSql($"getmenuhitlog {FDate},{TDate},{fbid}").AsNoTracking().ToListAsync();
+            var data= await _dapper.FromSqlAsync<TotalHitMenuLogViewModel>($"getmenuhitlog '{FDate}','{TDate}',{fbid}");
             return data;
         }
         public async Task<IEnumerable<TotalHitMenuLogViewModel>> GetMenuHitLogByDateWOD(int fbid)
         {
-            var data= await _context.totalHitMenuLogViewModels.FromSql($"getmenuhitlogWOD {fbid}").AsNoTracking().ToListAsync();
+            var data= await _dapper.FromSqlAsync<TotalHitMenuLogViewModel>($"getmenuhitlogWOD {fbid}");
             return data;
         }
         #endregion

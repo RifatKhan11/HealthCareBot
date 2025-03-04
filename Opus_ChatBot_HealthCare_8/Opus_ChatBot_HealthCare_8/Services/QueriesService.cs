@@ -3,6 +3,7 @@ using Opus_ChatBot_HealthCare_8.Data;
 using Opus_ChatBot_HealthCare_8.Models.AdminViewModels;
 using Opus_ChatBot_HealthCare_8.Models.BotModels;
 using Opus_ChatBot_HealthCare_8.Models.BotViewModels;
+using Opus_ChatBot_HealthCare_8.Services.Dapper.IInterfaces;
 using Opus_ChatBot_HealthCare_8.Services.IServices;
 using System;
 using System.Collections.Generic;
@@ -14,14 +15,15 @@ namespace Opus_ChatBot_HealthCare_8.Services
     public class QueriesService : IQueriesService
     {
         private readonly ApplicationDbContext _contex;
-
-        public QueriesService(ApplicationDbContext contex)
+        private readonly IDapper _dapper;
+        public QueriesService(ApplicationDbContext contex, IDapper dapper)
         {
             _contex = contex;
+            _dapper = dapper;
         }
         public async Task<IEnumerable<QueriesDataViewModel>> GetQueriesDataViewModels(int fbid)
         {
-            var data = await _contex.queriesDataViewModels.FromSql($"getqueries {fbid}").AsNoTracking().ToListAsync();
+            var data = await _dapper.FromSqlAsync<QueriesDataViewModel>($"getqueries {fbid}");
             return data;
         }
         public async Task<IEnumerable<Queries>> GetAllQueries(int fbPageId)

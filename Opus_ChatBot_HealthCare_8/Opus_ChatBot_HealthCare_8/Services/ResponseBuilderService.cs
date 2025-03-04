@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Opus_ChatBot_HealthCare_8.Data;
 using Opus_ChatBot_HealthCare_8.Models.BotModels;
+using Opus_ChatBot_HealthCare_8.Services.Dapper.IInterfaces;
 using Opus_ChatBot_HealthCare_8.Services.IServices;
 
 namespace Opus_ChatBot_HealthCare_8.Services
@@ -12,9 +13,11 @@ namespace Opus_ChatBot_HealthCare_8.Services
     public class ResponseBuilderService : IResponseBuilderService
     {
         private readonly ApplicationDbContext _context;
-        public ResponseBuilderService( ApplicationDbContext applicationDbContext)
+        private readonly IDapper _dapper;
+        public ResponseBuilderService( ApplicationDbContext applicationDbContext, IDapper dapper)
         {
             this._context = applicationDbContext;
+            _dapper = dapper;
         }
 
 
@@ -38,7 +41,7 @@ namespace Opus_ChatBot_HealthCare_8.Services
             Question data = null;
             try
             {
-                data = _context.Questions.FromSql("EXEC SP_SelectQuestion {0},{1}", QuesId, MenuId).ToList().Single();
+                //data = _dapper.FromSql<Question>($"EXEC SP_SelectQuestion {0},{1}", QuesId, MenuId).ToList().Single();
 
             }catch(Exception e)
             {
