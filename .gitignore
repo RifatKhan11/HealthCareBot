@@ -21,3 +21,11 @@
 *.cache
 /Opus_ChatBot_HealthCare_8/Opus_ChatBot_HealthCare_8/obj/Debug/net8.0/Opus_ChatBot_HealthCare_8.csproj.FileListAbsolute.txt
 *.json
+*.config
+*.dll
+*.exe
+*.pdb
+*.props
+*.Up2Date
+*.BuildWithSkipAnalyzers
+*.txt
