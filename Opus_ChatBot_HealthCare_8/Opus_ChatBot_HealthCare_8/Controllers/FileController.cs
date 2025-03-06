@@ -35,7 +35,7 @@ namespace Opus_ChatBot_HealthCare_8.Controllers
             {
                 //baseUrl = "https://tota.azurewebsites.net/",
                 baseUrl = "http://115.127.99.113:239/",
-                //baseUrl = "https://opusbot.opus-bd.com:93/",
+                //baseUrl = "https://Opus_ChatBot_HealthCare_8.opus-bd.com:93/",
                 //baseUrl = "http://localhost:23997/",
                 //baseUrl = "https://dataqbd.com/",
                 Files = await fileService.GetAllFiles(FbPageId)
@@ -92,7 +92,7 @@ namespace Opus_ChatBot_HealthCare_8.Controllers
             {
                 //baseUrl = "https://tota.azurewebsites.net/",
                 baseUrl = "http://103.95.38.180/",
-                // baseUrl = "https://opusbot.opus-bd.com/",
+                // baseUrl = "https://Opus_ChatBot_HealthCare_8.opus-bd.com/",
                 // baseUrl = "https://424f108a.ngrok.io/",
                 //baseUrl = "http://localhost:23997/",
                 //baseUrl = "https://dataqbd.com/",

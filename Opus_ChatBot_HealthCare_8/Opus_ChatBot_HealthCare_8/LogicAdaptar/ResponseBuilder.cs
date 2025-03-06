@@ -61,12 +61,12 @@ namespace Opus_ChatBot_HealthCare_8.LogicAdaptar
             }
             this.responseBuilderService = responseBuilderService;
             this.oTPService = oTPService;
-            //baseUrl = "https://tota.azurewebsites.net";opusbot.opus-bd.com
+            //baseUrl = "https://tota.azurewebsites.net";Opus_ChatBot_HealthCare_8.opus-bd.com
             // baseUrl = "https://f96a575b.ngrok.io";
             // baseUrl = "https://424f108a.ngrok.io";
             baseUrl = "http://103.95.38.180/";
             //baseUrl = "http://localhost:23997/";
-            //baseUrl = "https://opusbot.opus-bd.com:93";
+            //baseUrl = "https://Opus_ChatBot_HealthCare_8.opus-bd.com:93";
             //baseUrl = "https://dataqbd.com/";
 
         }

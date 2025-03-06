@@ -166,98 +166,7 @@ namespace Opus_ChatBot_HealthCare_8.HUB
                 string[] values = new string[] { "a", "b", "c", "d" };
                 int menuId = 0;
                 string PassportNo = "";
-                //if (message.ToLower() == "yes" && postBack.Contains("KWA"))
-                //{
-                //    values = postBack.Split(";");
-                //    int Id = Convert.ToInt32(values[1]);
-
-                //    int FbPageId = await facebookService.GetFacebookpageId(pageId);
-                //    var unknownquestion = await keyWordQuesService.getunknowquestionbyuserid(userId);
-                //    KnowledgeHitLog knowledgeHitLog = new KnowledgeHitLog
-                //    {
-                //        keyWordQuesAnsId=Id,
-                //        facebookPageId=FbPageId,
-                //        unKnownKeyWordQuestionId=unknownquestion.Id,
-                //        dateTime=DateTime.Now,
-                //        botKey = botKey,
-                //        connectionId = connectionId
-                //    };
-                //  await  knowledgeService.SaveKnowledgeHitLog(knowledgeHitLog);
-
-
-                //}
-
-
-                //if (postBack.StartsWith("menues") || postBack.StartsWith("menuel"))
-                //{
-                //    string s = postBack;
-                //    values = s.Split(',');
-                //    if (values[3] == "0")
-                //    {
-                //        BE = "Bangla";
-                //    }
-                //    else
-                //    {
-                //        BE = "English";
-                //    }
-                //    postBack = values[0];
-                //    menuId= Convert.ToInt32(values[1]);
-                //    if(menuId==-1||menuId==-1)
-                //    {
-                //        menuId = 0;
-                //        postBack = "menu";
-                //        message = "menu";
-                //    }
-                //    else if (menuId == 0 || menuId == 0)
-                //    {
-                //        menuId = 0;
-                //        postBack = "menu";
-                //        message = "মেনু";
-                //    }
-                //}
-                //if (postBack.StartsWith("passport"))
-                //{
-                //    passportdata = postBack;
-                //    string s = postBack;
-                //    values = s.Split(',');
-                //    if (values[1] == "Bangla")
-                //    {
-                //        BEE = "Bangla";
-                //    }
-                //    else
-                //    {
-                //        BEE = "English";
-                //    }
-                //    postBack = values[0];
-                //}
-
-                //if (postBack.StartsWith("complain-data"))
-                //{
-                //    passportdata = postBack;
-                //    string s = postBack;
-                //    values = s.Split(',');
-
-                //    postBack = values[0];
-                //    PassportNo= values[1];
-                //}
-                //if (postBack.StartsWith("Suggestion-data"))
-                //{
-                //    passportdata = postBack;
-                //    string s = postBack;
-                //    values = s.Split(',');
-
-                //    postBack = values[0];
-                //    PassportNo = values[1];
-                //}
-                //if (postBack.StartsWith("appointment"))
-                //{
-                //    passportdata = postBack;
-                //    string s = postBack;
-                //    values = s.Split(',');
-
-                //    postBack = values[0];
-                //    PassportNo = values[1];
-                //}
+                
 
 
                 string flow = "default";
@@ -272,18 +181,6 @@ namespace Opus_ChatBot_HealthCare_8.HUB
                     flow = botFlowService.UpdateFlow(combinedId, "default");
                     serviceFlowService.CLearServiceData(combinedId);
                 }
-                //else if (postBack == "passport")
-                //{
-                //    Console.WriteLine("\n\n\n\n Post Back: " + postBack + "\n\n\n\n");
-                //    //flow = botFlowService.UpdateFlow(combinedId, postBack);
-
-                //    flow = botFlowService.UpdateFlow(combinedId, passportdata);
-                //    string s = flow;
-                //    values = s.Split(',');
-                //    flow = values[0];
-                //    BEE = values[1];
-                //    serviceFlowService.InitNewService(combinedId, postBack, "start");
-                //}
                 else if (postBack == "menues")
                 {
 
@@ -301,29 +198,6 @@ namespace Opus_ChatBot_HealthCare_8.HUB
 
 
                 }
-                //else if (postBack == "menuel")
-                //{
-                //    flow = botFlowService.UpdateFlow(combinedId, "menuel");
-
-
-                //}
-                //else if (postBack == "complain-data")
-                //{
-                //    flow = botFlowService.UpdateFlow(combinedId, "complain-data");
-
-
-                //}
-                //else if (postBack == "Suggestion-data")
-                //{
-                //    flow = botFlowService.UpdateFlow(combinedId, "Suggestion-data");
-
-
-                //}
-                //else if (postBack == "menuesq")
-                //{
-                //    flow = botFlowService.UpdateFlow(combinedId, "getmenuq");
-
-                //}
                 else if (postBack == "appointment")
                 {
                     flow = botFlowService.UpdateFlow(combinedId, "appointment");
@@ -495,10 +369,6 @@ namespace Opus_ChatBot_HealthCare_8.HUB
                         var qdata = await _doctorInfoService.GetDoctorListbymenuid(Convert.ToInt32(values[1]));
                         if (BE == "Bangla")
                         {
-                            //if (qdata.AnswerText != string.Empty || qdata.AnswerText != null)
-                            //{
-                            //    messages.Add("{ \"msg\":\"" + qdata.AnswerText + "</div>\"}");
-                            //}
                             if (qdata.Count() > 0)
                             {
                                 foreach (DoctorInfo d in qdata)
@@ -508,7 +378,6 @@ namespace Opus_ChatBot_HealthCare_8.HUB
                                                     "<button onclick =ClickedMenuMenu(" + d.Id + "," + -1 + ") class='btn-menu' id = 'btnbanglas' class = 'btnbanglas' style='border:1px solid #006CFF; color: #006CFF; padding: 5px 10px 5px 10px; margin-top: 5px; margin-left: 3px; border-radius: 40px; cursor: pointer;'>Appointment</button>" +
                                                 "</div>";
                                 }
-                                //messages.Add("{ \"msg\":\"Please Select Menu from Below <br>" + btndata + "</div>\"}");
                             }
                             else
                             {
@@ -538,12 +407,8 @@ namespace Opus_ChatBot_HealthCare_8.HUB
                                                     "<button onclick =ClickedAppointment(" + d.Id + "," + 1 + "," + 1 + "," + "''" + ") id = 'btnbanglas' class = 'btnbanglas' style='border:1px solid #006CFF; color: #006CFF; padding: 5px 10px 5px 10px; margin-top: 5px; margin-left: 3px; border-radius: 40px; cursor: pointer;'>Appointment</button>" +
                                                 "</div><p>____________________________</p>";
                                 }
-                                //messages.Add("{ \"msg\":\"Please Select Menu from Below <br>" + btndata + "</div>\"}");
                             }
-                            //if (qdata.AnswerTextEN != string.Empty || qdata.AnswerTextEN != null)
-                            //{
-                            //    messages.Add("{ \"msg\":\"" + qdata.AnswerTextEN + "</div>\"}");
-                            //}
+                            
                             else
                             {
 
@@ -565,7 +430,6 @@ namespace Opus_ChatBot_HealthCare_8.HUB
 
                     if (message != "")
                         messages = await hubServiceManager.QuesReplayService(nick, pageId, message, postBack, userId);
-                    //else messages.Add("{ \"msg\":\"Hi There, <br> How Can I help you?\"}");
 
                     else
                     {
@@ -683,12 +547,6 @@ namespace Opus_ChatBot_HealthCare_8.HUB
 
                 }
 
-                //else if(flow == "getquestions")
-                //{
-                //    messages = await _botService.CustomInputMessageGenerator(menuId, botKey, connectionId);
-
-
-                //}
 
                 #endregion
 

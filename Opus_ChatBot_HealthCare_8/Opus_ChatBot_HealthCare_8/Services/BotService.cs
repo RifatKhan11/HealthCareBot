@@ -244,8 +244,12 @@ namespace Opus_ChatBot_HealthCare_8.Services
 
 
 
-            var docId2 = await _context.DoctorInfos.Where(x => x.name == message && x.branchInfoId == user.branchId).AsNoTracking().LastOrDefaultAsync();
-
+            //var docId2 = await _context.DoctorInfos.Where(x => x.name == message && x.branchInfoId == user.branchId).AsNoTracking().LastOrDefaultAsync();
+            var docId2 = await _context.DoctorInfos
+                                .Where(x => x.name == message && x.branchInfoId == user.branchId)
+                                .AsNoTracking()
+                                .OrderByDescending(x => x.Id) // Assuming 'Id' determines the latest record
+                                .FirstOrDefaultAsync();
 
             DateTime currentDate = DateTime.Now;
             #region Slots Api Call
@@ -266,7 +270,9 @@ namespace Opus_ChatBot_HealthCare_8.Services
                 if (doctorSlot2.Count == 1)
                 {
                     hasSlot = false;
-                    var qdata1 = await _context.MessageLogs.Where(x => x.connectionId == connectionId && x.branchInfoId == user.branchId).LastOrDefaultAsync();
+                    var qdata1 = await _context.MessageLogs
+                        .Where(x => x.connectionId == connectionId && x.branchInfoId == user.branchId)
+                        .OrderByDescending(x=>x.Id).FirstOrDefaultAsync();
 
                     qdata1.nextNodeId = user.branchId == 1 ? 501 : 1984;
                     _context.Entry(qdata1).State = EntityState.Modified;
@@ -287,7 +293,7 @@ namespace Opus_ChatBot_HealthCare_8.Services
                 }
                 else
                 {
-                    var qdata1 = await _context.MessageLogs.Where(x => x.connectionId == connectionId && x.branchInfoId == user.branchId).LastOrDefaultAsync();
+                    var qdata1 = await _context.MessageLogs.Where(x => x.connectionId == connectionId && x.branchInfoId == user.branchId).OrderByDescending(x=>x.Id).FirstOrDefaultAsync();
 
                     //qdata1.nextNodeId = user.branchId == 1 ? 497 : 1982;
                     //qdata1.nextNodeId = user.branchId == 1 ? 390 : 1885;
@@ -378,7 +384,7 @@ namespace Opus_ChatBot_HealthCare_8.Services
 
                     string question = null;
 
-                    if (await _context.DoctorInfos.Where(x => x.name == message && x.branchInfoId == user.branchId).AsNoTracking().LastOrDefaultAsync() != null)
+                    if (await _context.DoctorInfos.Where(x => x.name == message && x.branchInfoId == user.branchId).AsNoTracking().OrderByDescending(x => x.Id).FirstOrDefaultAsync() != null)
                     {
                         question = "Enter Dr. Name";
 
@@ -389,7 +395,7 @@ namespace Opus_ChatBot_HealthCare_8.Services
                         //_context.Entry(qdata1).State = EntityState.Modified;
                         //await _context.SaveChangesAsync();
                     }
-                    if (await _context.DoctorSpecializations.Where(x => x.name == message.ToLower().Trim() && x.branchInfoId == user.branchId).AsNoTracking().LastOrDefaultAsync() != null)
+                    if (await _context.DoctorSpecializations.Where(x => x.name == message.ToLower().Trim() && x.branchInfoId == user.branchId).AsNoTracking().OrderByDescending(x => x.Id).FirstOrDefaultAsync() != null)
                     {
                         question = "Please enter specializations name";
                     }
@@ -456,7 +462,7 @@ namespace Opus_ChatBot_HealthCare_8.Services
                 {
 
 
-                    var qdata1 = await _context.MessageLogs.Where(x => x.connectionId == connectionId && x.branchInfoId == user.branchId).LastOrDefaultAsync();
+                    var qdata1 = await _context.MessageLogs.Where(x => x.connectionId == connectionId && x.branchInfoId == user.branchId).OrderByDescending(x => x.Id).FirstOrDefaultAsync();
 
                     //qdata.nextNodeId = 371;
                     //qdata1.nextNodeId = user.branchId == 1 ? 497 : 1982;
@@ -1316,24 +1322,24 @@ namespace Opus_ChatBot_HealthCare_8.Services
 
             }
 
-                //var data = _context.QuestionNavigations.Where(x => x.requestQuestionId == questionId && x.botKey == botKey).AsNoTracking().Select(x => x.responseQuestion).ToList();
-                var data = _context.keyWordQuesAns.Where(x => x.isDelete != 1 && x.Id == questionId && x.botKey == botKey && x.branchInfoId == user.branchId).AsNoTracking().FirstOrDefault();
+            //var data = _context.QuestionNavigations.Where(x => x.requestQuestionId == questionId && x.botKey == botKey).AsNoTracking().Select(x => x.responseQuestion).ToList();
+            var data = _context.keyWordQuesAns.Where(x => x.isDelete != 1 && x.Id == questionId && x.botKey == botKey && x.branchInfoId == user.branchId).AsNoTracking().FirstOrDefault();
 
-                if (nextNodeId != "")
-                {
-                    data.nextNodeId = Convert.ToInt32(nextNodeId.Trim());
-                }
-
-                if (data.nextNodeId != null)
-                {
-                    var nextNode = _context.keyWordQuesAns.Where(x => x.isDelete != 1 && x.Id == data.nextNodeId && x.branchInfoId == user.branchId).AsNoTracking().FirstOrDefault();
-
-                    var result = _context.keyWordQuesAns.Where(x => x.isDelete != 1 && x.questionKey == nextNode.questionKey && x.branchInfoId == user.branchId).AsNoTracking().ToList();
-
-                    return result;
-                }
-                return new List<KeyWordQuesAns>();
+            if (nextNodeId != "")
+            {
+                data.nextNodeId = Convert.ToInt32(nextNodeId.Trim());
             }
+
+            if (data.nextNodeId != null)
+            {
+                var nextNode = _context.keyWordQuesAns.Where(x => x.isDelete != 1 && x.Id == data.nextNodeId && x.branchInfoId == user.branchId).AsNoTracking().FirstOrDefault();
+
+                var result = _context.keyWordQuesAns.Where(x => x.isDelete != 1 && x.questionKey == nextNode.questionKey && x.branchInfoId == user.branchId).AsNoTracking().ToList();
+
+                return result;
+            }
+            return new List<KeyWordQuesAns>();
+        }
 
 
 
@@ -2184,7 +2190,7 @@ namespace Opus_ChatBot_HealthCare_8.Services
             var flows = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && x.botKey == botKey && x.status == 1 && x.branchInfoId == user.branchId).AsNoTracking().OrderBy(x => x.StepNo).ToListAsync();
             var data = await _context.MenuReaders.Where(x => x.menuId == menuId && x.botKey == botKey && !flows.Select(y => y.questionText).Contains(x.message) && x.branchInfoId == user.branchId).OrderBy(x => x.stepNo).AsNoTracking().FirstOrDefaultAsync();
 
-            string responseApi = await _context.Menus.Where(x => x.Id == menuId && x.branchInfoId == user.branchId).Select(x => x.responseApi).AsNoTracking().LastOrDefaultAsync();
+            string responseApi = await _context.Menus.Where(x => x.Id == menuId && x.branchInfoId == user.branchId).OrderByDescending(x => x.Id).Select(x => x.responseApi).AsNoTracking().FirstOrDefaultAsync();
 
             if (flows.Count() > 0 && data == null)
             {
@@ -2240,13 +2246,13 @@ namespace Opus_ChatBot_HealthCare_8.Services
         {
             var user = await _context.ChatbotInfos.Where(x => x.botKey == botKey).Select(x => x.ApplicationUser).AsNoTracking().FirstOrDefaultAsync();
 
-            if (await _context.DoctorInfos.Where(x => x.name == message && x.branchInfoId == user.branchId && x.isDelete != 1).AsNoTracking().LastOrDefaultAsync() != null)
+            if (await _context.DoctorInfos.Where(x => x.name == message && x.branchInfoId == user.branchId && x.isDelete != 1).AsNoTracking().OrderByDescending(x => x.Id).FirstOrDefaultAsync() != null)
             {
                 var data = await _context.ServiceFlows.Where(x => x.botKey == botKey && x.branchInfoId == user.branchId && x.questionText == "Enter Dr. Name" && x.connectionId == connectionId && x.status == 0).OrderBy(x => x.DateTime).LastOrDefaultAsync();
 
                 return data;
             }
-            else if (await _context.DoctorSpecializations.Where(x => x.name == message && x.branchInfoId == user.branchId && x.isDelete != 1).AsNoTracking().LastOrDefaultAsync() != null)
+            else if (await _context.DoctorSpecializations.Where(x => x.name == message && x.branchInfoId == user.branchId && x.isDelete != 1).AsNoTracking().OrderByDescending(x => x.Id).FirstOrDefaultAsync() != null)
             {
                 var data = await _context.ServiceFlows.Where(x => x.botKey == botKey && x.branchInfoId == user.branchId && x.questionText == "Please enter specializations name" && x.connectionId == connectionId && x.status == 0).OrderBy(x => x.DateTime).LastOrDefaultAsync();
 
@@ -2350,7 +2356,7 @@ namespace Opus_ChatBot_HealthCare_8.Services
 
         public async Task<string> GetLastOTPByConnectionId(string connectionId)
         {
-            var data = await _context.OTPCodes.Where(x => x.connectionId == connectionId).AsNoTracking().Select(x => x.otpCode).LastOrDefaultAsync();
+            var data = await _context.OTPCodes.Where(x => x.connectionId == connectionId).AsNoTracking().OrderBy(x=>x.Id).Select(x => x.otpCode).LastOrDefaultAsync();
 
             return data;
         }
@@ -2388,7 +2394,7 @@ namespace Opus_ChatBot_HealthCare_8.Services
                     Console.WriteLine(ex.Message);
                 }
 
-                var phoneNumber = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && (x.questionText == "Phone") && x.answerText != null).AsNoTracking().Select(x => x.answerText).LastOrDefaultAsync();
+                var phoneNumber = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && (x.questionText == "Phone") && x.answerText != null).AsNoTracking().OrderBy(x=>x.Id).Select(x => x.answerText).LastOrDefaultAsync();
 
                 var otpHtml = "";
 
@@ -2458,7 +2464,7 @@ namespace Opus_ChatBot_HealthCare_8.Services
                 //var baseUrl2 = $"{baseUrl}";
                 //var url = await ApiCall.GetApiResponseAsync<List<patientViewModel>>(baseUrl2, bearerToken);
 
-                var phoneNumber = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && (x.questionText == "Phone") && x.answerText != null).AsNoTracking().Select(x => x.answerText).LastOrDefaultAsync();
+                var phoneNumber = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && (x.questionText == "Phone") && x.answerText != null).AsNoTracking().OrderBy(x=>x.Id).Select(x => x.answerText).LastOrDefaultAsync();
 
 
 
@@ -2609,9 +2615,9 @@ namespace Opus_ChatBot_HealthCare_8.Services
             //var u = globalService.GetOnlineUsers();
             var result = new List<string>();
 
-            var isValid = await _context.OTPCodes.Where(x => x.otpCode == otp).AsNoTracking().LastOrDefaultAsync();
+            var isValid = await _context.OTPCodes.Where(x => x.otpCode == otp).AsNoTracking().OrderByDescending(x => x.Id).FirstOrDefaultAsync();
 
-            var lastmsg = await _context.MessageLogs.Where(x => x.connectionId == isValid.connectionId).AsNoTracking().OrderBy(x => x.Id).LastOrDefaultAsync();
+            var lastmsg = await _context.MessageLogs.Where(x => x.connectionId == isValid.connectionId).AsNoTracking().OrderByDescending(x => x.Id).FirstOrDefaultAsync();
 
             if (isValid != null)
             {
@@ -2876,14 +2882,14 @@ namespace Opus_ChatBot_HealthCare_8.Services
 
                         if (item.refName == "APPOINTMENTCONFIRMATION")
                         {
-                            var doctorName = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && x.branchInfoId == user.branchId && (x.questionText == "Enter Dr. Name" || x.questionText == "Doctor search by department")).Select(x => x.answerText).AsNoTracking().LastOrDefaultAsync();
-                            var uhid = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && x.branchInfoId == user.branchId && x.questionText == "Uhid").Select(x => x.answerText).AsNoTracking().LastOrDefaultAsync();
-                            var name = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && x.branchInfoId == user.branchId && x.questionText == "FullName").Select(x => x.answerText).AsNoTracking().LastOrDefaultAsync();
-                            var email = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && x.branchInfoId == user.branchId && x.questionText == "Email").Select(x => x.answerText).AsNoTracking().LastOrDefaultAsync();
-                            var phone = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && x.branchInfoId == user.branchId && x.questionText == "Phone").Select(x => x.answerText).AsNoTracking().LastOrDefaultAsync();
-                            var drdesignation = await _context.DoctorInfos.Where(x => x.name == doctorName && x.branchInfoId == user.branchId).Select(x => x.designationName).AsNoTracking().LastOrDefaultAsync();
-                            var AppointDate = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && x.branchInfoId == user.branchId && x.questionText == "AppointDate").Select(x => x.answerText).AsNoTracking().LastOrDefaultAsync();
-                            var TimeSlot = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && x.branchInfoId == user.branchId && x.questionText == "TimeSlot").Select(x => x.answerText).AsNoTracking().LastOrDefaultAsync();
+                            var doctorName = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && x.branchInfoId == user.branchId && (x.questionText == "Enter Dr. Name" || x.questionText == "Doctor search by department")).OrderBy(x=>x.Id).Select(x => x.answerText).AsNoTracking().LastOrDefaultAsync();
+                            var uhid = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && x.branchInfoId == user.branchId && x.questionText == "Uhid").OrderBy(x => x.Id).Select(x => x.answerText).AsNoTracking().LastOrDefaultAsync();
+                            var name = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && x.branchInfoId == user.branchId && x.questionText == "FullName").OrderBy(x => x.Id).Select(x => x.answerText).AsNoTracking().LastOrDefaultAsync();
+                            var email = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && x.branchInfoId == user.branchId && x.questionText == "Email").OrderBy(x => x.Id).Select(x => x.answerText).AsNoTracking().LastOrDefaultAsync();
+                            var phone = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && x.branchInfoId == user.branchId && x.questionText == "Phone").OrderBy(x => x.Id).Select(x => x.answerText).AsNoTracking().LastOrDefaultAsync();
+                            var drdesignation = await _context.DoctorInfos.Where(x => x.name == doctorName && x.branchInfoId == user.branchId).OrderBy(x => x.Id).Select(x => x.designationName).AsNoTracking().LastOrDefaultAsync();
+                            var AppointDate = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && x.branchInfoId == user.branchId && x.questionText == "AppointDate").OrderBy(x => x.Id).Select(x => x.answerText).AsNoTracking().LastOrDefaultAsync();
+                            var TimeSlot = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && x.branchInfoId == user.branchId && x.questionText == "TimeSlot").OrderBy(x => x.Id).Select(x => x.answerText).AsNoTracking().LastOrDefaultAsync();
                             var userWithUhid = await _context.UserInfos.Where(x => x.UHID == uhid).FirstOrDefaultAsync();
                             var part1 = "";
                             if (userWithUhid != null)
@@ -3228,7 +3234,7 @@ namespace Opus_ChatBot_HealthCare_8.Services
                         }
                         else if (item.refName == "SPECIFICDOCTOR")
                         {
-                            string searchTxt = await _context.ServiceFlows.Where(x => x.answerText != null && x.questionText == "Please enter doctor name" && x.branchInfoId == user.branchId && x.connectionId == connectionId).AsNoTracking().OrderByDescending(x => x.DateTime).Select(x => x.answerText).LastOrDefaultAsync();
+                            string searchTxt = await _context.ServiceFlows.Where(x => x.answerText != null && x.questionText == "Please enter doctor name" && x.branchInfoId == user.branchId && x.connectionId == connectionId).AsNoTracking().OrderByDescending(x => x.DateTime).OrderBy(x => x.Id).Select(x => x.answerText).LastOrDefaultAsync();
 
                             doctors = await _context.DoctorInfos.Where(x => x.botKey == botKey && x.name.Contains(searchTxt) && x.branchInfoId == user.branchId && x.isDelete != 1).ToListAsync();
 
@@ -3396,7 +3402,7 @@ namespace Opus_ChatBot_HealthCare_8.Services
                     {
                         if (item.refName == "NEXT7DAYS")
                         {
-                            var doctorServiceFlow = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && x.branchInfoId == user.branchId && (x.answerText != null && (x.questionText == "Enter Dr. Name" || x.questionText == "Please enter doctor name" || x.questionText == "Doctor search by department"))).AsNoTracking().LastOrDefaultAsync();
+                            var doctorServiceFlow = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && x.branchInfoId == user.branchId && (x.answerText != null && (x.questionText == "Enter Dr. Name" || x.questionText == "Please enter doctor name" || x.questionText == "Doctor search by department"))).AsNoTracking().OrderByDescending(x => x.Id).FirstOrDefaultAsync();
                             var doctorWeeks = await _context.DoctorVisitTimePeriods.Where(x => x.doctorInfo.name == doctorServiceFlow.answerText && x.branchInfoId == user.branchId).Select(x => x.weeks.name).AsNoTracking().Distinct().ToListAsync();
                             DateTime currentDate = DateTime.Now;
                             List<string> next7Days = new List<string>();
@@ -3617,11 +3623,11 @@ namespace Opus_ChatBot_HealthCare_8.Services
 
                             string htmlContent = "<table>" +
                                                     "<tbody>" +
-                                                            "<tr><td style='font-weight: bold; text-align: right;'>Full Name</td><td>: " + chatData.Where(x => x.questionText == "FullName").Select(x => x.answerText).LastOrDefault() + "</td></tr>" +
-                                                            "<tr><td style='font-weight: bold; text-align: right;'>Date of Birth</td><td>: " + chatData.Where(x => x.questionText == "DateOfBirth").Select(x => x.answerText).LastOrDefault() + "</td></tr>" +
-                                                            "<tr><td style='font-weight: bold; text-align: right;'>Sex</td><td>: " + chatData.Where(x => x.questionText == "Gender").Select(x => x.answerText).LastOrDefault() + "</td></tr>" +
-                                                            "<tr><td style='font-weight: bold; text-align: right;'>Mobile</td><td>: " + chatData.Where(x => x.questionText == "Phone").Select(x => x.answerText).LastOrDefault() + "</td></tr>" +
-                                                            "<tr><td style='font-weight: bold; text-align: right;'>Email</td><td style='font-size:10px;'>: " + chatData.Where(x => x.questionText == "Email").Select(x => x.answerText).LastOrDefault() + "</td></tr>" +
+                                                            "<tr><td style='font-weight: bold; text-align: right;'>Full Name</td><td>: " + chatData.Where(x => x.questionText == "FullName").OrderBy(x => x.Id).Select(x => x.answerText).LastOrDefault() + "</td></tr>" +
+                                                            "<tr><td style='font-weight: bold; text-align: right;'>Date of Birth</td><td>: " + chatData.Where(x => x.questionText == "DateOfBirth").OrderBy(x => x.Id).Select(x => x.answerText).LastOrDefault() + "</td></tr>" +
+                                                            "<tr><td style='font-weight: bold; text-align: right;'>Sex</td><td>: " + chatData.Where(x => x.questionText == "Gender").OrderBy(x => x.Id).Select(x => x.answerText).LastOrDefault() + "</td></tr>" +
+                                                            "<tr><td style='font-weight: bold; text-align: right;'>Mobile</td><td>: " + chatData.Where(x => x.questionText == "Phone").OrderBy(x => x.Id).Select(x => x.answerText).LastOrDefault() + "</td></tr>" +
+                                                            "<tr><td style='font-weight: bold; text-align: right;'>Email</td><td style='font-size:10px;'>: " + chatData.Where(x => x.questionText == "Email").OrderBy(x => x.Id).Select(x => x.answerText).LastOrDefault() + "</td></tr>" +
                                                             "<tr><td style='font-weight: bold; text-align: right;'>Doctor</td><td>: " + doctorName + "</td></tr>" +
                                                             "<tr><td style='font-weight: bold; text-align: center' colspan='2'>Preferred Date and Time for Appointment</td></tr>" +
                                                             "<tr><td style='font-weight: bold; text-align: right;'>Date</td><td>: " + Convert.ToDateTime(appointDate).ToString("dd-MMM-yyyy") + "</td></tr>" +
@@ -3634,12 +3640,12 @@ namespace Opus_ChatBot_HealthCare_8.Services
                             if (_configuration["Project:isLive"] == "YES")
                             {
                                 smsAPI.Single_Sms(phoneNumber, reply);
-                                await SendHTMLEmail(chatData.Where(x => x.questionText == "Email" && x.branchInfoId == user.branchId).Select(x => x.answerText).LastOrDefault(), "Chatbot Appointment Request", htmlContent);
+                                await SendHTMLEmail(chatData.Where(x => x.questionText == "Email" && x.branchInfoId == user.branchId).OrderBy(x => x.Id).Select(x => x.answerText).LastOrDefault(), "Chatbot Appointment Request", htmlContent);
                             }
                             else
                             {
                                 await this.SendSMSAsync(phoneNumber, reply);
-                                await SendHTMLEmail(chatData.Where(x => x.questionText == "Email" && x.branchInfoId == user.branchId).Select(x => x.answerText).LastOrDefault(), "Chatbot Appointment Request", htmlContent);
+                                await SendHTMLEmail(chatData.Where(x => x.questionText == "Email" && x.branchInfoId == user.branchId).OrderBy(x => x.Id).Select(x => x.answerText).LastOrDefault(), "Chatbot Appointment Request", htmlContent);
                             }
 
                             int btnClickId = 495;
@@ -3891,29 +3897,38 @@ namespace Opus_ChatBot_HealthCare_8.Services
                         var knowledge = await _context.BotKnowledges.AsNoTracking().Where(x => x.Id == maxPercentageKnowledgeId && x.branchInfoId == user.branchId).FirstOrDefaultAsync();
                         if (knowledge.keyWordQuesAnsId != null)
                         {
-                            var questionsByKeyword = await _context.keyWordQuesAns.Where(x => x.Id == knowledge.keyWordQuesAnsId && x.branchInfoId == user.branchId).AsNoTracking().FirstOrDefaultAsync();
+                            try
+                            {
+                                var questionsByKeyword = await _context.keyWordQuesAns.Where(x => x.Id == knowledge.keyWordQuesAnsId && x.branchInfoId == user.branchId).AsNoTracking().FirstOrDefaultAsync();
+                                var msglog = new MessageLog
+                                {
+                                    Id = 0,
+                                    botKey = botKey,
+                                    connectionId = connectionId,
+                                    message = questionsByKeyword.answer,
+                                    menuId = null,
+                                    Type = msg == "menu" ? "Menu" : "text",
+                                    rawMessage = questionsByKeyword.answer,
+                                    entryDate = DateTime.Now,
+                                    KeyWordQuesAnsId = null,
+                                    nextNodeId = questionsByKeyword.nextNodeId,
+                                    branchInfoId = user.branchId
+                                };
+                                _context.MessageLogs.Add(msglog);
+                                await _context.SaveChangesAsync();
+                                //Log Message End
+
+
+                                result = await this.SendNextMessageByNodeId(botKey, connectionId, knowledge.keyWordQuesAnsId);
+                            }
+                            catch (Exception ex)
+                            {
+
+                                throw;
+                            }
 
                             //Log Message Start
-                            var msglog = new MessageLog
-                            {
-                                Id = 0,
-                                botKey = botKey,
-                                connectionId = connectionId,
-                                message = questionsByKeyword.answer,
-                                menuId = null,
-                                Type = msg == "menu" ? "Menu" : "text",
-                                rawMessage = questionsByKeyword.answer,
-                                entryDate = DateTime.Now,
-                                KeyWordQuesAnsId = null,
-                                nextNodeId = questionsByKeyword.nextNodeId,
-                                branchInfoId = user.branchId
-                            };
-                            _context.MessageLogs.Add(msglog);
-                            await _context.SaveChangesAsync();
-                            //Log Message End
-
-
-                            result = await this.SendNextMessageByNodeId(botKey, connectionId, knowledge.keyWordQuesAnsId);
+                            
                         }
 
                         else
@@ -3988,7 +4003,7 @@ namespace Opus_ChatBot_HealthCare_8.Services
         }
         public async Task<string> SaveUserByOTP(string otp, string uhid)
         {
-            var otpCode = await _context.OTPCodes.Where(x => x.otpCode == otp).AsNoTracking().LastOrDefaultAsync();
+            var otpCode = await _context.OTPCodes.Where(x => x.otpCode == otp).AsNoTracking().OrderBy(x => x.Id).LastOrDefaultAsync();
             if (otpCode != null)
             {
                 var inputs = await _context.ServiceFlows.Where(x => x.connectionId == otpCode.connectionId && x.answerText != null && x.branchInfoId == otpCode.branchInfoId).AsNoTracking().OrderByDescending(x => x.DateTime).ToListAsync();
@@ -4217,7 +4232,7 @@ namespace Opus_ChatBot_HealthCare_8.Services
                 };
                 _context.OTPCodes.Add(otpData);
                 await _context.SaveChangesAsync();
-                var phoneNumber = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && (x.questionText == "Phone" || x.questionText == "Please enter registered mobile number") && x.answerText != null).AsNoTracking().Select(x => x.answerText).LastOrDefaultAsync();
+                var phoneNumber = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && (x.questionText == "Phone" || x.questionText == "Please enter registered mobile number") && x.answerText != null).AsNoTracking().OrderBy(x => x.Id).Select(x => x.answerText).LastOrDefaultAsync();
                 var otpmsg = "<p>Please enter otp received on your number</p>";
                 var otpHtml = "";
 
@@ -4287,7 +4302,7 @@ namespace Opus_ChatBot_HealthCare_8.Services
                 {
                     if (item.refName == "RESCHEDULE")
                     {
-                        var phone = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && x.questionText == "Phone").AsNoTracking().LastOrDefaultAsync();
+                        var phone = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && x.questionText == "Phone").AsNoTracking().OrderBy(x => x.Id).LastOrDefaultAsync();
                         if (phone != null)
                         {
                             //var schedules = await _context.AppoinmentInfos.Include(x => x.userInfo).Include(x => x.doctorInfo).Where(x => x.userInfo.Mobile == phone.answerText && x.status == 0).AsNoTracking().ToListAsync();
@@ -4348,7 +4363,7 @@ namespace Opus_ChatBot_HealthCare_8.Services
                     if (item.refName == "NEXT7DAYS")
                     {
 
-                        var doctorServiceFlow = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && (x.questionText == "Enter Dr. Name" || x.questionText == "Doctor search by department")).AsNoTracking().LastOrDefaultAsync();
+                        var doctorServiceFlow = await _context.ServiceFlows.Where(x => x.connectionId == connectionId && (x.questionText == "Enter Dr. Name" || x.questionText == "Doctor search by department")).AsNoTracking().OrderBy(x => x.Id).LastOrDefaultAsync();
                         var doctorWeeks = await _context.DoctorVisitTimePeriods.Where(x => x.doctorInfo.name == doctorServiceFlow.answerText).Select(x => x.weeks.name).AsNoTracking().Distinct().ToListAsync();
                         DateTime currentDate = DateTime.Now;
                         List<string> next7Days = new List<string>();
@@ -4504,11 +4519,11 @@ namespace Opus_ChatBot_HealthCare_8.Services
 
                         string htmlContent = "<table>" +
                                                 "<tbody>" +
-                                                        "<tr><td style='font-weight: bold; text-align: right;'>Full Name</td><td>: " + chatData.Where(x => x.questionText == "FullName").Select(x => x.answerText).LastOrDefault() + "</td></tr>" +
-                                                        "<tr><td style='font-weight: bold; text-align: right;'>Date of Birth</td><td>: " + chatData.Where(x => x.questionText == "DateOfBirth").Select(x => x.answerText).LastOrDefault() + "</td></tr>" +
-                                                        "<tr><td style='font-weight: bold; text-align: right;'>Sex</td><td>: " + chatData.Where(x => x.questionText == "Gender").Select(x => x.answerText).LastOrDefault() + "</td></tr>" +
-                                                        "<tr><td style='font-weight: bold; text-align: right;'>Mobile</td><td>: " + chatData.Where(x => x.questionText == "Phone").Select(x => x.answerText).LastOrDefault() + "</td></tr>" +
-                                                        "<tr><td style='font-weight: bold; text-align: right;'>Email</td><td style='font-size:10px;'>: " + chatData.Where(x => x.questionText == "Email").Select(x => x.answerText).LastOrDefault() + "</td></tr>" +
+                                                        "<tr><td style='font-weight: bold; text-align: right;'>Full Name</td><td>: " + chatData.Where(x => x.questionText == "FullName").OrderBy(x => x.Id).Select(x => x.answerText).LastOrDefault() + "</td></tr>" +
+                                                        "<tr><td style='font-weight: bold; text-align: right;'>Date of Birth</td><td>: " + chatData.Where(x => x.questionText == "DateOfBirth").OrderBy(x => x.Id).Select(x => x.answerText).LastOrDefault() + "</td></tr>" +
+                                                        "<tr><td style='font-weight: bold; text-align: right;'>Sex</td><td>: " + chatData.Where(x => x.questionText == "Gender").OrderBy(x => x.Id).Select(x => x.answerText).LastOrDefault() + "</td></tr>" +
+                                                        "<tr><td style='font-weight: bold; text-align: right;'>Mobile</td><td>: " + chatData.Where(x => x.questionText == "Phone").OrderBy(x => x.Id).Select(x => x.answerText).LastOrDefault() + "</td></tr>" +
+                                                        "<tr><td style='font-weight: bold; text-align: right;'>Email</td><td style='font-size:10px;'>: " + chatData.Where(x => x.questionText == "Email").OrderBy(x => x.Id).Select(x => x.answerText).LastOrDefault() + "</td></tr>" +
                                                         "<tr><td style='font-weight: bold; text-align: right;'>Doctor</td><td>: " + doctorName + "</td></tr>" +
                                                         "<tr><td style='font-weight: bold; text-align: center' colspan='2'>Preferred Date and Time for Appointment</td></tr>" +
                                                         "<tr><td style='font-weight: bold; text-align: right;'>Date</td><td>: " + Convert.ToDateTime(appointDate).ToString("dd-MMM-yyyy") + "</td></tr>" +
@@ -4524,12 +4539,12 @@ namespace Opus_ChatBot_HealthCare_8.Services
                         if (_configuration["Project:isLive"] == "YES")
                         {
                             smsAPI.Single_Sms(phoneNumber, reply);
-                            await SendHTMLEmail(chatData.Where(x => x.questionText == "Email").Select(x => x.answerText).LastOrDefault(), "Chatbot Appointment Request", htmlContent);
+                            await SendHTMLEmail(chatData.Where(x => x.questionText == "Email").OrderBy(x => x.Id).Select(x => x.answerText).LastOrDefault(), "Chatbot Appointment Request", htmlContent);
                         }
                         else
                         {
                             await this.SendSMSAsync(phoneNumber, reply);
-                            await SendHTMLEmail(chatData.Where(x => x.questionText == "Email").Select(x => x.answerText).LastOrDefault(), "Chatbot Appointment Request", htmlContent);
+                            await SendHTMLEmail(chatData.Where(x => x.questionText == "Email").OrderBy(x => x.Id).Select(x => x.answerText).LastOrDefault(), "Chatbot Appointment Request", htmlContent);
                         }
 
                         int btnClickId = 495;
@@ -4555,7 +4570,7 @@ namespace Opus_ChatBot_HealthCare_8.Services
 
         public async Task<List<string>> CancelAppointmentById(int scheduleId, string connectionId, string botKey)
         {
-            var data = await _context.AppoinmentInfos.Where(x => x.Id == scheduleId).AsNoTracking().LastOrDefaultAsync();
+            var data = await _context.AppoinmentInfos.Where(x => x.Id == scheduleId).AsNoTracking().OrderBy(x => x.Id).LastOrDefaultAsync();
 
             data.status = 5;
             data.isDelete = 1;
@@ -4607,9 +4622,9 @@ namespace Opus_ChatBot_HealthCare_8.Services
 
         public async Task<string> GetConnectionIdByOTP(string otp)
         {
-            var isValid = await _context.OTPCodes.Where(x => x.otpCode == otp).AsNoTracking().LastOrDefaultAsync();
+            var isValid = await _context.OTPCodes.Where(x => x.otpCode == otp).AsNoTracking().OrderBy(x => x.Id).LastOrDefaultAsync();
 
-            var lastmsg = await _context.MessageLogs.Where(x => x.connectionId == isValid.connectionId).AsNoTracking().OrderBy(x => x.Id).LastOrDefaultAsync();
+            var lastmsg = await _context.MessageLogs.Where(x => x.connectionId == isValid.connectionId).AsNoTracking().OrderBy(x => x.Id).OrderBy(x => x.Id).LastOrDefaultAsync();
 
             return isValid.connectionId;
         }
@@ -4617,17 +4632,30 @@ namespace Opus_ChatBot_HealthCare_8.Services
 
         public async Task<string> GetBotKeyByOTP(string otp)
         {
-            var isValid = await _context.OTPCodes.Where(x => x.otpCode == otp).AsNoTracking().LastOrDefaultAsync();
+            var isValid = await _context.OTPCodes.Where(x => x.otpCode == otp).AsNoTracking().OrderBy(x => x.Id).LastOrDefaultAsync();
 
-            var lastmsg = await _context.MessageLogs.Where(x => x.connectionId == isValid.connectionId).AsNoTracking().OrderBy(x => x.Id).LastOrDefaultAsync();
+            var lastmsg = await _context.MessageLogs.Where(x => x.connectionId == isValid.connectionId).AsNoTracking().OrderBy(x => x.Id).OrderBy(x => x.Id).LastOrDefaultAsync();
 
             return lastmsg.botKey;
         }
 
         public async Task<Models.BotModels.ConnectionInfo> GetConnectionInfoByUserId(string userid)
         {
-            var data = await _context.ConnectionInfos.Where(x => x.userId == userid).AsNoTracking().LastOrDefaultAsync();
-            return data;
+            try
+            {
+                var data = await _context.ConnectionInfos
+                            .Where(x => x.userId == userid)
+                            .AsNoTracking()
+                            .OrderByDescending(x => x.Id)
+                            .FirstOrDefaultAsync();
+                return data;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
         }
 
 
@@ -4641,7 +4669,7 @@ namespace Opus_ChatBot_HealthCare_8.Services
 
         public async Task<Models.BotModels.UserInfo> GetUserInfoByuhId(string uhid)
         {
-            var data = await _context.UserInfos.Where(x => x.UHID == uhid).AsNoTracking().LastOrDefaultAsync();
+            var data = await _context.UserInfos.Where(x => x.UHID == uhid).AsNoTracking().OrderBy(x => x.Id).LastOrDefaultAsync();
             return data;
         }
 
@@ -4664,8 +4692,13 @@ namespace Opus_ChatBot_HealthCare_8.Services
 
         public async Task<ChatbotInfo> GetChatBotInfoByBotKey(string botkey)
         {
-            var data = await _context.ChatbotInfos.Include(x => x.ApplicationUser).Where(x => x.botKey == botkey).AsNoTracking().LastOrDefaultAsync();
-
+            //var data = await _context.ChatbotInfos.Include(x => x.ApplicationUser).Where(x => x.botKey == botkey).AsNoTracking().LastOrDefaultAsync();
+            var data = await _context.ChatbotInfos
+                        .Include(x => x.ApplicationUser)
+                        .Where(x => x.botKey == botkey)
+                        .AsNoTracking()
+                        .OrderByDescending(x => x.Id) // Assuming 'Id' determines the latest entry
+                        .FirstOrDefaultAsync();
             return data;
         }
 
